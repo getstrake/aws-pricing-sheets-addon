@@ -10,30 +10,40 @@ function fetchApi({instanceType, region, purchaseType, platform, offeringClass, 
 }
 
 const filterPrices = (prices, {purchaseType, instanceType, offeringClass, paymentOption, purchaseTerm}) => {
-    purchaseType === "ondemand" ? prices.filter(filterOnDemand(instanceType));
-    : prices.filter(filterReserved({instanceType, offeringClass, paymentOption, purchaseTerm}));
-}
-
-const filterReserved = ({instanceType, offeringClass, paymentOption, purchaseTerm}) => price => {
     const paymentOptionLib = {  
        'all_upfront': 'All Upfront',
        'no_upfront': 'No Upfront',
        'partial_upfront': 'Partial Upfront'
     }
-    return price.attributes['aws:ec2:instanceType'] === instanceType &&
+    const filterReserved = price => 
+        price.attributes['aws:ec2:instanceType'] === instanceType &&
         price.attributes['aws:offerTermOfferingClass'] === offeringClass &&
         price.attributes['aws:offerTermPurchaseOption'] === paymentOptionLib[paymentOption] &&
         price.attributes['aws:offerTermLeaseLength'] === purchaseTerm + 'yr';
+    const filterOnDemand = price => {
+        return price.attributes['aws:ec2:instanceType'] === instanceType;
+    }
+    return purchaseType === "ondemand" ? 
+      prices.filter(filterOnDemand) : 
+      prices.filter(filterReserved);
 }
 
-filterOnDemand = instanceType => price => {
-    return price.attributes['aws:ec2:instanceType'] === instanceType;
+function fetchUrlCached(url) {
+    return getObjectFromCache(url) || saveObjectToCache(url, fetchUrl(url));
 }
 
 function fetchUrl(url) {
     let resp = UrlFetchApp.fetch(url);
-    if (resp.getResponseCode() != 200)
-        throw "Unable to load the URL: " + url;
-    
+    if (resp.getResponseCode() != 200) throw "Unable to load the URL: " + url;
     return JSON.parse(resp.getContentText());
+}
+
+function getObjectFromCache(key) {
+    return JSON.parse(CacheService.getScriptCache().get(Utilities.base64Encode(key)));
+}
+
+// to do: fix 'argument too large'
+function saveObjectToCache(key, value) {
+    CacheService.getScriptCache().put(Utilities.base64Encode(key), JSON.stringify(value), 3600);
+    return value;
 }
