@@ -1,4 +1,5 @@
 export class CacheLoader {
+  expireTime = 1000 * 60 * 60; // 1 hour
   constructor(private readonly cache: GoogleAppsScript.Cache.Cache) {}
 
   get(key: string): string {
@@ -21,7 +22,7 @@ export class CacheLoader {
       let encoded = Utilities.base64Encode(gzBlob.getBytes())
 
       if (encoded.length <= 100 * 1000)
-        this.cache.put(keyEncode, encoded);
+        this.cache.put(keyEncode, encoded, this.expireTime);
   }
 
   putAndReturn(key, value) {

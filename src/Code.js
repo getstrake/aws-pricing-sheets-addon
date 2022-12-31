@@ -4,15 +4,16 @@ function fetchApi(options) {
     const {instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption} = options;
     const path = `/pricing/1.0/ec2/region/${region}/${purchaseType}/${platform}/index.json`;
     const url = `${cfg.baseHost}${path}?timestamp=${Date.now()}`;
-    const response = fetchUrl(url);
-    const filteredPrices = filterPrices(response.prices, {purchaseType, instanceType, offeringClass, paymentOption, purchaseTerm});
+    const response = fetchUrlCached(url);
+    const filteredPrices = filterPrices(response.prices, options);
     const price = purchaseType === "ondemand" ? 
       filteredPrices[0].price.USD : 
       filteredPrices[0].calculatedPrice.effectiveHourlyRate.USD
     return parseFloat(price);
 }
 
-const filterPrices = (prices, {purchaseType, instanceType, offeringClass, paymentOption, purchaseTerm}) => {
+const filterPrices = (prices, options) => {
+    const {purchaseType, instanceType, offeringClass, paymentOption, purchaseTerm} = options;
     const paymentOptionLib = {  
        'all_upfront': 'All Upfront',
        'no_upfront': 'No Upfront',
