@@ -1,4 +1,7 @@
-function fetchApi({instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption}) {
+const cacheLoader = new CacheLoader(CacheService.getScriptCache());
+
+function fetchApi(options) {
+    const {instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption} = options;
     const path = `/pricing/1.0/ec2/region/${region}/${purchaseType}/${platform}/index.json`;
     const url = `${cfg.baseHost}${path}?timestamp=${Date.now()}`;
     const response = fetchUrl(url);
@@ -29,21 +32,11 @@ const filterPrices = (prices, {purchaseType, instanceType, offeringClass, paymen
 }
 
 function fetchUrlCached(url) {
-    return getObjectFromCache(url) || saveObjectToCache(url, fetchUrl(url));
+    return cacheLoader.get(url) || cacheLoader.putAndReturn(url, fetchUrl(url));
 }
 
 function fetchUrl(url) {
     let resp = UrlFetchApp.fetch(url);
     if (resp.getResponseCode() != 200) throw "Unable to load the URL: " + url;
     return JSON.parse(resp.getContentText());
-}
-
-function getObjectFromCache(key) {
-    return JSON.parse(CacheService.getScriptCache().get(Utilities.base64Encode(key)));
-}
-
-// to do: fix 'argument too large'
-function saveObjectToCache(key, value) {
-    CacheService.getScriptCache().put(Utilities.base64Encode(key), JSON.stringify(value), 3600);
-    return value;
 }
