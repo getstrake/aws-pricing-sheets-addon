@@ -1,11 +1,12 @@
-export class CacheLoader {
+
+class CacheLoader {
   expireTime = 1000 * 60 * 60; // 1 hour
   constructor(private readonly cache: GoogleAppsScript.Cache.Cache) {}
 
-  get(key: string): string {
+  get(key: string): string|null {
       let keyEncode = this.keyEncode(key)
       let data = this.cache.get(keyEncode)
-      
+
       if (!data) return null;
 
       let decoded = Utilities.base64Decode(data, Utilities.Charset.UTF_8)

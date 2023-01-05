@@ -4,10 +4,10 @@ function fetchApi(options) {
     const {instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption} = options;
     const path = `/pricing/1.0/ec2/region/${region}/${purchaseType}/${platform}/index.json`;
     const url = `${cfg.baseHost}${path}?timestamp=${Date.now()}`;
-    const response = fetchUrlCached(url);
+    const response = JSON.parse(fetchUrlCached(url));
     const prices = filterPrices(response.prices, options);
     if(prices.length === 0)
-      throw new Error(`No price found for ${JSON.stringify(options)}`);
+      throw new Error(`No price found.\n\n ${JSON.stringify(options)}`);
     if(prices.length > 1)
       throw new Error(`Multiple prices found for ${JSON.stringify(options)}`);
     const price = purchaseType === "ondemand" ? 
@@ -43,5 +43,5 @@ function fetchUrlCached(url) {
 function fetchUrl(url) {
     const resp = UrlFetchApp.fetch(url);
     if (resp.getResponseCode() != 200) throw "Unable to load the URL: " + url;
-    return JSON.parse(resp.getContentText());
+    return resp.getContentText();
 }
