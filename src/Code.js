@@ -5,14 +5,14 @@ function fetchApi(options) {
     const path = `/pricing/1.0/ec2/region/${region}/${purchaseType}/${platform}/index.json`;
     const url = `${cfg.baseHost}${path}?timestamp=${Date.now()}`;
     const response = fetchUrlCached(url);
-    const filteredPrices = filterPrices(response.prices, options);
-    if(filteredPrices.length === 0)
+    const prices = filterPrices(response.prices, options);
+    if(prices.length === 0)
       throw new Error(`No price found for ${JSON.stringify(options)}`);
-    if(filterPrices.length > 1)
-      throw new Error(`Multiple prices found for ${JSON.stringify(options)}`
+    if(prices.length > 1)
+      throw new Error(`Multiple prices found for ${JSON.stringify(options)}`);
     const price = purchaseType === "ondemand" ? 
-      filteredPrices[0].price.USD : 
-      filteredPrices[0].calculatedPrice.effectiveHourlyRate.USD
+      prices[0].price.USD : 
+      prices[0].calculatedPrice.effectiveHourlyRate.USD
     return parseFloat(price);
 }
 
