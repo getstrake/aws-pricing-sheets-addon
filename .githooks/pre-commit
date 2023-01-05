@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Pre-commit checks for git
+#
+
+printf -- "--- Running git pre-commit hook ---\n"
+should_fail=0
+
+printf ">>> Checking committer name "
+git config user.name | grep -E '([A-Za-z.-]+) ([A-Za-z.-]+)' >> /dev/null
+
+if [[ $? != 0 ]];
+then
+    printf '[\xc3\x97]\n'
+    cat <<-ERR_MSG
+
+    Invalid name in commit: `git config user.name`
+
+    All commits must be created using the fully qualified name you use in a
+    professional context. Please properly configure your 'user.name' git
+    option per the "Git Setup" document in the 'dev' repository.
+
+    See: https://github.com/getmacroscope/dev/On-Boarding/Git-Setup.md
+
+ERR_MSG
+    should_fail=1
+else
+    printf "[\xE2\x9C\x93]\n"
+fi
+
+printf ">>> Checking committer email address "
+git config user.email | grep -E '.*@getmacroscope.com' >> /dev/null
+
+if [[ $? != 0 ]];
+then
+    printf '[\xc3\x97]\n'
+    cat <<-ERR_MSG
+
+    Invalid email address in commit: `git config user.email`
+
+    All commits must be created with an @getmacroscope.com email address.
+    Please properly configure your 'user.email' git option per the "Git Setup"
+    document in the 'dev' repository.
+
+    See: https://github.com/getmacroscope/dev/On-Boarding/Git-Setup.md
+
+ERR_MSG
+    should_fail=1
+else
+    printf "[\xE2\x9C\x93]\n"
+fi
+
+exit $should_fail

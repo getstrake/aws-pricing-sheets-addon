@@ -1,0 +1,4 @@
+[core]
+
+    # Convenience scripts that will prevent common mistakes.
+    hooksPath = .githooks
