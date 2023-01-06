@@ -1,2 +1,9 @@
+node_modules/
+.vscode/
+.clasp.json
+experiment/
+pnpm-lock.yamlexperiment/
+pnpm-lock.yaml
+
 # macOS debris
 .DS_Store
