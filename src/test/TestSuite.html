@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <h1>Test Suite</h1>
+    <p>Ps: tests are run in parallel</p>
+    <div id="results">
+    </div>
+    <script>
+      const tests = <?!= JSON.stringify(tests) ?>;
+      tests.forEach(testName => {
+        google.script.run.withSuccessHandler(success).withFailureHandler(failure).test(testName);
+      })
+
+      function success(e) {
+        printResult(e);
+      }
+      function failure(e) {
+        printResult('Error in apps script: ' + e);
+      }
+
+      function printResult(text) {
+        const textDiv = document.createElement('div');
+        textDiv.innerHTML = text;
+        document.getElementById('results').appendChild(textDiv);
+      }
+    </script>
+  </body>
+</html>

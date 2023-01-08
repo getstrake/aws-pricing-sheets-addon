@@ -1,41 +1,109 @@
 function EC2_EBS_GB(volumeType, volumeSize, region) {
-  return fetchApiEBS({volumeType, volumeSize, region, storageType: "storage"})
+  return fetchApiEBS({ volumeType, volumeSize, region, storageType: "storage" })
 }
 
 function EC2_EBS_SNAPSHOT_GB(volumeSize, region) {
-  return fetchApiEBS({volumeSize, region, storageType: "snapshot"})
+  return fetchApiEBS({ volumeSize, region, storageType: "snapshot" })
+}
+
+function EC2_EBS_IO1_IOPS(units, region) {
+  return fetchApiEBS({ volumeType: 'io1', units, storageType: "iops" });
 }
 
 function fetchApiEBS(options) {
-    const {volumeSize, region} = options;
-    const path =  `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
-    const url = `${cfg.baseHost}${path}`;
-    const response = JSON.parse(fetchUrlCached(url));
-    const prices = filterPricesEBS(response.prices, options);
-
-    if(prices.length === 0)
-      throw new Error(`No price found.\n\n ${JSON.stringify(options)}`);
-    if(prices.length > 1)
-      throw new Error(`Multiple prices found for ${JSON.stringify(options)}`);
-
-    return parseFloat(prices[0].price.USD) * parseFloat(volumeSize) / 730;
+  const { volumeSize, region } = options;
+  const path = `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
+  const url = `${cfg.baseHost}${path}`;
+  const response = JSON.parse(fetchUrlCached(url));
+  const price = getPriceEBS(response.prices, options);
+  return price * parseFloat(volumeSize) / 730;
 }
 
-const filterPricesEBS = (prices, options) => {
-    const {volumeType, storageType} = options;
-    const filterLib = {
-      gp3: p => true,/// to do
-      io2: p => true, /// to do
-      filterStorageType: {
-        storage: p => 
-          p.attributes['aws:ec2:volumeType'] === 'General Purpose' &&
-          p.attributes['aws:ec2:usagetype'].endsWith("EBS:VolumeUsage." + volumeType), // The usagetype is prefixed with a region abbrev. outside of UE1
-        snapshot: p =>
-          p.attributes['aws:ec2:usagetype'].endsWith("EBS:SnapshotUsage"),
-        iops: p =>
-          p.attributes['aws:ec2:usagetype'].endsWith('EBS:VolumeP-IOPS.piops')
-      }
+const getPriceEBS = (prices, options) => {
+  const { volumeType, storageType } = options;
+
+  const filterVolumeLib = {
+    gp3: () => tieredGP3IOPS(prices, options.units),
+    io2: () => tieredIO2IOPS(prices, options.units),
+  }
+  if (filterVolumeLib[volumeType]) {
+    return filterVolumeLib[volumeType]()
+  }
+  
+  const filterStorageLib = {
+    storage: p =>
+      p.attributes['aws:ec2:volumeType'] === 'General Purpose' &&
+      p.attributes['aws:ec2:usagetype'].endsWith("EBS:VolumeUsage." + volumeType), // The usagetype is prefixed with a region abbrev. outside of UE1
+    snapshot: p =>
+      p.attributes['aws:ec2:usagetype'].endsWith("EBS:SnapshotUsage"),
+    iops: p =>
+      p.attributes['aws:ec2:usagetype'].endsWith('EBS:VolumeUsage.piops')
+  }
+
+  prices = prices.filter(filterStorageLib[storageType]);
+
+  if (prices.length === 0)
+    throw new Error(`No price found.\n\n ${JSON.stringify(options)}`);
+  if (prices.length > 1)
+    throw new Error(`Multiple prices found for ${JSON.stringify(options)}`);
+
+  return parseFloat(prices[0].price.USD);
+}
+
+function tieredIO2IOPS(prices, units) {
+
+  function filterPricesVolumeIopsIO2(prices, tier) {
+    let usageType = 'EBS:VolumeUsage.io2';
+    if (tier === 'tier2') {
+      usageType = 'EBS:VolumeUsage.io2.tier2';
+    } else if (tier === 'tier3') {
+      usageType = 'EBS:VolumeUsage.io2.tier3';
     }
-    
-    return prices.filter(filterLib[volumeType] || filterLib.filterStorageType[storageType]);
+
+    return prices.filter(price => {
+      return Utils.endsWith(price.attributes['aws:ec2:usagetype'], usageType)
+    })
+  }
+
+  let price1 = filterPricesVolumeIopsIO2(prices, 'tier1')
+  let price2 = filterPricesVolumeIopsIO2(prices, 'tier2')
+  let price3 = filterPricesVolumeIopsIO2(prices, 'tier3')
+
+  if (price1.length !== 1 || price2.length !== 1 || price3.length !== 1) {
+    throw `Unable to find tiered pricing for IO2 IOPS`
+  }
+
+  let tiers = [0.0, 32000.0, 64000.0]
+  let priceTiers = [price1[0], price2[0], price3[0]]
+
+  return totalPrice(tiers, priceTiers, units, duration);
+}
+
+function tieredGP3IOPS(prices, units) {
+  let priceTier = prices.filter(price => {
+    return Utils.endsWith(price.attributes['aws:ec2:usagetype'], 'EBS:VolumeUsage.gp3')
+  })
+
+  if (priceTier.length !== 1) {
+    throw `Unable to find pricing for GP3 IOPS`
+  }
+
+  let tiers = [0.0, 3000.0];
+
+  // We fake the first tier since it is free
+  let priceTiers = [{ price: { USD: 0.0 } }, priceTier[0]]
+
+  return totalPrice(tiers, priceTiers, units, duration);
+}
+
+
+function totalPrice(tiers, priceTiers, units, duration) {
+  let total = 0;
+  for (var i = tiers.length - 1; i >= 0; i--) {
+    if (units > tiers[i]) {
+      total += priceTiers[i].price.USD * (units - tiers[i])
+      units -= (units - tiers[i])
+    }
+  }
+  return total;
 }
