@@ -6,8 +6,12 @@ function EC2_EBS_SNAPSHOT_GB(volumeSize, region) {
   return fetchApiEBS({ volumeSize, region, storageType: "snapshot" })
 }
 
-function EC2_EBS_IO1_IOPS(units, region) {
-  return fetchApiEBS({ volumeType: 'io1', units, storageType: "iops" });
+function EC2_EBS_IO1_IOPS(volumeSize, region) {
+  return fetchApiEBS({ volumeType: 'io1', volumeSize, storageType: "iops", region });
+}
+
+function EC2_EBS_IO2_IOPS(volumeSize, region) {
+  return fetchApiEBS({ volumeType: 'io2', volumeSize, storageType: "iops", region });
 }
 
 function fetchApiEBS(options) {
@@ -23,12 +27,11 @@ const getPriceEBS = (prices, options) => {
   const { volumeType, storageType } = options;
 
   const filterVolumeLib = {
-    gp3: () => tieredGP3IOPS(prices, options.units),
-    io2: () => tieredIO2IOPS(prices, options.units),
+    gp3: () => tieredGP3IOPS(prices, options.volumeSize),
+    io2: () => tieredIO2IOPS(prices, options.volumeSize),
   }
-  if (filterVolumeLib[volumeType]) {
+  if (filterVolumeLib[volumeType])
     return filterVolumeLib[volumeType]()
-  }
   
   const filterStorageLib = {
     storage: p =>
@@ -50,21 +53,7 @@ const getPriceEBS = (prices, options) => {
   return parseFloat(prices[0].price.USD);
 }
 
-function tieredIO2IOPS(prices, units) {
-
-  function filterPricesVolumeIopsIO2(prices, tier) {
-    let usageType = 'EBS:VolumeUsage.io2';
-    if (tier === 'tier2') {
-      usageType = 'EBS:VolumeUsage.io2.tier2';
-    } else if (tier === 'tier3') {
-      usageType = 'EBS:VolumeUsage.io2.tier3';
-    }
-
-    return prices.filter(price => {
-      return Utils.endsWith(price.attributes['aws:ec2:usagetype'], usageType)
-    })
-  }
-
+function tieredIO2IOPS(prices, volumeSize) {
   let price1 = filterPricesVolumeIopsIO2(prices, 'tier1')
   let price2 = filterPricesVolumeIopsIO2(prices, 'tier2')
   let price3 = filterPricesVolumeIopsIO2(prices, 'tier3')
@@ -76,12 +65,25 @@ function tieredIO2IOPS(prices, units) {
   let tiers = [0.0, 32000.0, 64000.0]
   let priceTiers = [price1[0], price2[0], price3[0]]
 
-  return totalPrice(tiers, priceTiers, units, duration);
+  return totalPrice(tiers, priceTiers, volumeSize);
 }
 
-function tieredGP3IOPS(prices, units) {
+function filterPricesVolumeIopsIO2(prices, tier) {
+  let usageType = 'EBS:VolumeP-IOPS.io2';
+  if (tier === 'tier2') {
+    usageType = 'EBS:VolumeP-IOPS.io2.tier2';
+  } else if (tier === 'tier3') {
+    usageType = 'EBS:VolumeP-IOPS.io2.tier3';
+  }
+
+  return prices.filter(price => {
+    return price.attributes['aws:ec2:usagetype'] === usageType;
+  })
+}
+
+function tieredGP3IOPS(prices, volumeSize) {
   let priceTier = prices.filter(price => {
-    return Utils.endsWith(price.attributes['aws:ec2:usagetype'], 'EBS:VolumeUsage.gp3')
+    return price.attributes['aws:ec2:usagetype'] === 'EBS:VolumeUsage.gp3';
   })
 
   if (priceTier.length !== 1) {
@@ -93,16 +95,18 @@ function tieredGP3IOPS(prices, units) {
   // We fake the first tier since it is free
   let priceTiers = [{ price: { USD: 0.0 } }, priceTier[0]]
 
-  return totalPrice(tiers, priceTiers, units, duration);
+  return totalPrice(tiers, priceTiers, volumeSize, duration);
 }
 
 
-function totalPrice(tiers, priceTiers, units, duration) {
+function totalPrice(tiers, priceTiers, volumeSize) {
+  console.log({volumeSize, tiers, priceTiers});
+  volumeSize = parseFloat(volumeSize);
   let total = 0;
   for (var i = tiers.length - 1; i >= 0; i--) {
-    if (units > tiers[i]) {
-      total += priceTiers[i].price.USD * (units - tiers[i])
-      units -= (units - tiers[i])
+    if (volumeSize > tiers[i]) {
+      total += priceTiers[i].price.USD * (volumeSize - tiers[i])
+      volumeSize -= (volumeSize - tiers[i])
     }
   }
   return total;

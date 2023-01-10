@@ -9,7 +9,7 @@
     <div id="results">
     </div>
     <script>
-      const tests = <?!= JSON.stringify(tests) ?>;
+      const tests = JSON.parse("<?!= JSON.stringify(tests) ?>;");
       tests.forEach(testName => {
         google.script.run.withSuccessHandler(success).withFailureHandler(failure).test(testName);
       })
