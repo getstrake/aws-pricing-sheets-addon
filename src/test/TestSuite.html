@@ -2,6 +2,11 @@
 <html>
   <head>
     <base target="_top">
+    <style>
+      .result {
+        margin-bottom: 10px;
+      }
+    </style>
   </head>
   <body>
     <h1>Test Suite</h1>
@@ -9,22 +14,33 @@
     <div id="results">
     </div>
     <script>
-      const tests = JSON.parse("<?!= JSON.stringify(tests) ?>;");
-      tests.forEach(testName => {
-        google.script.run.withSuccessHandler(success).withFailureHandler(failure).test(testName);
+      const tests = <?!= JSON.stringify(tests) ?>;
+      createResultsDivs(tests.length);
+      tests.forEach((testName, index) => {
+        google.script.run
+          .withSuccessHandler(e => printResult(e, index))
+          .withFailureHandler(failure)
+          .test(testName);
       })
 
-      function success(e) {
-        printResult(e);
+      function createResultsDivs(testsLength) {
+        const resultsDiv = document.getElementById('results');
+        for (let i = 0; i < testsLength; i++) {
+          const div = document.createElement('div');
+          div.id = `result-${i}`;
+          div.className = 'result';
+          div.innerHTML = 'Running...';
+          resultsDiv.appendChild(div);
+        }
       }
+
       function failure(e) {
         printResult('Error in apps script: ' + e);
       }
 
-      function printResult(text) {
-        const textDiv = document.createElement('div');
+      function printResult(text, index) {
+        const textDiv = document.querySelector(`#result-${index}`);
         textDiv.innerHTML = text;
-        document.getElementById('results').appendChild(textDiv);
       }
     </script>
   </body>

@@ -14,6 +14,10 @@ function EC2_EBS_IO2_IOPS(volumeSize, region) {
   return fetchApiEBS({ volumeType: 'io2', volumeSize, storageType: "iops", region });
 }
 
+function EC2_EBS_GP3_IOPS(volumeSize, region) {
+  return fetchApiEBS({volumeType: 'gp3', volumeSize, storageType: "iops", region});
+}
+
 function fetchApiEBS(options) {
   const { volumeSize, region } = options;
   const path = `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
@@ -46,9 +50,9 @@ const getPriceEBS = (prices, options) => {
   prices = prices.filter(filterStorageLib[storageType]);
 
   if (prices.length === 0)
-    throw new Error(`No price found.\n\n ${JSON.stringify(options)}`);
+    throw "Can not find instance";
   if (prices.length > 1)
-    throw new Error(`Multiple prices found for ${JSON.stringify(options)}`);
+    throw "Multiple prices found";
 
   return parseFloat(prices[0].price.USD);
 }
@@ -95,7 +99,7 @@ function tieredGP3IOPS(prices, volumeSize) {
   // We fake the first tier since it is free
   let priceTiers = [{ price: { USD: 0.0 } }, priceTier[0]]
 
-  return totalPrice(tiers, priceTiers, volumeSize, duration);
+  return totalPrice(tiers, priceTiers, volumeSize);
 }
 
 

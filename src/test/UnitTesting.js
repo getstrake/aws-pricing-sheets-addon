@@ -7,18 +7,83 @@ class UnitTestingApp {
   }
 
   /**
-   * Tests whether conditions pass or not
-   * @param {Boolean | Function} condition - The condition to check
+   * Tests whether expected and actual are equal
+   * @param {Number | String} expected - The expected value
+   * @param {Number | String | Function} actual - The actual value or test
    * @param {String} message - the message to display in the onsole
    * @return {void}
    */
-  assert(condition, message) {
+  areEqual(expected, actual, message) {
     try {
-      if ("function" === typeof condition) condition = condition();
-      if (condition) return `✔ PASSED: ${message}`;
-      else return `❌ FAILED: ${message}`;
+      message = message || this.getFunctionName(actual) + " === " + expected.toString();
+      if ("function" === typeof actual) actual = actual();
+      if (actual === expected) return `✔ ${message}`;
+      else return `❌ ${message}`;
     } catch(err) {
-      return `❌ FAILED: ${message} (${err})`;
+      return `❌ ${message} (${err})`;
+    }
+  }
+
+  /**
+   * Tests whether expected and actual are equal (also for objects)
+   * @param {Number | String | Object} expected - The expected value
+   * @param {Number | String | Function} actual - The actual value or test
+   * @param {String} message - the message to display in the onsole
+   * @return {void}
+   */
+  areDeepEqual(expected, actual, message) {
+    try {
+      message = message || JSON.stringify(this.getFunctionName(actual)) + " === (deep equal) === " + JSON.stringify(expected.toString());
+      if ("function" === typeof actual) actual = actual();
+      if (JSON.stringify(actual) === JSON.stringify(expected)) return `✔ ${message}`;
+      else return `❌ ${message}`;
+    } catch(err) {
+      return `❌ ${message} (${err})`;
+    }
+  }
+
+
+  /**
+   * Tests whether conditions pass or not
+   * @param {Boolean | Function} test - The condition to check
+   * @param {String} message - the message to display in the onsole
+   * @return {void}
+   */
+  isTrue(test, message) {
+    try {
+      if ("function" === typeof test) test = test();
+      if (test) return `✔ ${message}`;
+      else return `❌ ${message}`;
+    } catch(err) {
+      return `❌ ${message} (${err})`;
+    }
+  }
+
+  /**
+   * Tests whether conditions pass or not
+   * @param {Number | String} expected - The expected value
+   * @param {Number | String | Function} actual - The actual value or test
+   * @param {Number} epsilon - The maximum difference
+   * @param {String} message - the message to display in the onsole
+   * @return {void}
+   */
+  areClose(expected, actual, epsilon, message) {
+    message = message || this.getFunctionName(actual) + " ~= " + expected;
+    try {
+      if ("function" === typeof actual) actual = actual();
+      return this.isTrue(Math.abs(expected - actual) <= epsilon, message);
+    } catch(err) {
+      return `❌ ${message} (${err})`;
+    }
+  }
+
+  willThrow(callback, errorMessage) {
+    let message = this.getFunctionName(callback) + " should throw: (" + errorMessage + ")";
+    try {
+      callback();
+      return `❌ ${message}`;
+    } catch(err) {
+      return err == errorMessage ? `✔ ${message}` : `❌ ${message}. It threw error: (${err})`;
     }
   }
 
@@ -38,10 +103,15 @@ class UnitTestingApp {
       error = err;
       isCaught = new RegExp(errorMessage).test(err);
     } finally {
-      this.assert(isCaught, message);
+      this.areEqual(isCaught, message);
     }
   }
 
+  getFunctionName(func) {
+    if("function" !== typeof func) return func;
+    return func.toString().replaceAll('() => ','').replaceAll('function() {','').replace(/\}$\s?/g,'').trim();
+  }
+  
   /**
    * Adds a new test to the prototype of the class
    * @param {String} name the name of the function
