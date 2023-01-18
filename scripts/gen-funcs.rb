@@ -13,7 +13,7 @@ end
 # EC2 RI functions
 #
 def gen_ec2_ri(func_dir)
-  outfilename = 'ec2_ri_gen.ts'
+  outfilename = 'ec2_ri_gen.js'
   outfile = File.join(func_dir, outfilename)
   
   f = create_file(outfile)
@@ -84,66 +84,53 @@ def gen_ec2_ri(func_dir)
 end
 
 def gen_ebs(func_dir)
-  outfilename = 'ec2_ebs_gen.ts'
+  outfilename = 'ec2_ebs_gen.js'
   outfile = File.join(func_dir, outfilename)
   
   f = create_file(outfile)
-  
-  f.write <<~EOF
-  import { EBSFunctions } from "../ebs";
-
-  EOF
 
   vol_types = ['magnetic', 'gp2', 'gp3', 'st1', 'sc1', 'io1', 'io2']
 
   vol_types.each do |vol_type|
       vol_type_up = vol_type.upcase
-      func = <<~EOF
-      function EC2_EBS_#{vol_type_up}_GB(settingsRange: Array<Array<string>>, size: string | number, region?: string): number;
-      function EC2_EBS_#{vol_type_up}_GB(size: string | number, region: string): number;
+      # function EC2_EBS_#{vol_type_up}_GB(settingsRange: Array<Array<string>>, size: string | number, region?: string): number;
+      # function EC2_EBS_#{vol_type_up}_GB(size: string | number, region: string): number;
 
-       /**
-       * Returns the hourly cost for the amount of provisioned EBS #{vol_type_up} storage Gigabytes. Invoke as either:
-       * (settingsRange, size[, region]) or (size, region).
-       *
-       * @param {A2:B7 or 4000} settingsOrSize Settings range or volume size
-       * @param {4000 or "us-east-2"} sizeOrRegion Either a volume size or the region
-       * @param {"us-east-2"} region AWS region (optional)
-       * @returns price
-       * @customfunction
-       */
-      function EC2_EBS_#{vol_type_up}_GB(settingsOrSize, sizeOrRegion, region?) {
-          if (typeof settingsOrSize === "string" || typeof settingsOrSize === "number") {
-              return EBSFunctions.EC2_EBS_GB("#{vol_type}", settingsOrSize.toString(), sizeOrRegion)
-          } else {
-              return EBSFunctions.EC2_EBS_GB(settingsOrSize, "#{vol_type}", sizeOrRegion, region)
-          }
+      #  /**
+      #  * Returns the hourly cost for the amount of provisioned EBS #{vol_type_up} storage Gigabytes. Invoke as either:
+      #  * (settingsRange, size[, region]) or (size, region).
+      #  *
+      #  * @param {A2:B7 or 4000} settingsOrSize Settings range or volume size
+      #  * @param {4000 or "us-east-2"} sizeOrRegion Either a volume size or the region
+      #  * @param {"us-east-2"} region AWS region (optional)
+      #  * @returns price
+      #  * @customfunction
+      #  */
+    #   function EC2_EBS_#{vol_type_up}_GB(settingsOrSize, sizeOrRegion, region?) {
+    #     if (typeof settingsOrSize === "string" || typeof settingsOrSize === "number") {
+    #         return EBSFunctions.EC2_EBS_GB("#{vol_type}", settingsOrSize.toString(), sizeOrRegion)
+    #     } else {
+    #         return EBSFunctions.EC2_EBS_GB(settingsOrSize, "#{vol_type}", sizeOrRegion, region)
+    #     }
+    # }
+      func = <<~EOF
+      // EBS #{vol_type_up} storage
+      function EC2_EBS_#{vol_type_up}_GB(settingsOrSize, sizeOrRegion, region) {
+        if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
+          return EC2_EBS_GB("#{vol_type}", settingsOrSize, sizeOrRegion);
+        else
+          return EC2_EBS_GB_FROM_SETTINGS("#{vol_type}", settingsOrSize, sizeOrRegion, region);
       }
 
       EOF
       f.write(func)
   end
 
-  f.write <<~EOF
-  
-  // don't export variables, results in clasp error
-  const EC2_EBS_GENFunctions = {
-      EC2_EBS_MAGNETIC_GB,
-      EC2_EBS_GP2_GB,
-      EC2_EBS_GP3_GB, 
-      EC2_EBS_ST1_GB,
-      EC2_EBS_SC1_GB,
-      EC2_EBS_IO1_GB,
-      EC2_EBS_IO2_GB 
-  }
-
-  EOF
-
   f.close
 end
 
 def gen_rds(func_dir)
-  outfilename = 'rds_gen.ts'
+  outfilename = 'rds_gen.js'
   outfile = File.join(func_dir, outfilename)
   
   f = create_file(outfile)
@@ -243,7 +230,7 @@ def gen_rds(func_dir)
 end
 
 def gen_rds_storage(func_dir)
-  outfilename = 'rds_storage_gen.ts'
+  outfilename = 'rds_storage_gen.js'
   outfile = File.join(func_dir, outfilename)
 
   f = create_file(outfile)
@@ -307,6 +294,6 @@ topdir = File.join(from, "..")
 func_dir = File.join(topdir, 'src/functions/v1/generated')
 
 gen_ec2_ri(func_dir)
-# gen_ebs(func_dir)
+gen_ebs(func_dir)
 # gen_rds(func_dir)
 # gen_rds_storage(func_dir)

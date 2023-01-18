@@ -1,6 +1,7 @@
 const cache = new CacheLoader(CacheService.getScriptCache());
 
 function fetchUrlCached(url) {
+    console.log('fetching ' + url);
     return cache.get(url) || cache.putAndReturn(url, fetchUrl(url));
 }
 

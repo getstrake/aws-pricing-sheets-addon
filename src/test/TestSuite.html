@@ -15,22 +15,33 @@
     </div>
     <script>
       const tests = <?!= JSON.stringify(tests) ?>;
-      createResultsDivs(tests.length);
-      tests.forEach((testName, index) => {
-        google.script.run
-          .withSuccessHandler(e => printResult(e, index))
-          .withFailureHandler(failure)
-          .test(testName);
-      })
+      createResultsDivs();
+      // tests.forEach((testName, index) => {
+        // google.script.run
+        //   .withSuccessHandler(e => printResult(e, index))
+        //   .withFailureHandler(failure)
+        //   .<?!= callback ?>(testName);
+      // })
 
-      function createResultsDivs(testsLength) {
+      function createResultsDivs() {
         const resultsDiv = document.getElementById('results');
-        for (let i = 0; i < testsLength; i++) {
-          const div = document.createElement('div');
-          div.id = `result-${i}`;
-          div.className = 'result';
-          div.innerHTML = 'Running...';
-          resultsDiv.appendChild(div);
+        for(let key in tests) {
+          const chapterDiv = document.createElement('div');
+          chapterDiv.id = `chapter-${key}`;
+          chapterDiv.className = 'chapter';
+          chapterDiv.innerHTML = `<h2>${key}</h2>`;
+          resultsDiv.appendChild(chapterDiv);
+          for (let i = 0; i < tests[key].length; i++) {
+            const testDiv = document.createElement('div');
+            testDiv.id = `result-${key}-${i}`.replace(/\s/g, '');
+            testDiv.className = 'result';
+            testDiv.innerHTML = 'Running...';
+            chapterDiv.appendChild(testDiv);
+            google.script.run
+              .withSuccessHandler(e => printResult(e, '#' + testDiv.id))
+              .withFailureHandler(failure)
+              .<?!= callback ?>(key, i);
+          }
         }
       }
 
@@ -38,8 +49,8 @@
         printResult('Error in apps script: ' + e);
       }
 
-      function printResult(text, index) {
-        const textDiv = document.querySelector(`#result-${index}`);
+      function printResult(text, selector) {
+        const textDiv = document.querySelector(selector);
         textDiv.innerHTML = text;
       }
     </script>

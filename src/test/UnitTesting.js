@@ -71,7 +71,7 @@ class UnitTestingApp {
     message = message || this.getFunctionName(actual) + " ~= " + expected;
     try {
       if ("function" === typeof actual) actual = actual();
-      return this.isTrue(Math.abs(expected - actual) <= epsilon, message);
+      return this.isTrue(Math.abs(expected - actual) <= epsilon, message + '. the result was ' + actual);
     } catch(err) {
       return `❌ ${message} (${err})`;
     }
