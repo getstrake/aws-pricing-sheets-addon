@@ -27,7 +27,7 @@ function EC2_EBS_GB_FROM_SETTINGS(volumeType, settings, volumeSize, region) {
   const options = {
     volumeType, 
     volumeSize, 
-    region: settings.region || region, 
+    region: region || settings.region, 
     storageType: "storage"
   };
 
@@ -64,7 +64,7 @@ function EC2_EBS(volumeType, storageType, a, b, c) {
   return fetchApiEBS({
     volumeType,
     volumeSize, 
-    region: settings.region || region, 
+    region: region || settings.region, 
     storageType
   });
 }
