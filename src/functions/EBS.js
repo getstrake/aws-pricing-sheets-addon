@@ -1,28 +1,28 @@
-function EC2_EBS_GB(a, b, c, d) {
-  if(typeof a === "string") 
+function EC2_EBS_GB(settingsOrVolumeType, volumeTypeOrVolumeSize, volumeSizeOrRegion, region) {
+  if(typeof settingsOrVolumeType === "string") {
     return fetchApiEBS({
-      volumeType: a, 
-      volumeSize: b, 
-      region: c, 
+      volumeType: settingsOrVolumeType, 
+      volumeSize: volumeTypeOrVolumeSize, 
+      region: volumeSizeOrRegion, 
       storageType: "storage"
     }
   )
-  else {
+  } else { // first argument is a range selected from the sheet with settings
     [ settings, 
       volumeType,
-      volumeSize, 
-      region
-    ] = [a, b, c, d]
+      volumeSize
+    ] = [settingsOrVolumeType, volumeTypeOrVolumeSize, volumeSizeOrRegion]
     return EC2_EBS_GB_FROM_SETTINGS(volumeType, settings, volumeSize, region);
   }
 }
 
 // settings are retrieved from a range, a 2d array
 function EC2_EBS_GB_FROM_SETTINGS(volumeType, settings, volumeSize, region) {
-  
+  console.log('EC2_EBS_GB_FROM_SETTINGS');
+  console.log('volumeType', volumeType);
   settings = mapValuesToObjectWithLowerCaseValues(settings);
-  if (!settings.region && !region)
-    throw "Missing region or region not specified in settings.";
+  if(!getVolumeTypeFullName(volumeType))
+    throw 'invalid EBS volume type';
   
   const options = {
     volumeType, 
@@ -60,8 +60,6 @@ function EC2_EBS(volumeType, storageType, a, b, c) {
   let [settings, volumeSize, region] = [a, b, c];
 
   settings = mapValuesToObjectWithLowerCaseValues(settings);
-  if (!settings.region && !region)
-    throw "Missing region or region not specified in settings.";
 
   return fetchApiEBS({
     volumeType,
@@ -73,7 +71,13 @@ function EC2_EBS(volumeType, storageType, a, b, c) {
 
 function fetchApiEBS(options) {
   options = getObjectWithLowerCaseValues(options);
-  const { volumeSize, region } = options;
+  const { region, volumeSize } = options;
+
+  if (!region)
+    throw "must specify region";
+  if (!parseFloat(volumeSize))
+    throw "unable to parse volume units";
+
   const path = `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
   const url = `${cfg.baseHost}${path}`;
   const response = JSON.parse(fetchUrlCached(url));
@@ -83,6 +87,19 @@ function fetchApiEBS(options) {
   }
   const price = getPriceEBS(response.prices, options);
   return price / cfg.hoursPerMonth;
+}
+
+function getVolumeTypeFullName(volumeType) {
+  const volumeTypeMap = {
+    'magnetic': 'Magnetic',
+    'gp2': 'General Purpose',
+    'gp3': 'General Purpose',
+    'st1': 'Throughput Optimized HDD',
+    'sc1': 'Cold HDD',
+    'io1': 'Provisioned IOPS',
+    'io2': 'Provisioned IOPS',
+  }
+  return volumeTypeMap[volumeType]
 }
 
 const getPriceEBS = (prices, options) => {
@@ -95,16 +112,6 @@ const getPriceEBS = (prices, options) => {
       return tieredIO2IOPS(prices, volumeSize)
     if(volumeType === "gp3")
       return tieredGP3IOPS(prices, volumeSize)
-  }
-
-  const volumeTypeMap = {
-    'magnetic': 'Magnetic',
-    'gp2': 'General Purpose',
-    'gp3': 'General Purpose',
-    'st1': 'Throughput Optimized HDD',
-    'sc1': 'Cold HDD',
-    'io1': 'Provisioned IOPS',
-    'io2': 'Provisioned IOPS',
   }
 
   function usageTypeFull(volumeType) {
@@ -120,7 +127,7 @@ const getPriceEBS = (prices, options) => {
 
   const filterStorageLib = {
     storage: p =>
-      p.attributes['aws:ec2:volumeType'] === volumeTypeMap[volumeType] &&
+      p.attributes['aws:ec2:volumeType'] === getVolumeTypeFullName(volumeType) &&
       p.attributes['aws:ec2:usagetype'].endsWith(usageTypeFull(volumeType)), // The usagetype is prefixed with a region abbrev. outside of UE1
     snapshot: p =>
       p.attributes['aws:ec2:usagetype'].endsWith("EBS:SnapshotUsage"),
@@ -128,7 +135,7 @@ const getPriceEBS = (prices, options) => {
       p.attributes['aws:ec2:usagetype'].endsWith('EBS:VolumeP-IOPS.piops') //EBS:VolumeUsage.piops')
   }
 
-  console.log('filting on volumeTypeMap[volumeType] ' + volumeTypeMap[volumeType]);
+  console.log('filting on volumeTypeMap[volumeType] ' + getVolumeTypeFullName(volumeType));
   console.log('filting on usageTypeFull(volumeType) ' + usageTypeFull(volumeType));
 
   prices = prices.filter(filterStorageLib[storageType] || filterStorageLib.snapshot); // from v1: take snapshot if no storageType matches
@@ -187,7 +194,6 @@ function tieredGP3IOPS(prices, volumeSize) {
 
   return totalPriceEBS(tiers, priceTiers, volumeSize);
 }
-
 
 function totalPriceEBS(tiers, priceTiers, volumeSize) {
   console.log({volumeSize, tiers, priceTiers});

@@ -81,23 +81,23 @@ function getEBSTests() {
 
 ],"EBS invalid configs": [
     t.willThrow(function() {
-        () => EC2_EBS_GB(s, "gp1", 400)
+      return EC2_EBS_GB([['region', 'us-east-1']], "gp1", 400)
     }, "invalid EBS volume type"),
 
     t.willThrow(function() {
-        () => EC2_EBS_GP2_GB(400, undefined)
+      return EC2_EBS_GP2_GB(400, undefined)
     }, "must specify region"),
 
     t.willThrow(function() {
-        () => EC2_EBS_GP2_GB(undefined, "us-east-1")
+      return EC2_EBS_GP2_GB(undefined, "us-east-1")
     }, "must specify parameter"),
 
     t.willThrow(function() {
-        () => EC2_EBS_GP2_GB("foo", "us-east-1")
+      return EC2_EBS_GP2_GB("foo", "us-east-1")
     }, "unable to parse volume units"),
 
     t.willThrow(function() {
-        () => EC2_EBS_GB(s, 400, "gp2")
+      return EC2_EBS_GB(s, 400, "gp2")
     }, "invalid EBS volume type")
   ]};
 }

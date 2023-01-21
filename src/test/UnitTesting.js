@@ -80,8 +80,8 @@ class UnitTestingApp {
   willThrow(callback, errorMessage) {
     let message = this.getFunctionName(callback) + " should throw: (" + errorMessage + ")";
     try {
-      callback();
-      return `❌ ${message}`;
+      const result = callback();
+      return `❌ ${message} but returned successfully this value: ${result}`;
     } catch(err) {
       return err == errorMessage ? `✔ ${message}` : `❌ ${message}. It threw error: (${err})`;
     }

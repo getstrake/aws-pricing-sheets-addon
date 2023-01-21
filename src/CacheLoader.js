@@ -1,9 +1,11 @@
 
 class CacheLoader {
-  expireTime = 1000 * 60 * 60; // 1 hour
-  constructor(private readonly cache: GoogleAppsScript.Cache.Cache) {}
+  constructor(cache) {
+    this.cache = cache;
+    this.expireTime = 1000 * 60 * 60; // static properties are not supported in GAS
+  }
 
-  get(key: string): string|null {
+  get(key) {
       let keyEncode = this.keyEncode(key)
       let data = this.cache.get(keyEncode)
 
@@ -16,7 +18,7 @@ class CacheLoader {
       return blob.getDataAsString()
   }
 
-  put(key: string, value: string) {
+  put(key, value) {
       let keyEncode = this.keyEncode(key)
       let textBlob = Utilities.newBlob(value)
       let gzBlob = Utilities.gzip(textBlob)
@@ -31,7 +33,7 @@ class CacheLoader {
     return value;
   }
 
-  private keyEncode(key: string): string {
+  keyEncode(key) {
       return Utilities.base64Encode(key)
   }
 }

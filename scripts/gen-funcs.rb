@@ -291,7 +291,7 @@ end
 from = File.expand_path(File.dirname(__FILE__))
 topdir = File.join(from, "..")
 
-func_dir = File.join(topdir, 'src/functions/v1/generated')
+func_dir = File.join(topdir, 'src/functions/generated')
 
 gen_ec2_ri(func_dir)
 gen_ebs(func_dir)
