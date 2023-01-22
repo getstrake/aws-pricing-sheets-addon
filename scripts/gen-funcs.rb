@@ -127,6 +127,7 @@ def gen_ebs(func_dir)
                 volumeSize: sizeOrRegion, 
                 region
             }
+        );
       }
 
       EOF

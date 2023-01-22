@@ -35,7 +35,7 @@ function EC2_EBS_GP3_IOPS(a, b, c) {
 function EC2_EBS(volumeType, storageType, a, b, c) {
   if(typeof a === "string" || typeof a === "number") {
     const [volumeSize, region] = [a, b];
-    return fetchApiEBS({ volumeType, volumeSize, storageType, region });
+    return fetchApiEBS({ volumeType, storageType, volumeSize, region });
   }
 
   // else
@@ -44,8 +44,8 @@ function EC2_EBS(volumeType, storageType, a, b, c) {
 }
 
 function EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType, volumeSize, region}) {
-  if (storageType !== "snapshot" && !getVolumeTypeFullName(volumeType)) {
-    throw `Invalid EBS volume type '${this.volumeType}'`
+  if ((!storageType || storageType.toString().toLowerCase() !== "snapshot") && !getVolumeTypeFullName(volumeType)) {
+    throw `invalid EBS volume type`
   }
   
   settings = mapValuesToObjectWithLowerCaseValues(settings);
@@ -88,7 +88,7 @@ function getVolumeTypeFullName(volumeType) {
     'io1': 'Provisioned IOPS',
     'io2': 'Provisioned IOPS',
   }
-  return volumeTypeMap[volumeType]
+  return volumeTypeMap[volumeType?.toString().toLowerCase()]
 }
 
 const getPriceEBS = (prices, options) => {
@@ -149,8 +149,6 @@ function tieredIO2IOPS(prices, volumeSize) {
   let tiers = [0.0, 32000.0, 64000.0]
   let priceTiers = [price1[0], price2[0], price3[0]]
 
-  console.log({tiers, priceTiers: JSON.stringify(priceTiers), volumeSize})
-
   return totalPriceEBS(tiers, priceTiers, volumeSize);
 }
 
@@ -169,7 +167,7 @@ function filterPricesVolumeIopsIO2(prices, tier) {
 
 function tieredGP3IOPS(prices, volumeSize) {
   let priceTier = prices.filter(price => {
-    return price.attributes['aws:ec2:usagetype'] === 'EBS:VolumeUsage.gp3';
+    return price.attributes['aws:ec2:usagetype'].endsWith('EBS:VolumeP-IOPS.gp3');
   })
 
   if (priceTier.length !== 1) {
@@ -178,8 +176,10 @@ function tieredGP3IOPS(prices, volumeSize) {
 
   let tiers = [0.0, 3000.0];
 
+
   // We fake the first tier since it is free
   let priceTiers = [{ price: { USD: 0.0 } }, priceTier[0]]
+  console.log({tiers, priceTiers: JSON.stringify(priceTiers.map(x => x.price)), volumeSize})
 
   return totalPriceEBS(tiers, priceTiers, volumeSize);
 }

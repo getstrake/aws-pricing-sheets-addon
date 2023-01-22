@@ -13,10 +13,12 @@ function EC2_EBS_MAGNETIC_GB(settingsOrSize, sizeOrRegion, region) {
           volumeSize: sizeOrRegion, 
           region
       }
+  );
 }
 
 // EBS GP2 storage
 function EC2_EBS_GP2_GB(settingsOrSize, sizeOrRegion, region) {
+  if(!settingsOrSize) throw `must specify parameter`;
   if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
     return EC2_EBS_GB("gp2", settingsOrSize, sizeOrRegion);
   else
@@ -28,6 +30,7 @@ function EC2_EBS_GP2_GB(settingsOrSize, sizeOrRegion, region) {
           volumeSize: sizeOrRegion, 
           region
       }
+  );
 }
 
 // EBS GP3 storage
@@ -43,6 +46,7 @@ function EC2_EBS_GP3_GB(settingsOrSize, sizeOrRegion, region) {
           volumeSize: sizeOrRegion, 
           region
       }
+  );
 }
 
 // EBS ST1 storage
@@ -58,6 +62,7 @@ function EC2_EBS_ST1_GB(settingsOrSize, sizeOrRegion, region) {
           volumeSize: sizeOrRegion, 
           region
       }
+  );
 }
 
 // EBS SC1 storage
@@ -73,6 +78,7 @@ function EC2_EBS_SC1_GB(settingsOrSize, sizeOrRegion, region) {
           volumeSize: sizeOrRegion, 
           region
       }
+  );
 }
 
 // EBS IO1 storage
@@ -88,6 +94,7 @@ function EC2_EBS_IO1_GB(settingsOrSize, sizeOrRegion, region) {
           volumeSize: sizeOrRegion, 
           region
       }
+  );
 }
 
 // EBS IO2 storage
@@ -103,5 +110,6 @@ function EC2_EBS_IO2_GB(settingsOrSize, sizeOrRegion, region) {
           volumeSize: sizeOrRegion, 
           region
       }
+  );
 }
 
