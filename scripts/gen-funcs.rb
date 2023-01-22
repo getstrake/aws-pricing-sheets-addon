@@ -119,7 +119,14 @@ def gen_ebs(func_dir)
         if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
           return EC2_EBS_GB("#{vol_type}", settingsOrSize, sizeOrRegion);
         else
-          return EC2_EBS_GB_FROM_SETTINGS("#{vol_type}", settingsOrSize, sizeOrRegion, region);
+          return EC2_EBS_FROM_SETTINGS(
+            {
+                settings: settingsOrSize, 
+                volumeType: "#{vol_type}", 
+                storageType: "storage", 
+                volumeSize: sizeOrRegion, 
+                region
+            }
       }
 
       EOF

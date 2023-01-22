@@ -12,26 +12,8 @@ function EC2_EBS_GB(settingsOrVolumeType, volumeTypeOrVolumeSize, volumeSizeOrRe
       volumeType,
       volumeSize
     ] = [settingsOrVolumeType, volumeTypeOrVolumeSize, volumeSizeOrRegion]
-    return EC2_EBS_GB_FROM_SETTINGS(volumeType, settings, volumeSize, region);
+    return EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType: "storage", volumeSize, region})
   }
-}
-
-// settings are retrieved from a range, a 2d array
-function EC2_EBS_GB_FROM_SETTINGS(volumeType, settings, volumeSize, region) {
-  console.log('EC2_EBS_GB_FROM_SETTINGS');
-  console.log('volumeType', volumeType);
-  settings = mapValuesToObjectWithLowerCaseValues(settings);
-  if(!getVolumeTypeFullName(volumeType))
-    throw 'invalid EBS volume type';
-  
-  const options = {
-    volumeType, 
-    volumeSize, 
-    region: region || settings.region, 
-    storageType: "storage"
-  };
-
-  return fetchApiEBS(options);
 }
 
 function EC2_EBS_SNAPSHOT_GB(a, b, c) {
@@ -58,7 +40,14 @@ function EC2_EBS(volumeType, storageType, a, b, c) {
 
   // else
   let [settings, volumeSize, region] = [a, b, c];
+  return EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType, volumeSize, region})
+}
 
+function EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType, volumeSize, region}) {
+  if (storageType !== "snapshot" && !getVolumeTypeFullName(volumeType)) {
+    throw `Invalid EBS volume type '${this.volumeType}'`
+  }
+  
   settings = mapValuesToObjectWithLowerCaseValues(settings);
 
   return fetchApiEBS({
