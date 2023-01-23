@@ -70,9 +70,10 @@ function EC2_OD(instanceType, region, platform) {
   return fetchApiEC2({ instanceType, region, purchaseType: "ondemand", platform });
 }
 
+// purchaseTerm in v1 was just "1" or 1, in v2 it is "1yr"
 function EC2_RI(instanceType, region, platform, offeringClass,
   purchaseTerm, paymentOption) {
-  return fetchApiEC2({ instanceType, region, purchaseType: "reserved-instance", platform, offeringClass, purchaseTerm, paymentOption })
+  return fetchApiEC2({ instanceType, region, purchaseType: "reserved-instance", platform, offeringClass, purchaseTerm: purchaseTerm + "yr", paymentOption })
 }
 
 function fetchApiEC2(options) {
@@ -116,7 +117,7 @@ const filterPricesEC2 = (prices, options) => {
     p.attributes['aws:ec2:instanceType'] === instanceType &&
     p.attributes['aws:offerTermOfferingClass'] === offeringClass &&
     p.attributes['aws:offerTermPurchaseOption'] === paymentOptionLib[paymentOption] &&
-    p.attributes['aws:offerTermLeaseLength'] === purchaseTerm + 'yr';
+    p.attributes['aws:offerTermLeaseLength'] === purchaseTerm;
   const filterOnDemand = p =>
     p.attributes['aws:ec2:instanceType'] === instanceType;
 

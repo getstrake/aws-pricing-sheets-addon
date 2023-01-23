@@ -8,7 +8,7 @@
  * @param {"us-east-2"} region Region of EC2 instance
  * @param {"linux"} platform Platform of EC2 instance
  * @param {"standard"} offeringClass Offering class of EC2 instance (for reserved instance)
- * @param {1} purchaseTerm Purchase term in years (for reserved instance)
+ * @param {"1yr"} purchaseTerm Purchase term (for reserved instance)
  * @param {"no_upfront"} paymentOption Payment option: no_upfront, partial_upfront, all_upfront (for reserved instance)
  * @returns price
  * @customfunction
