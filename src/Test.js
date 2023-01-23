@@ -21,10 +21,10 @@ function test1() {
 function fetchTest() {
   const baseHost = 'https://cdn.x.macroscope.io/aws-pricing/retro';
   const path = '/pricing/1.0/rds/database-storage/index.json?timestamp=1673883284511'
-  const url = `${baseHost}${path}`;
+  const url = '/pricing/1.0/rds/region/us-east-1/aurora/mysql/reserved-instance/single-az/index.json'; //`${baseHost}${path}`;
   console.log('fetching ' + url)
-  var response = UrlFetchApp.fetch(baseHost + path);
-  saveToDrive(response.getContentText(), response);
+  var response = UrlFetchApp.fetch(url);
+  saveToDrive(response.getContentText(), 'RDS RI from cdn ');
 }
 
 function saveToDrive(text, title) {

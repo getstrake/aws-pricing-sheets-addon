@@ -20,14 +20,14 @@ function fetchApiRDS(options) {
   // purchaseTerm?
   // paymentOption?
 
-  const path = `/pricing/1.0/rds/region/${region}/${dbEngine}/${purchaseType}/single_az/index.json`;
+  const path = `/pricing/1.0/rds/region/${region}/${dbEngine}/${purchaseType}/single-az/index.json`;
   const url = `${cfg.baseHost}${path}`;
   const response = JSON.parse(fetchUrlCached(url));
   const prices = filterPricesRDS(response.prices, options);
   if (prices.length === 0)
-    throw `Unable to find RDS instance ${this.instanceType} for DB engine ${this.dbEngineStr()}`
+    throw `Unable to find RDS instance ${instanceType} for DB engine ${dbEngine}`
   if (prices.length > 1)
-    throw `Too many matches found for ${this.instanceType} for DB engine ${this.dbEngineStr()}`
+    throw `Too many matches found for ${instanceType} for DB engine ${dbEngine}`
   const price = purchaseType === "ondemand" ?
     prices[0].price.USD :
     prices[0].calculatedPrice.effectiveHourlyRate.USD
@@ -35,16 +35,20 @@ function fetchApiRDS(options) {
 }
 
 function filterPricesRDS(prices, options) {
+  const rewritePurchaseType = {
+    "reserved-instance": "reserved-only",
+    "ondemand": "ondemand",
+  }
   return prices.filter(price => {
     let ret = price.attributes['aws:region'] == options.region &&
-        price.attributes['aws:rds:term'] === options.purchaseType &&
+        price.attributes['aws:rds:term'] === rewritePurchaseType[options.purchaseType] &&
         price.attributes['aws:rds:instanceType'] === options.instanceType;
     if(options.purchaseType !== 'reserved-instance')
       return ret;
     
-    // if (!ret) { // TO DO: why?
-    //     return ret
-    // }
+    if (!ret) { // TO DO: why?
+        return ret
+    }
 
     return price.attributes['aws:offerTermLeaseLength'] === options.purchaseTerm + "yr" &&
         price.attributes['aws:offerTermPurchaseOption'] === getPaymentOptionAttr(options.paymentOption)

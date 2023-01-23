@@ -4,6 +4,5 @@ node_modules/
 experiment/
 pnpm-lock.yamlexperiment/
 pnpm-lock.yaml
-
-# macOS debris
 .DS_Store
+src/Test.js
