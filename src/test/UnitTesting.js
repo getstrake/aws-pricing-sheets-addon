@@ -33,10 +33,10 @@ class UnitTestingApp {
    */
   areDeepEqual(expected, actual, message) {
     try {
-      message = message || JSON.stringify(this.getFunctionName(actual)) + " === (deep equal) === " + JSON.stringify(expected.toString());
+      message = message || JSON.stringify(this.getFunctionName(actual)) + " === (deep equal) === " + JSON.stringify(expected);
       if ("function" === typeof actual) actual = actual();
       if (JSON.stringify(actual) === JSON.stringify(expected)) return `✔ ${message}`;
-      else return `❌ ${message}`;
+      else return `❌ ${message} but result was ${JSON.stringify(actual)}`;
     } catch(err) {
       return `❌ ${message} (${err})`;
     }
@@ -109,7 +109,7 @@ class UnitTestingApp {
 
   getFunctionName(func) {
     if("function" !== typeof func) return func;
-    return func.toString().replaceAll('() => ','').replaceAll('function() {','').replace(/\}$\s?/g,'').trim();
+    return func.toString().replace(/\n/g,' ').replaceAll('() => ','').replaceAll('function() {','').replace(/\}$\s?/g,'').trim();
   }
   
   /**

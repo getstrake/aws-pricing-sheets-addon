@@ -1,5 +1,15 @@
 
-function fetchApiRDS_Storage(options) {
+function RDS_STORAGE_FROM_SETTINGS({settings, storageType, storageSize, region}) {
+  settings = mapValuesToObjectWithLowerCaseValues(settings);
+
+  return fetchApiEBS({
+    region: region || settings.region, 
+    storageType,
+    storageSize
+  });
+}
+
+function fetchApiRDSStorage(options) {
   options = getObjectWithValuesToLowerCase(options);
   const { storageType, storageSize, region } = options;
 
