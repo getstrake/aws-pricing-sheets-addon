@@ -76,7 +76,7 @@ function EC2_RI(instanceType, region, platform, offeringClass,
 }
 
 function fetchApiEC2(options) {
-  options = getObjectWithAllValuesToLowerCase(options);
+  options = getObjectWithValuesToLowerCase(options);
   const { instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption } = options;
 
   if(!region) throw 'Missing region';
@@ -85,7 +85,7 @@ function fetchApiEC2(options) {
   if(!platform) throw 'Missing platform';
 
   const path = `/pricing/1.0/ec2/region/${region}/${purchaseType}/${platform}/index.json`;
-  const url = `${cfg.baseHost}${path}?timestamp=${Date.now()}`;
+  const url = `${cfg.baseHost}${path}`;
   const response = JSON.parse(fetchUrlCached(url));
   const prices = filterPricesEC2(response.prices, options);
   if (prices.length === 0)

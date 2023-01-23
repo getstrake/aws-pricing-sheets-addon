@@ -18,7 +18,7 @@ class UnitTestingApp {
       message = message || this.getFunctionName(actual) + " === " + expected.toString();
       if ("function" === typeof actual) actual = actual();
       if (actual === expected) return `✔ ${message}`;
-      else return `❌ ${message}`;
+      else return `❌ ${message} but result was ${actual}`;
     } catch(err) {
       return `❌ ${message} (${err})`;
     }

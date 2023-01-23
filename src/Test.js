@@ -10,8 +10,8 @@ function test2() {
   // console.log(EC2_EBS_GB([['region', 'us-east-1']], "gp2", 400));
   // console.log(EC2_EBS_MAGNETIC_GB(550.0, "us-east-1"));
   // console.log(EC2_EBS_IO2_IOPS(60000, "us-east-1"));
-  console.log(EC2_EBS_GP3_IOPS(7000, "us-east-1", 0.000001));
-  
+  // console.log(EC2_EBS_GP3_IOPS(7000, "us-east-1", 0.000001));
+  console.log(EC2_SUSE_OD("m5.xlarge", "us-east-1"));
 }
 
 function test1() {
