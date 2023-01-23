@@ -42,7 +42,7 @@ function filterPricesRDS(prices, options) {
     if(options.purchaseType !== 'reserved-instance')
       return ret;
     
-    // if (!ret) { // CHECK THIS: why?
+    // if (!ret) { // TO DO: why?
     //     return ret
     // }
 

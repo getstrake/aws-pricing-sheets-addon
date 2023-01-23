@@ -4,6 +4,8 @@ function onOpen() {
     .addItem('Test EC2','showTestEC2')
     .addItem('Test EBS','showTestEBS')
     .addItem('Test RDS Functions','showTestRDSFunction')
+    .addItem('Test RDS Storage','showTestRDSStorageFunction')
+    .addItem('Test Functions','showTestFunctions')
     .addToUi();
 }
 
@@ -262,18 +264,24 @@ function getRDSFunctionTests() {
   }
 }
 
-function getFunctionTests() {
+function getRDSStorageTests() {
+  /// TO DO
+}
 
-  getObjectWithValuesToLowerCase(
-    { a: 
-      [
-        'A', 
-        'b', 
-        { c: 'CCCee', 
-          d: ['D', 'EE'] }, 
-        new Date()
-      ] 
-  });
+function getFunctionTests() {
+  const t = new UnitTestingApp();
+  return {"Function tests": [
+    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2022-12-31T23:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
+      { a: 
+        [
+          'A', 
+          'b', 
+          { c: 'CCCee', 
+            d: ['D', 'EE'] }, 
+          new Date(2023,0,1)
+        ] 
+    })),
+  ]}
 }
 
 function linuxRi(region, offeringClass, term, paymentOption) {
@@ -303,6 +311,14 @@ function showTestRDSFunction() {
   showTest(getRDSFunctionTests(), 'RDSFunctionTest');
 }
 
+function showTestRDSStorageFunction() {
+  showTest(getRDSStorageTests(), 'RDSStorageTest');
+}
+
+function showTestFunctions() {
+  showTest(getFunctionTests(), 'FunctionTest');
+}
+
 function EC2Test(chapter, testIndex) {
   return getEC2Tests()[chapter][testIndex];
 }
@@ -313,6 +329,14 @@ function EBSTest(chapter, testIndex) {
 
 function RDSFunctionTest(chapter, testIndex) {
   return getRDSFunctionTests()[chapter][testIndex];
+}
+
+function RDSStorageTest(chapter, testIndex) {
+  return getRDSStorageTests()[chapter][testIndex];
+}
+
+function FunctionTest(chapter, testIndex) {
+  return getFunctionTests()[chapter][testIndex];
 }
 
 function showTest(tests, callback) {

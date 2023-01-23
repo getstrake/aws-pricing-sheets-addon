@@ -142,60 +142,56 @@ def gen_rds(func_dir)
   outfile = File.join(func_dir, outfilename)
   
   f = create_file(outfile)
-  
-  f.write <<~EOF
-  import { RDSFunctions } from "../rds";
-  import { RDSDbEngine } from "../../models/rds_db_engine";
-
-  EOF
 
   engines = {
-      "AURORA_MYSQL" => "Aurora_Mysql",
-      "AURORA_POSTGRESQL" => "Aurora_Postgresql",
-      "MYSQL" => "Mysql",
-      "POSTGRESQL" => "Postgresql",
-      "MARIADB" => "Mariadb"
+      "AURORA_MYSQL" => "aurora/mysql",
+      "AURORA_POSTGRESQL" => "aurora/postgresql",
+      "MYSQL" => "mysql",
+      "POSTGRESQL" => "postgresql",
+      "MARIADB" => "mariadb"
   }
 
   engines.each do |engine|
+    # /**
+    #  * Returns the instance price for a #{engine[1]} RDS DB instance
+    #  *
+    #  * @param {A2:B7} settingsRange Two-column range of default EC2 instance settings
+    #  * @param {"db.r4.xlarge"} instanceType Type of RDS instance
+    #  * @param {"us-east-2"} region Override the region setting (optional)
+    #  * @returns price
+    #  * @customfunction
+    #  */
+
+    #   /**
+    #   * Returns the on-demand instance price for a #{engine[1]} RDS DB instance
+    #   *
+    #   * @param {"db.r4.xlarge"} instanceType Type of RDS instance
+    #   * @param {"us-east-2"} region AWS region of instance
+    #   * @returns price
+    #   * @customfunction
+    #   */
+
+    # /**
+    # * Returns the reserved instance price for a #{engine[1]} RDS DB instance
+    # *
+    # * @param {"db.r4.xlarge"} instanceType Type of RDS instance
+    # * @param {"us-east-2"} region AWS region of instance
+    # * @param {1} purchaseTerm Duration of RI in years (1 or 3)
+    # * @param {"all_upfront"} paymentOption Payment terms (no_upfront, partial_upfront, all_upfront)
+    # * @returns price
+    # * @customfunction
+    # */
       func = <<~EOF
-      /**
-       * Returns the instance price for a #{engine[1]} RDS DB instance
-       *
-       * @param {A2:B7} settingsRange Two-column range of default EC2 instance settings
-       * @param {"db.r4.xlarge"} instanceType Type of RDS instance
-       * @param {"us-east-2"} region Override the region setting (optional)
-       * @returns price
-       * @customfunction
-       */
-      function RDS_#{engine[0].upcase}(settingsRange: Array<Array<string>>, instanceType: string, region?: string) {
-          return RDSFunctions._rds_settings(settingsRange, RDSDbEngine.#{engine[1]}, instanceType, region)
+      function RDS_#{engine[0].upcase}(settingsRange, instanceType, region) {
+        return RDS_FROM_SETTINGS(settingsRange, "#{engine[1]}", instanceType, region)
       }
 
-      /**
-       * Returns the on-demand instance price for a #{engine[1]} RDS DB instance
-       *
-       * @param {"db.r4.xlarge"} instanceType Type of RDS instance
-       * @param {"us-east-2"} region AWS region of instance
-       * @returns price
-       * @customfunction
-       */
-      function RDS_#{engine[0].upcase}_OD(instanceType: string, region: string) {
-          return RDSFunctions._rds_full(RDSDbEngine.#{engine[1]}, instanceType, region, 'ondemand')
+      function RDS_#{engine[0].upcase}_OD(instanceType, region) {
+        return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: "ondemand"})
       }
 
-      /**
-       * Returns the reserved instance price for a #{engine[1]} RDS DB instance
-       *
-       * @param {"db.r4.xlarge"} instanceType Type of RDS instance
-       * @param {"us-east-2"} region AWS region of instance
-       * @param {1} purchaseTerm Duration of RI in years (1 or 3)
-       * @param {"all_upfront"} paymentOption Payment terms (no_upfront, partial_upfront, all_upfront)
-       * @returns price
-       * @customfunction
-       */
-      function RDS_#{engine[0].upcase}_RI(instanceType: string, region: string, purchaseTerm: string | number, paymentOption: string) {
-          return RDSFunctions._rds_full(RDSDbEngine.#{engine[1]}, instanceType, region, 'reserved', purchaseTerm, paymentOption)
+      function RDS_#{engine[0].upcase}_RI(instanceType, region, purchaseTerm, paymentOption) {
+        return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm, paymentOption})
       }
 
       EOF
@@ -209,30 +205,24 @@ def gen_rds(func_dir)
       }
 
       payment_options.each do |payment_option|
+        # /**
+        # * Returns the reserved instance price for a #{engine[1]} RDS DB instance with #{payment_option[0]} payment
+        # *
+        # * @param {"db.r4.xlarge"} instanceType Type of RDS instance
+        # * @param {"us-east-2"} region AWS region of instance
+        # * @param {1} purchaseTerm Duration of RI in years (1 or 3)
+        # * @returns price
+        # * @customfunction
+        # */
           func = <<~EOF
-          /**
-          * Returns the reserved instance price for a #{engine[1]} RDS DB instance with #{payment_option[0]} payment
-          *
-          * @param {"db.r4.xlarge"} instanceType Type of RDS instance
-          * @param {"us-east-2"} region AWS region of instance
-          * @param {1} purchaseTerm Duration of RI in years (1 or 3)
-          * @returns price
-          * @customfunction
-          */
-          function RDS_#{engine[0].upcase}_RI_#{payment_option[1].upcase}(instanceType: string, region: string, purchaseTerm: string | number) {
-              return RDSFunctions._rds_full(RDSDbEngine.#{engine[1]}, instanceType, region, 'reserved', purchaseTerm, "#{payment_option[0]}")
+          function RDS_#{engine[0].upcase}_RI_#{payment_option[1].upcase}(instanceType, region, purchaseTerm) {
+            return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm, paymentOption: "#{payment_option[0]}"});
           }
+
           EOF
           f.write(func)
       end
   end
-
-  f.write <<~EOF
-
-  // don't export variables, results in clasp error
-  const RDS_GENFunctions = { RDS_AURORA_MYSQL_OD, RDS_AURORA_MYSQL_RI, RDS_AURORA_MYSQL_RI_NO, RDS_AURORA_MYSQL_RI_PARTIAL, RDS_AURORA_MYSQL_RI_ALL, RDS_AURORA_POSTGRESQL_OD, RDS_MARIADB_OD, RDS_POSTGRESQL_OD, RDS_MYSQL_OD, RDS_AURORA_MYSQL, RDS_MARIADB_RI, RDS_AURORA_POSTGRESQL_RI, RDS_MYSQL_RI, RDS_POSTGRESQL_RI }
-
-  EOF
 
   f.close
 end
@@ -243,51 +233,30 @@ def gen_rds_storage(func_dir)
 
   f = create_file(outfile)
 
-  f.write <<~EOF
-  import { RDS_STORAGE_Functions } from "../rds_storage";
-
-  EOF
-
   voltypes = ["aurora", "gp2", "piops", "magnetic"]
 
   voltypes.each do |voltype|
+    # /**
+    #  * Returns the price of RDS storage for a #{voltype} volume type. Invoke as either:
+    #  * (settingsRange, size[, region]) or (size, region).
+    #  *
+    #  * @param {A2:B7 or 4000} settingsOrSize Settings range or volume size
+    #  * @param {4000 or "us-east-2"} sizeOrRegion Either a volume size or the region
+    #  * @param {"us-east-2"} region AWS region (optional)
+    #  * @returns price
+    #  * @customfunction
+    #  */
       func = <<~EOF
-      function RDS_STORAGE_#{voltype.upcase}_GB(settingsRange: Array<Array<string>>, volumeSize: string|number, region?: string): number;
-
-      function RDS_STORAGE_#{voltype.upcase}_GB(volumeSize: string|number, region: string): number;
-
-      /**
-       * Returns the price of RDS storage for a #{voltype} volume type. Invoke as either:
-       * (settingsRange, size[, region]) or (size, region).
-       *
-       * @param {A2:B7 or 4000} settingsOrSize Settings range or volume size
-       * @param {4000 or "us-east-2"} sizeOrRegion Either a volume size or the region
-       * @param {"us-east-2"} region AWS region (optional)
-       * @returns price
-       * @customfunction
-       */
-      function RDS_STORAGE_#{voltype.upcase}_GB(settingsOrSize, sizeOrRegion, region?: string): number {
-          if (typeof settingsOrSize === "string" || typeof settingsOrSize === "number") {
-              return RDS_STORAGE_Functions.RDS_STORAGE_GB("#{voltype}", settingsOrSize, sizeOrRegion)
-          } else {
-              return RDS_STORAGE_Functions.RDS_STORAGE_GB(settingsOrSize, "#{voltype}", sizeOrRegion, region)
-          }
+      function RDS_STORAGE_#{voltype.upcase}_GB(settingsOrSize, sizeOrRegion, region) {
+        if (typeof settingsOrSize === "string" || typeof settingsOrSize === "number") {
+            return fetchApiRDSStorage({ storageType: "#{voltype}", storageSize: settingsOrSize, region });
+        } else {
+            return RDS_STORAGE_FROM_SETTINGS({settings: settingsOrSize, storageType: "#{voltype}", storageSize: sizeOrRegion, region});
+        }
       }
       EOF
       f.write(func)
   end
-
-  f.write <<~EOF
-  
-  // don't export variables, results in clasp error
-  const RDS_STORAGE_GENFunctions = {
-  RDS_STORAGE_AURORA_GB,
-  RDS_STORAGE_PIOPS_GB,
-  RDS_STORAGE_MAGNETIC_GB,
-  RDS_STORAGE_GP2_GB,
-  };
-
-  EOF
 
   f.close
 end
@@ -303,5 +272,5 @@ func_dir = File.join(topdir, 'src/functions/generated')
 
 gen_ec2_ri(func_dir)
 gen_ebs(func_dir)
-# gen_rds(func_dir)
-# gen_rds_storage(func_dir)
+gen_rds(func_dir)
+gen_rds_storage(func_dir)
