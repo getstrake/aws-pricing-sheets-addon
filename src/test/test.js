@@ -176,18 +176,18 @@ function getEC2Tests() {
           () => EC2(paramsToSettings("ca-central-1", "linux", "ondemand", "standard", 1, "all_upfront"), "m5.xlarge")),
   // })
   ],"EC2 RI": [
-    t.areClose(0.115648, () => EC2(linuxRi('us-east-1', 'standard', 1, 'partial_upfront'), "m5.xlarge"), 0.00001, 0.000001),
-    t.areClose(0.134123, () => EC2(linuxRi('us-east-1', 'convertible', 1, 'partial_upfront'), "m5.xlarge"), 0.00001, 0.000001),
-    t.areClose(0.121, () => EC2(linuxRi('us-east-1', 'standard', 1, 'no_upfront'), "m5.xlarge"), 0.00001, 0.000001),
-    t.areClose(0.1129, () => EC2(linuxRi('us-east-1', 'standard', 1, 'all_upfront'), "m5.xlarge"), 0.00001, 0.000001),
-    t.areClose(0.072184, () => EC2(linuxRi('us-east-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001, 0.000001),
-    t.areClose(0.084209, () => EC2(linuxRi('us-west-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001, 0.000001),
+    t.areClose(0.115648, () => EC2(linuxRi('us-east-1', 'standard', 1, 'partial_upfront'), "m5.xlarge"), 0.00001),
+    t.areClose(0.134123, () => EC2(linuxRi('us-east-1', 'convertible', 1, 'partial_upfront'), "m5.xlarge"), 0.00001),
+    t.areClose(0.121, () => EC2(linuxRi('us-east-1', 'standard', 1, 'no_upfront'), "m5.xlarge"), 0.00001),
+    t.areClose(0.1129, () => EC2(linuxRi('us-east-1', 'standard', 1, 'all_upfront'), "m5.xlarge"), 0.00001),
+    t.areClose(0.072184, () => EC2(linuxRi('us-east-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001),
+    t.areClose(0.084209, () => EC2(linuxRi('us-west-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001),
   // })
   ],"EC2 RI functions": [
-    t.areClose(0.131621, () => EC2_LINUX_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001, 0.000001),
-    t.areClose(0.191667, () => EC2_RHEL_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001, 0.000001),
-    t.areClose(0.199201, () => EC2_LINUX_MSSQL_CONV_RI_ALL("m5.xlarge", "us-east-1", "web", "1"), 0.00001, 0.000001),
-    t.areClose(0.740395, () => EC2_WINDOWS_MSSQL_STD_RI_PARTIAL("m5.xlarge", "us-east-2", "std", "3"), 0.00001, 0.000001),
+    t.areClose(0.131621, () => EC2_LINUX_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001),
+    t.areClose(0.191667, () => EC2_RHEL_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001),
+    t.areClose(0.199201, () => EC2_LINUX_MSSQL_CONV_RI_ALL("m5.xlarge", "us-east-1", "web", "1"), 0.00001),
+    t.areClose(0.740395, () => EC2_WINDOWS_MSSQL_STD_RI_PARTIAL("m5.xlarge", "us-east-2", "std", "3"), 0.00001),
   ],"helper functions": [
     t.areDeepEqual({
       "region": "us-east-1",
@@ -260,6 +260,20 @@ function getRDSFunctionTests() {
     t.willThrow(() => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 2, "no_upfront"), "purchase_term")
     ]
   }
+}
+
+function getFunctionTests() {
+
+  getObjectWithValuesToLowerCase(
+    { a: 
+      [
+        'A', 
+        'b', 
+        { c: 'CCCee', 
+          d: ['D', 'EE'] }, 
+        new Date()
+      ] 
+  });
 }
 
 function linuxRi(region, offeringClass, term, paymentOption) {

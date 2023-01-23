@@ -75,7 +75,7 @@ function fetchApiEBS(options) {
     saveToDrive(response, "ebs.json");
   }
   const price = getPriceEBS(response.prices, options);
-  return price / cfg.hoursPerMonth;
+  return price * parseFloat(volumeSize) / cfg.hoursPerMonth;
 }
 
 function getVolumeTypeFullName(volumeType) {
@@ -134,7 +134,7 @@ const getPriceEBS = (prices, options) => {
   if (prices.length > 1)
     throw "Multiple prices found";
 
-  return parseFloat(prices[0].price.USD) * parseFloat(volumeSize)
+  return parseFloat(prices[0].price.USD);
 }
 
 function tieredIO2IOPS(prices, volumeSize) {
