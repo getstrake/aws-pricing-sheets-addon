@@ -5,10 +5,6 @@ function RDS_FROM_SETTINGS(settingsRange, dbEngine, instanceType, region) {
   fetchApiRDS(options);
 }
 
-function RDS(dbEngine, instanceType, region, purchaseType) {
-  return fetchApiRDS({ dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption });
-}
-
 function fetchApiRDS(options) {
   options = getObjectWithValuesToLowerCase(options);
   const { dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption } = options;
