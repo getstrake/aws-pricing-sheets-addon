@@ -33,21 +33,21 @@ function fetchApiRDS(options) {
 function filterPricesRDS(prices, options) {
   const rewritePurchaseType = {
     "reserved-instance": "reserved-only",
-    "ondemand": "ondemand",
+    "ondemand": "on-demand",
   }
   return prices.filter(price => {
-    let ret = price.attributes['aws:region'] == options.region &&
-        price.attributes['aws:rds:term'] === rewritePurchaseType[options.purchaseType] &&
-        price.attributes['aws:rds:instanceType'] === options.instanceType;
-    if(options.purchaseType !== 'reserved-instance')
-      return ret;
-    
-    if (!ret) { // TO DO: why?
-        return ret
-    }
+    let basicFilter = price.attributes['aws:region'] == options.region &&
+      price.attributes['aws:rds:term'] === rewritePurchaseType[options.purchaseType] &&
+      price.attributes['aws:rds:instanceType'] === options.instanceType;
+  
+    if(options.purchaseType === "ondemand")
+    return basicFilter;
 
-    return price.attributes['aws:offerTermLeaseLength'] === options.purchaseTerm &&
-        price.attributes['aws:offerTermPurchaseOption'] === getPaymentOptionAttr(options.paymentOption)
+    let reservedFilter = price.attributes['aws:offerTermLeaseLength'] === options.purchaseTerm &&
+      price.attributes['aws:offerTermPurchaseOption'] === getPaymentOptionAttr(options.paymentOption);
+    
+    if(options.purchaseType === "reserved-instance")
+      return  basicFilter && reservedFilter;
   })
 }
 
@@ -58,6 +58,6 @@ function getPaymentOptionAttr(paymentOption) {
     'all_upfront': 'All Upfront',
   }
   const result = paymentOptionLib[paymentOption];
-  if(!result) throw `Unknown payment option ${this.settings.get('payment_option')}`;
+  if(!result) throw `Unknown payment option ${paymentOption}`;
   return result;
 }

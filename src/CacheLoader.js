@@ -28,6 +28,11 @@ class CacheLoader {
         this.cache.put(keyEncode, encoded, this.expireTime);
   }
 
+  remove(key) {
+    let keyEncode = this.keyEncode(key)
+    this.cache.remove(keyEncode);
+  }
+
   putAndReturn(key, value) {
     this.put(key, value);
     return value;
