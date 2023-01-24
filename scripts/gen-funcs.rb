@@ -191,7 +191,8 @@ def gen_rds(func_dir)
       }
 
       function RDS_#{engine[0].upcase}_RI(instanceType, region, purchaseTerm, paymentOption) {
-        return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm, paymentOption})
+        // version 1 of AWS Pricing has purchaseTerm: 1 (instead of "1yr")
+        return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm: purchaseTerm + "yr", paymentOption})
       }
 
       EOF
@@ -216,7 +217,8 @@ def gen_rds(func_dir)
         # */
           func = <<~EOF
           function RDS_#{engine[0].upcase}_RI_#{payment_option[1].upcase}(instanceType, region, purchaseTerm) {
-            return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm, paymentOption: "#{payment_option[0]}"});
+            // version 1 of AWS Pricing has purchaseTerm: 1 (instead of "1yr")
+            return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm: purchaseTerm + "yr", paymentOption: "#{payment_option[0]}"});
           }
 
           EOF

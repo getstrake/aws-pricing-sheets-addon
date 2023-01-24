@@ -41,7 +41,7 @@ function AWS_EBS(volumeType, storageType, volumeSize, region) {
  * @param {"db.r6g.xlarge"} instanceType Type of RDS instance
  * @param {"us-east-1"} region Override the region setting (optional)
  * @param {"reserved"} purchaseType Either "ondemand" or "reserved"
- * @param {3} purchaseTerm Purchase term years (for reserved instances)
+ * @param {"3yr"} purchaseTerm Purchase term (for reserved instances)
  * @param {"partial_upfront"} paymentOption Payment option: no_upfront, partial_upfront, all_upfront (for reserved instances)
  *
  * @returns price

@@ -50,7 +50,7 @@ function filterPricesRDS(prices, options) {
         return ret
     }
 
-    return price.attributes['aws:offerTermLeaseLength'] === options.purchaseTerm + "yr" &&
+    return price.attributes['aws:offerTermLeaseLength'] === options.purchaseTerm &&
         price.attributes['aws:offerTermPurchaseOption'] === getPaymentOptionAttr(options.paymentOption)
   })
 }
