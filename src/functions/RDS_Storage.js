@@ -1,8 +1,16 @@
 
+function RDS_STORAGE_GB(storageType, storageSize, region) {
+  return fetchApiRDSStorage({
+    region, 
+    storageType,
+    storageSize
+  });
+}
+
 function RDS_STORAGE_FROM_SETTINGS({settings, storageType, storageSize, region}) {
   settings = mapValuesToObjectWithLowerCaseValues(settings);
 
-  return fetchApiEBS({
+  return fetchApiRDSStorage({
     region: region || settings.region, 
     storageType,
     storageSize
@@ -28,16 +36,18 @@ function fetchApiRDSStorage(options) {
       throw `Too many matches for RDS storage type ${storageTypeStr(storageType)}`
   
   const price = prices[0].price.USD;
-  return parseFloat(price) * parseFlost(storageSize);
+  return parseFloat(price) * parseFloat(storageSize) / cfg.hoursPerMonth;
 }
 
 function filterRDSStorage(prices, options) {
+  console.log('options.region ' + options.region);
+  console.log('storageTypeStr(options.storageType) ' + storageTypeStr(options.storageType));
   return prices.filter(price => 
-          price.attributes['aws:productFamily'] === 'Database Storage' &&
-          price.attributes['aws:rds:deploymentOption'] === 'Single-AZ' &&
-          price.attributes['aws:rds:databaseEngine'] === 'Any' &&
+          // price.attributes['aws:productFamily'] === 'Database Storage' && // this attribute is left out, and is already filtered out
+          price.attributes['aws:deploymentOption'] === 'Single-AZ' &&
+          price.attributes['aws:rds:dbEngine'] === 'Any' &&
           price.attributes['aws:region'] === options.region &&
-          price.attributes['aws:rds:volumeType'] === storageTypeStr(storageType)
+          price.attributes['aws:rds:volumetype'] === storageTypeStr(options.storageType)
   )
 }
 

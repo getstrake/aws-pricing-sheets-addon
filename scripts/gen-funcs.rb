@@ -251,7 +251,7 @@ def gen_rds_storage(func_dir)
       func = <<~EOF
       function RDS_STORAGE_#{voltype.upcase}_GB(settingsOrSize, sizeOrRegion, region) {
         if (typeof settingsOrSize === "string" || typeof settingsOrSize === "number") {
-            return fetchApiRDSStorage({ storageType: "#{voltype}", storageSize: settingsOrSize, region });
+            return fetchApiRDSStorage({ storageType: "#{voltype}", storageSize: settingsOrSize, region: sizeOrRegion });
         } else {
             return RDS_STORAGE_FROM_SETTINGS({settings: settingsOrSize, storageType: "#{voltype}", storageSize: sizeOrRegion, region});
         }

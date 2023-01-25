@@ -209,7 +209,7 @@ function getRDSFunctionTests() {
     t.areClose(0.316210, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "all_upfront"), 0.000001),
 
     t.willThrow(
-        () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 3, "no_upfront"), "not supported"),
+        () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 3, "no_upfront"), "The No-Upfront payment option is not supported for 3 year RDS RIs"),
     t.areClose(0.192570, () => RDS_AURORA_MYSQL_RI("db.r6g.xlarge", "us-east-1", 3, "partial_upfront"), 0.000001),
     t.areClose(0.202207, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 3, "all_upfront"), 0.000001),
 
@@ -238,8 +238,14 @@ function getRDSFunctionTests() {
       ['purchase_type', 'ondemand']
   ], "db.r5.xlarge", "ca-central-1")),
 
-    t.areClose(0.288806, () => RDS_AURORA_MYSQL(s, "db.r6g.xlarge"), 0.000001),
-    t.areClose(0.282990, () => RDS_AURORA_MYSQL(s, "db.r6g.xlarge"), 0.000001)
+    t.areClose(0.288806, () => RDS_AURORA_MYSQL([['region', 'us-east-1'],
+    ['purchase_type', 'reserved'],
+    ['purchase_term', '1'],
+    ['payment_option', 'partial_upfront']], "db.r6g.xlarge"), 0.000001),
+    t.areClose(0.282990, () => RDS_AURORA_MYSQL([['region', 'us-east-1'],
+    ['purchase_type', 'reserved'],
+    ['purchase_term', '1'],
+    ['payment_option', 'partial_upfront']], "db.r6g.xlarge"), 0.000001)
 ,
 ],"RDS invalid settings": [
 
@@ -249,7 +255,7 @@ function getRDSFunctionTests() {
         ['purchase_type', 'reserved'],
         ['purchase_term', '1'],
         ['payment_option', 'partial_upfront']
-    ], "db.r1.2xlarge"), "unable to find"),
+    ], "db.r1.2xlarge"), "Unable to find RDS instance db.r1.2xlarge for DB engine aurora/mysql"),
 
     t.willThrow(
         () => RDS_AURORA_MYSQL([
@@ -257,9 +263,9 @@ function getRDSFunctionTests() {
         ['purchase_type', 'reserved'],
         ['purchase_term', '1'],
         ['payment_option', 'partial_upfront']
-    ], undefined), "must specify a db instance"),
+    ], undefined), "Must specify a DB instance type"),
 
-    t.willThrow(() => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 2, "no_upfront"), "purchase_term")
+    t.willThrow(() => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 2, "no_upfront"), "Only 1yr and 3yr purchase terms are supported for RDS RIs")
     ]
   }
 }
