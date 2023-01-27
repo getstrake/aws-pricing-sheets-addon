@@ -195,7 +195,7 @@ function getEC2Tests() {
       "region": "us-east-1",
       "purchase_term": "ondemand",
       "operating_system": "linux"
-    }, mapValuesToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
+    }, map2dArrayToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
   ]};
 }
 
@@ -209,7 +209,7 @@ function getRDSFunctionTests() {
     t.areClose(0.316210, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "all_upfront"), 0.000001),
 
     t.willThrow(
-        () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 3, "no_upfront"), "not supported"),
+        () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 3, "no_upfront"), "The No-Upfront payment option is not supported for 3 year RDS RIs"),
     t.areClose(0.192570, () => RDS_AURORA_MYSQL_RI("db.r6g.xlarge", "us-east-1", 3, "partial_upfront"), 0.000001),
     t.areClose(0.202207, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 3, "all_upfront"), 0.000001),
 
@@ -238,8 +238,14 @@ function getRDSFunctionTests() {
       ['purchase_type', 'ondemand']
   ], "db.r5.xlarge", "ca-central-1")),
 
-    t.areClose(0.288806, () => RDS_AURORA_MYSQL(s, "db.r6g.xlarge"), 0.000001),
-    t.areClose(0.282990, () => RDS_AURORA_MYSQL(s, "db.r6g.xlarge"), 0.000001)
+    t.areClose(0.288806, () => RDS_AURORA_MYSQL([['region', 'us-east-1'],
+    ['purchase_type', 'reserved'],
+    ['purchase_term', '1'],
+    ['payment_option', 'partial_upfront']], "db.r6g.xlarge"), 0.000001),
+    t.areClose(0.282990, () => RDS_AURORA_MYSQL([['region', 'us-east-1'],
+    ['purchase_type', 'reserved'],
+    ['purchase_term', '1'],
+    ['payment_option', 'partial_upfront']], "db.r6g.xlarge"), 0.000001)
 ,
 ],"RDS invalid settings": [
 
@@ -249,7 +255,7 @@ function getRDSFunctionTests() {
         ['purchase_type', 'reserved'],
         ['purchase_term', '1'],
         ['payment_option', 'partial_upfront']
-    ], "db.r1.2xlarge"), "unable to find"),
+    ], "db.r1.2xlarge"), "Unable to find RDS instance db.r1.2xlarge for DB engine aurora/mysql"),
 
     t.willThrow(
         () => RDS_AURORA_MYSQL([
@@ -257,15 +263,55 @@ function getRDSFunctionTests() {
         ['purchase_type', 'reserved'],
         ['purchase_term', '1'],
         ['payment_option', 'partial_upfront']
-    ], undefined), "must specify a db instance"),
+    ], undefined), "Must specify a DB instance type"),
 
-    t.willThrow(() => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 2, "no_upfront"), "purchase_term")
+    t.willThrow(() => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 2, "no_upfront"), "Only 1yr and 3yr purchase terms are supported for RDS RIs")
     ]
   }
 }
 
 function getRDSStorageTests() {
-  /// TO DO
+  const t = new UnitTestingApp();
+  return {"volume type tests": [
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("aurora", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("gp2", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("piops", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("magnetic", 4000, "us-west-1"), 0.000001)
+  ,
+
+  ],"alias tests": [
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_AURORA_GB(4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GP2_GB(4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_PIOPS_GB(4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_MAGNETIC_GB(4000, "us-west-1"), 0.000001)
+  ,
+
+  ],"settings tests": [
+      t.areClose(4000 * (0.127/730), () => RDS_STORAGE_GB(['region', 'ca-central-1'], "gp2", 4000), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB(['region', 'ca-central-1'], "gp2", 4000, "us-west-1"), 0.000001)
+  ],"invalid configs": [
+      t.willThrow(() =>
+          RDS_STORAGE_GB(['region', 'us-east-1'], "gp3", 400),
+          "Invalid storage type"),
+
+      t.willThrow(() =>
+          RDS_STORAGE_GP2_GB(4000, undefined),
+          "Missing region"),
+
+      t.willThrow(() =>
+          RDS_STORAGE_GP2_GB(undefined, "us-east-1"),
+          "must specify a parameter"),
+
+      t.willThrow(() =>
+          RDS_STORAGE_GP2_GB("foo", "us-east-1"),
+          "Invalid storage size"),
+
+      // XXX: this is a compile error but we want to verify we don't treat the number as string
+      // without checking
+      t.willThrow(() =>
+          RDS_STORAGE_GB(['region', 'us-east-1'], 400, "gp2"),
+          "invalid storage type")
+      ]}
 }
 
 function getFunctionTests() {

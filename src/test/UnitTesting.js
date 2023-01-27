@@ -83,7 +83,7 @@ class UnitTestingApp {
       const result = callback();
       return `❌ ${message} but returned successfully this value: ${result}`;
     } catch(err) {
-      return err == errorMessage ? `✔ ${message}` : `❌ ${message}. It threw error: (${err})`;
+      return err.toString().toLowerCase() === errorMessage.toString().toLowerCase() ? `✔ ${message}` : `❌ ${message}. It threw error: (${err})`;
     }
   }
 

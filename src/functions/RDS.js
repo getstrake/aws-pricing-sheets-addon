@@ -1,12 +1,21 @@
 function RDS_FROM_SETTINGS(settingsRange, dbEngine, instanceType, region) {
-  // take settings
-  // dbEngine, instanceType from arguments or settings?
-  // overrule region
-  fetchApiRDS(options);
-}
+  if (!settingsRange || settingsRange.length === 0 || settingsRange[0].length < 2) {
+      throw "Missing required settings range"
+  }
 
-function RDS(dbEngine, instanceType, region, purchaseType) {
-  return fetchApiRDS({ dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption });
+  const settings = map2dArrayToObjectWithLowerCaseValues(settingsRange);
+
+  console.log({settings})
+  const options = {
+    dbEngine: dbEngine || settings.db_engine,
+    instanceType: instanceType,
+    region: region || settings.region,
+    purchaseType: settings.purchase_type === "reserved" ? "reserved-instance" : settings.purchase_type, 
+    purchaseTerm: settings.purchase_term + "yr", // version 1 of the add-on used purchase_term as a number 
+    paymentOption: settings.payment_option
+  }
+  console.log({options})
+  return fetchApiRDS(options);
 }
 
 function fetchApiRDS(options) {
@@ -17,8 +26,17 @@ function fetchApiRDS(options) {
   if(!instanceType) throw `Must specify a DB instance type`;
   if(!region) throw 'Missing region';
   if(!purchaseType) throw 'Missing purchaseType';
-  // purchaseTerm?
-  // paymentOption?
+
+  if(purchaseType === "reserved-instance") {
+    if(!purchaseTerm) throw 'Missing purchaseTerm';
+    if(!paymentOption) throw 'Missing paymentOption';
+    if(!["1yr","3yr"].includes(purchaseTerm)) {
+      throw `Only 1yr and 3yr purchase terms are supported for RDS RIs`
+    }
+    if(purchaseTerm === "3yr" && paymentOption === "no_upfront") {
+      throw `The No-Upfront payment option is not supported for 3 year RDS RIs`
+    }
+  }
 
   const path = `/pricing/1.0/rds/region/${region}/${dbEngine}/${purchaseType}/single-az/index.json`;
   const url = `${cfg.baseHost}${path}`;
@@ -37,21 +55,21 @@ function fetchApiRDS(options) {
 function filterPricesRDS(prices, options) {
   const rewritePurchaseType = {
     "reserved-instance": "reserved-only",
-    "ondemand": "ondemand",
+    "ondemand": "on-demand",
   }
   return prices.filter(price => {
-    let ret = price.attributes['aws:region'] == options.region &&
-        price.attributes['aws:rds:term'] === rewritePurchaseType[options.purchaseType] &&
-        price.attributes['aws:rds:instanceType'] === options.instanceType;
-    if(options.purchaseType !== 'reserved-instance')
-      return ret;
-    
-    if (!ret) { // TO DO: why?
-        return ret
-    }
+    let basicFilter = price.attributes['aws:region'] == options.region &&
+      price.attributes['aws:rds:term'] === rewritePurchaseType[options.purchaseType] &&
+      price.attributes['aws:rds:instanceType'] === options.instanceType;
+  
+    if(options.purchaseType === "ondemand")
+      return basicFilter;
 
-    return price.attributes['aws:offerTermLeaseLength'] === options.purchaseTerm + "yr" &&
-        price.attributes['aws:offerTermPurchaseOption'] === getPaymentOptionAttr(options.paymentOption)
+    let reservedFilter = price.attributes['aws:offerTermLeaseLength'] === options.purchaseTerm &&
+      price.attributes['aws:offerTermPurchaseOption'] === getPaymentOptionAttr(options.paymentOption);
+    
+    if(options.purchaseType === "reserved-instance")
+      return  basicFilter && reservedFilter;
   })
 }
 
@@ -62,6 +80,6 @@ function getPaymentOptionAttr(paymentOption) {
     'all_upfront': 'All Upfront',
   }
   const result = paymentOptionLib[paymentOption];
-  if(!result) throw `Unknown payment option ${this.settings.get('payment_option')}`;
+  if(!result) throw `Unknown payment option ${paymentOption}`;
   return result;
 }
