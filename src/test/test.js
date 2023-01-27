@@ -118,7 +118,7 @@ function getEC2Tests() {
     t.areEqual(0.192, () => EC2_LINUX_OD("m5.xlarge", "us-east-1")),
     t.areEqual(0.214, () => EC2_LINUX_OD("m5.xlarge", "ca-central-1")),
     t.areEqual(0.252, () => EC2_RHEL_OD("m5.xlarge", "us-east-1")),
-    t.areEqual(0.292, () => EC2_SUSE_OD("m5.xlarge", "us-east-1")),
+    t.areEqual(0.248, () => EC2_SUSE_OD("m5.xlarge", "us-east-1")),
     t.willThrow(function() {
         EC2_OD("m5.xlarge", "us-east-1", undefined)
     }, "Missing platform"),
