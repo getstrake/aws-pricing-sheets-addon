@@ -3,7 +3,7 @@ function RDS_FROM_SETTINGS(settingsRange, dbEngine, instanceType, region) {
       throw "Missing required settings range"
   }
 
-  const settings = mapValuesToObjectWithLowerCaseValues(settingsRange);
+  const settings = map2dArrayToObjectWithLowerCaseValues(settingsRange);
 
   console.log({settings})
   const options = {

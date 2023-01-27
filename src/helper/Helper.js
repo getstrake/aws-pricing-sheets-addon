@@ -41,8 +41,9 @@ function getArrayWithValuesToLowerCase(arr) {
 
 // maps 2d array to object with lowercase for keys and values
 // example: [["name", "JohN"],["aGe", 39]] => {name: "john", age: 39}
-function mapValuesToObjectWithLowerCaseValues(values) {
+function map2dArrayToObjectWithLowerCaseValues(values) {
   if(!values || !Array.isArray(values)) return {};
+  if(!Array.isArray(values[0])) values = [values]; // if not 2d array, make it 2d
   const result = values.reduce((prev, cur) => {
       const key = cur?.[0]?.toString().toLowerCase();
       const value = cur?.[1]?.toString().toLowerCase();

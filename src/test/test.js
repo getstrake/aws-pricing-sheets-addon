@@ -195,7 +195,7 @@ function getEC2Tests() {
       "region": "us-east-1",
       "purchase_term": "ondemand",
       "operating_system": "linux"
-    }, mapValuesToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
+    }, map2dArrayToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
   ]};
 }
 

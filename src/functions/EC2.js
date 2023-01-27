@@ -29,7 +29,7 @@ function EC2(settingsValues, instanceType, region) {
       throw "Missing required settings range"
   }
 
-  const settings = mapValuesToObjectWithLowerCaseValues(settingsValues);
+  const settings = map2dArrayToObjectWithLowerCaseValues(settingsValues);
 
   // Example settings: (comes from a selection in an earlier version of AWS Pricing Sheets)
   //   {

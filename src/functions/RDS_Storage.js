@@ -8,7 +8,7 @@ function RDS_STORAGE_GB(storageType, storageSize, region) {
 }
 
 function RDS_STORAGE_FROM_SETTINGS({settings, storageType, storageSize, region}) {
-  settings = mapValuesToObjectWithLowerCaseValues(settings);
+  settings = map2dArrayToObjectWithLowerCaseValues(settings);
 
   return fetchApiRDSStorage({
     region: region || settings.region, 
