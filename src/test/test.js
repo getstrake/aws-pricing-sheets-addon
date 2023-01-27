@@ -271,7 +271,47 @@ function getRDSFunctionTests() {
 }
 
 function getRDSStorageTests() {
-  /// TO DO
+  const t = new UnitTestingApp();
+  return {"volume type tests": [
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("aurora", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("gp2", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("piops", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("magnetic", 4000, "us-west-1"), 0.000001)
+  ,
+
+  ],"alias tests": [
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_AURORA_GB(4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GP2_GB(4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_PIOPS_GB(4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_MAGNETIC_GB(4000, "us-west-1"), 0.000001)
+  ,
+
+  ],"settings tests": [
+      t.areClose(4000 * (0.127/730), () => RDS_STORAGE_GB(['region', 'ca-central-1'], "gp2", 4000), 0.000001),
+      t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB(['region', 'ca-central-1'], "gp2", 4000, "us-west-1"), 0.000001)
+  ],"invalid configs": [
+      t.willThrow(() =>
+          RDS_STORAGE_GB(['region', 'us-east-1'], "gp3", 400),
+          "invalid storage type"),
+
+      t.willThrow(() =>
+          RDS_STORAGE_GP2_GB(4000, undefined),
+          "missing required option: region"),
+
+      t.willThrow(() =>
+          RDS_STORAGE_GP2_GB(undefined, "us-east-1"),
+          "must specify a parameter"),
+
+      t.willThrow(() =>
+          RDS_STORAGE_GP2_GB("foo", "us-east-1"),
+          "unable to parse"),
+
+      // XXX: this is a compile error but we want to verify we don't treat the number as string
+      // without checking
+      t.willThrow(() =>
+          RDS_STORAGE_GB(['region', 'us-east-1'], 400, "gp2"),
+          "invalid storage type")
+      ]}
 }
 
 function getFunctionTests() {
