@@ -48,7 +48,7 @@ function EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType, volumeSize, r
     throw `invalid EBS volume type`
   }
   
-  settings = mapValuesToObjectWithLowerCaseValues(settings);
+  settings = map2dArrayToObjectWithLowerCaseValues(settings);
 
   return fetchApiEBS({
     volumeType,
