@@ -39,17 +39,15 @@ function fetchApiRDSStorage(options) {
   const prices = filterRDSStorage(response.prices, options);
 
   if (prices.length === 0)
-    throw `Can not find price for RDS storage type ${storageTypeStr(storageType)}`
+    throw `Can not find price for RDS storage type ${storageTypeStr(storageType)} from storageType ${storageType}`
   if (prices.length > 1)
-      throw `Too many matches for RDS storage type ${storageTypeStr(storageType)}`
+      throw `Too many matches for RDS storage type ${storageTypeStr(storageType)} from storageType ${storageType}`
   
   const price = prices[0].price.USD;
   return parseFloat(price) * parseFloat(storageSize) / cfg.hoursPerMonth;
 }
 
 function filterRDSStorage(prices, options) {
-  console.log('options.region ' + options.region);
-  console.log('storageTypeStr(options.storageType) ' + storageTypeStr(options.storageType));
   return prices.filter(price => 
           // price.attributes['aws:productFamily'] === 'Database Storage' && // this attribute is left out, and is already filtered out
           price.attributes['aws:deploymentOption'] === 'Single-AZ' &&
