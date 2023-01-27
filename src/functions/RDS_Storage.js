@@ -16,6 +16,7 @@ function RDS_STORAGE_GB(settingsOrType, typeOrSize, sizeOrRegion, region) {
 }
 
 function RDS_STORAGE_FROM_SETTINGS({settings, storageType, storageSize, region}) {
+  if(!settings) throw 'Must specify a parameter';
   settings = map2dArrayToObjectWithLowerCaseValues(settings);
 
   return fetchApiRDSStorage({
@@ -30,8 +31,10 @@ function fetchApiRDSStorage(options) {
   const { storageType, storageSize, region } = options;
 
   if(!storageType) throw `Must specify storage type`;
+  if(!storageTypeStr(options.storageType)) throw 'Invalid storage type';
   if(!storageSize) throw `Must specify storage size`;
   if(!region) throw 'Missing region';
+  if(isNaN(parseFloat(storageSize))) throw 'Invalid storage size';
 
   const path = '/pricing/1.0/rds/database-storage/index.json';
   const url = `${cfg.baseHost}${path}`;
@@ -64,5 +67,5 @@ function storageTypeStr(storageType) {
     'magnetic': 'Magnetic',
     'aurora': 'General Purpose-Aurora',
   };
-  return storageTypeLib[storageType] || "Unknown"
+  return storageTypeLib[storageType];
 }

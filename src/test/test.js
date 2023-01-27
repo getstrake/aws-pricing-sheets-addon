@@ -292,11 +292,11 @@ function getRDSStorageTests() {
   ],"invalid configs": [
       t.willThrow(() =>
           RDS_STORAGE_GB(['region', 'us-east-1'], "gp3", 400),
-          "invalid storage type"),
+          "Invalid storage type"),
 
       t.willThrow(() =>
           RDS_STORAGE_GP2_GB(4000, undefined),
-          "missing required option: region"),
+          "Missing region"),
 
       t.willThrow(() =>
           RDS_STORAGE_GP2_GB(undefined, "us-east-1"),
@@ -304,7 +304,7 @@ function getRDSStorageTests() {
 
       t.willThrow(() =>
           RDS_STORAGE_GP2_GB("foo", "us-east-1"),
-          "unable to parse"),
+          "Invalid storage size"),
 
       // XXX: this is a compile error but we want to verify we don't treat the number as string
       // without checking
