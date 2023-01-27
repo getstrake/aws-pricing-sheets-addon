@@ -1,10 +1,18 @@
-
-function RDS_STORAGE_GB(storageType, storageSize, region) {
-  return fetchApiRDSStorage({
-    region, 
-    storageType,
-    storageSize
-  });
+function RDS_STORAGE_GB(settingsOrType, typeOrSize, sizeOrRegion, region) {
+  if(Array.isArray(settingsOrType)) {
+    return RDS_STORAGE_FROM_SETTINGS({
+      settings: settingsOrType, 
+      storageType: typeOrSize, 
+      storageSize: sizeOrRegion, 
+      region
+    });
+  } else {
+    return fetchApiRDSStorage({
+      storageType: settingsOrType,
+      storageSize: typeOrSize,
+      region: sizeOrRegion
+    });
+  }
 }
 
 function RDS_STORAGE_FROM_SETTINGS({settings, storageType, storageSize, region}) {
