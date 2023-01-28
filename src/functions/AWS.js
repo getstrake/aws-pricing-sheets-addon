@@ -14,9 +14,11 @@
  * @customfunction
  */
 function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, purchaseTerm, paymentOption) {
-  options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption });
-  options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
-  return fetchApiEC2(options);
+  return analyticsWrapper(arguments, () => {
+    options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption });
+    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    return fetchApiEC2(options);
+  });
 }
 
 /**
@@ -30,8 +32,10 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
  * @customfunction
  */
 function AWS_EBS(volumeType, storageType, volumeSize, region) {
-  options = getObjectWithValuesToLowerCase({ volumeType, storageType, volumeSize, region });
-  return  fetchApiEBS(options);
+  return analyticsWrapper(arguments, () => {
+    options = getObjectWithValuesToLowerCase({ volumeType, storageType, volumeSize, region });
+    return fetchApiEBS(options);
+  });
 }
 
 /**
@@ -48,9 +52,11 @@ function AWS_EBS(volumeType, storageType, volumeSize, region) {
  * @customfunction
  */
 function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption) {
-  const options = getObjectWithValuesToLowerCase({ dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption });
-  options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
-  return  fetchApiRDS(options);
+  return analyticsWrapper(arguments, () => {
+    const options = getObjectWithValuesToLowerCase({ dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption });
+    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    return fetchApiRDS(options);
+  });
 }
 
 /**
@@ -63,6 +69,8 @@ function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, pay
  * @customfunction
  */
 function AWS_RDS_STORAGE(storageType, storageSize, region) {
-  const options = getObjectWithValuesToLowerCase({ storageType, storageSize, region });
-  return  fetchApiRDSStorage(options);
+  return analyticsWrapper(arguments, () => {
+    const options = getObjectWithValuesToLowerCase({ storageType, storageSize, region });
+    return fetchApiRDSStorage(options);
+  });
 }
