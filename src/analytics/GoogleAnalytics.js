@@ -1,4 +1,6 @@
 function analyticsWrapper(args, callback) {
+  if(!cfg.logCustomFunctionToAnalytics) return callback();
+  
   const startTime = Date.now();
   const result = callback();
   validateAndSendToGoogleAnalytics({
