@@ -6,3 +6,4 @@ pnpm-lock.yamlexperiment/
 pnpm-lock.yaml
 .DS_Store
 src/Test.js
+src/analytics/credentials.js
