@@ -1,3 +1,14 @@
+function analyticsWrapper(args, callback) {
+  const startTime = Date.now();
+  const result = callback();
+  validateAndSendToGoogleAnalytics({
+    funcName: args.callee.name, 
+    args: [...args], 
+    timeExecution: Date.now() - startTime,
+  });
+  return result;
+}
+
 function validateAndSendToGoogleAnalytics(options) {
   options.debug = true;
   const test = sendToGoogleAnalytics(options);
