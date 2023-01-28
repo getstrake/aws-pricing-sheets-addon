@@ -1,6 +1,6 @@
 function analyticsWrapper(args, callback) {
   if(!cfg.logCustomFunctionToAnalytics) return callback();
-  
+
   const startTime = Date.now();
   const result = callback();
   validateAndSendToGoogleAnalytics({
@@ -27,7 +27,7 @@ function sendToGoogleAnalytics(parameters) {
   const {funcName, args, timeExecution, debug} = parameters;
 
   const email = getUserEmail() || "Unknown email";
-  const userLocale = Session.getActiveUserLocale();
+  const userLocale = getUserLocale() || "Unknown locale";
   const scriptTimeZone = Session.getScriptTimeZone();
   const argumentsWithCommas = args.join(", ");
   const fullFunction = funcName + "(" + argumentsWithCommas + ")";
