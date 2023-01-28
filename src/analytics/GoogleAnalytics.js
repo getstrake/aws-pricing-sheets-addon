@@ -11,8 +11,11 @@ function validateAndSendToGoogleAnalytics(options) {
 // if debug is true, it will send the data to the debug endpoint
 // that debug endpoint returns 
 function sendToGoogleAnalytics(parameters) {
-  const {email, funcName, args, timeExecution, debug} = parameters;
+  const {funcName, args, timeExecution, debug} = parameters;
 
+  const email = getUserEmail() || "Unknown email";
+  const userLocale = Session.getActiveUserLocale();
+  const scriptTimeZone = Session.getScriptTimeZone();
   const argumentsWithCommas = args.join(", ");
   const fullFunction = funcName + "(" + argumentsWithCommas + ")";
 
@@ -23,12 +26,12 @@ function sendToGoogleAnalytics(parameters) {
         {
           "name": funcName,
           "params": {
-            "time_execution": JSON.stringify({timeExecution, funcName}),
+            timeExecution,
             "session_id": Date.now(),
-            "userLocale": Session.getActiveUserLocale(),
-            "scriptTimeZone": Session.getScriptTimeZone(),
-            "email": email,
-            "function": fullFunction,
+            userLocale,
+            scriptTimeZone,
+            email,
+            "function": fullFunction + " " + timeExecution + "s",
           }
         }
       ]
