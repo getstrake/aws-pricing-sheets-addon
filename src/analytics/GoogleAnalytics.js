@@ -1,6 +1,7 @@
 function validateAndSendToGoogleAnalytics(options) {
+  options.debug = true;
   const test = sendToGoogleAnalytics(options);
-  if(test.response.validationMessages.length > 0)
+  if(test?.response?.validationMessages?.length > 0)
     throw test.response.validationMessages.map(x => JSON.stringify(x)).join(". ");
   
   options.debug = false;
