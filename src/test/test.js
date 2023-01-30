@@ -7,6 +7,10 @@ function onOpen() {
     .addItem('Test RDS Storage','showTestRDSStorageFunction')
     .addItem('Test Functions','showTestFunctions')
     .addToUi();
+
+  ui.createMenu('AWS Pricing')
+    .addItem('Start','onboarding')
+    .addToUi();
 }
 
 function getEBSTests() {
