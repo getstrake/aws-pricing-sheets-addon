@@ -3,12 +3,26 @@ function analyticsWrapper(args, callback) {
 
   const startTime = Date.now();
   const result = callback();
-  validateAndSendToGoogleAnalytics({
+  const options = {
     funcName: args.callee.name, 
     args: [...args], 
     timeExecution: Date.now() - startTime,
-  });
+    email: getUserEmail(),
+    userLocale: getUserLocale(),
+    scriptTimeZone: Session.getScriptTimeZone()
+  };
+  validateAndSendToGoogleAnalytics(options);
   return result;
+}
+
+function getUserEmail() {
+  return PropertiesService.getUserProperties().getProperty('emailUser')
+    || "Unknown email";
+}
+
+function getUserLocale() {
+  return PropertiesService.getUserProperties().getProperty('emailUser')
+    || "Unknown locale";
 }
 
 function validateAndSendToGoogleAnalytics(options) {
@@ -24,11 +38,8 @@ function validateAndSendToGoogleAnalytics(options) {
 // if debug is true, it will send the data to the debug endpoint
 // that debug endpoint returns 
 function sendToGoogleAnalytics(parameters) {
-  const {funcName, args, timeExecution, debug} = parameters;
+  const {funcName, args, timeExecution, debug, email, userLocale, scriptTimeZone} = parameters;
 
-  const email = getUserEmail() || "Unknown email";
-  const userLocale = getUserLocale() || "Unknown locale";
-  const scriptTimeZone = Session.getScriptTimeZone();
   const argumentsWithCommas = args.join(", ");
   const fullFunction = funcName + "(" + argumentsWithCommas + ")";
 
