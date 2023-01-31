@@ -3,8 +3,9 @@ function createHubSpotContact({email, userLocale}) {
 
   var data = {
       "properties": {
-          "company": Session.getScriptTimeZone(),
+          "script_timezone": Session.getScriptTimeZone(),
           "firstname": userLocale,
+          "userlocale": userLocale,
           email,
           "lastname": email.split("@")[0],
           // "phone": "(123) 456-123456",
