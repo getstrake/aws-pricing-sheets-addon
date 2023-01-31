@@ -2,7 +2,7 @@
 class CacheLoader {
   constructor(cache) {
     this.cache = cache;
-    this.expireTime = 1000 * 60 * 60; // static properties are not supported in GAS
+    this.expireTime = 24 * 60 * 60 * 1000; // static properties are not supported in GAS
   }
 
   get(key) {
