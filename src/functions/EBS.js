@@ -70,10 +70,6 @@ function fetchApiEBS(options) {
   const path = `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
   const url = `${cfg.baseHost}${path}`;
   const response = JSON.parse(fetchUrlCached(url));
-  if(cfg.testing) {
-    console.log({url, response});
-    saveToDrive(response, "ebs.json");
-  }
   const totalPrice = getTotalPriceEBS(response.prices, options);
   const pricePerHour = totalPrice / cfg.hoursPerMonth;
   return pricePerHour;
