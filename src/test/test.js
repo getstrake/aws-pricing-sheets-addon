@@ -321,7 +321,7 @@ function getRDSStorageTests() {
 function getFunctionTests() {
   const t = new UnitTestingApp();
   return {"Function tests": [
-    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2022-12-31T23:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
+    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2023-01-01T00:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
       { a: 
         [
           'A', 
