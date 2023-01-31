@@ -55,7 +55,7 @@ function sendToGoogleAnalytics(parameters) {
             userLocale,
             scriptTimeZone,
             email,
-            "function": fullFunction + " " + timeExecution + "s",
+            "function": fullFunction + " " + timeExecution + "ms",
           }
         }
       ]
