@@ -117,7 +117,12 @@ def gen_ebs(func_dir)
       // EBS #{vol_type_up} storage
       function EC2_EBS_#{vol_type_up}_GB(settingsOrSize, sizeOrRegion, region) {
         if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
-          return EC2_EBS_GB("#{vol_type}", settingsOrSize, sizeOrRegion);
+          return fetchApiEBS({
+            volumeType: "#{vol_type}", 
+            volumeSize: settingsOrSize, 
+            region: sizeOrRegion, 
+            storageType: "storage"
+          })
         else
           return EC2_EBS_FROM_SETTINGS(
             {
