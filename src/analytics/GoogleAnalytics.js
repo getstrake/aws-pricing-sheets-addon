@@ -21,7 +21,7 @@ function getUserEmail() {
 }
 
 function getUserLocale() {
-  return PropertiesService.getUserProperties().getProperty('emailUser')
+  return PropertiesService.getUserProperties().getProperty('userLocale')
     || "Unknown locale";
 }
 
