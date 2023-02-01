@@ -25,23 +25,24 @@ function EC2_WINDOWS_OD(instanceType, region) {
 }
 
 function EC2(settingsValues, instanceType, region) {
-  if (!settingsValues || settingsValues.length === 0 || settingsValues[0].length < 2) {
+  return analyticsWrapper(arguments, () => {
+    if (!settingsValues || settingsValues.length === 0 || settingsValues[0].length < 2) {
       throw "Missing required settings range"
-  }
+    }
 
-  const settings = map2dArrayToObjectWithLowerCaseValues(settingsValues);
+    const settings = map2dArrayToObjectWithLowerCaseValues(settingsValues);
 
-  // Example settings: (comes from a selection in an earlier version of AWS Pricing Sheets)
-  //   {
-  //     "region": "eu-central-2",
-  //     "platform": "linux",
-  //     "purchase_type": "ondemand",
-  //     "offering_class": "standard",
-  //     "purchase_term": 1,
-  //     "payment_option": "no_upfront"
-  //   }
+    // Example settings: (comes from a selection in an earlier version of AWS Pricing Sheets)
+    //   {
+    //     "region": "eu-central-2",
+    //     "platform": "linux",
+    //     "purchase_type": "ondemand",
+    //     "offering_class": "standard",
+    //     "purchase_term": 1,
+    //     "payment_option": "no_upfront"
+    //   }
 
-  const options = {
+    const options = {
       instanceType, // from argument instanceType
       region: region || settings.region,
       purchaseType: settings.purchase_type === "reserved" ? "reserved-instance" : "ondemand",
@@ -49,31 +50,36 @@ function EC2(settingsValues, instanceType, region) {
       offeringClass: settings.offering_class,
       purchaseTerm: settings.purchase_term + "yr", // purchaseTerm in v1 was just "1" or 1, in v2 it is "1yr"
       paymentOption: settings.payment_option
-  }
+    }
 
-  return fetchApiEC2(options);
+    return fetchApiEC2(options);
+  });
 }
 
 function EC2_OD(instanceType, region, platform) {
-  if(!instanceType) throw 'Missing instanceType';
-  if(!region) throw 'Missing region';
-  if(!platform) throw 'Missing platform';
+  return analyticsWrapper(arguments, () => {
+    if (!instanceType) throw 'Missing instanceType';
+    if (!region) throw 'Missing region';
+    if (!platform) throw 'Missing platform';
 
-  return fetchApiEC2({ instanceType, region, purchaseType: "ondemand", platform });
+    return fetchApiEC2({ instanceType, region, purchaseType: "ondemand", platform });
+  });
 }
 
 // purchaseTerm in v1 was just "1" or 1, in v2 it is "1yr"
 function EC2_RI(instanceType, region, platform, offeringClass,
   purchaseTerm, paymentOption) {
-  return fetchApiEC2({ 
-    instanceType, 
-    region, 
-    purchaseType: "reserved-instance", 
-    platform, 
-    offeringClass, 
-    purchaseTerm: purchaseTerm + "yr",
-    paymentOption 
-  })
+  return analyticsWrapper(arguments, () => {
+    return fetchApiEC2({
+      instanceType,
+      region,
+      purchaseType: "reserved-instance",
+      platform,
+      offeringClass,
+      purchaseTerm: purchaseTerm + "yr",
+      paymentOption
+    })
+  });
 }
 
 function validateSqlLicenceParameter(sqlLicense) {
