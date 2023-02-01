@@ -116,23 +116,49 @@ def gen_ebs(func_dir)
       func = <<~EOF
       // EBS #{vol_type_up} storage
       function EC2_EBS_#{vol_type_up}_GB(settingsOrSize, sizeOrRegion, region) {
-        if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
-          return EC2_EBS_GB("#{vol_type}", settingsOrSize, sizeOrRegion);
-        else
-          return EC2_EBS_FROM_SETTINGS(
-            {
-                settings: settingsOrSize, 
-                volumeType: "#{vol_type}", 
-                storageType: "storage", 
-                volumeSize: sizeOrRegion, 
-                region
-            }
-        );
+        return analyticsWrapper(arguments, () => {
+          if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
+            return fetchApiEBS({
+              volumeType: "#{vol_type}", 
+              volumeSize: settingsOrSize, 
+              region: sizeOrRegion, 
+              storageType: "storage"
+            })
+          else
+            return _EC2_EBS_FROM_SETTINGS({
+              settings: settingsOrSize, 
+              volumeType: "#{vol_type}", 
+              storageType: "storage", 
+              volumeSize: sizeOrRegion, 
+              region
+          });
+        });
       }
 
       EOF
       f.write(func)
   end
+
+#   // EBS IO1 storage
+# function EC2_EBS_IO1_GB(settingsOrSize, sizeOrRegion, region) {
+#   return analyticsWrapper(arguments, () => {
+#     if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
+#       return fetchApiEBS({
+#         volumeType: "io1", 
+#         volumeSize: settingsOrSize, 
+#         region: sizeOrRegion, 
+#         storageType: "storage"
+#       })
+#     else
+#       return _EC2_EBS_FROM_SETTINGS({
+#         settings: settingsOrSize, 
+#         volumeType: "io1", 
+#         storageType: "storage", 
+#         volumeSize: sizeOrRegion, 
+#         region
+#       })
+#   });
+# }
 
   f.close
 end
@@ -183,16 +209,22 @@ def gen_rds(func_dir)
     # */
       func = <<~EOF
       function RDS_#{engine[0].upcase}(settingsRange, instanceType, region) {
-        return RDS_FROM_SETTINGS(settingsRange, "#{engine[1]}", instanceType, region)
+        return analyticsWrapper(arguments, () => {
+          return RDS_FROM_SETTINGS(settingsRange, "#{engine[1]}", instanceType, region)
+        });
       }
 
       function RDS_#{engine[0].upcase}_OD(instanceType, region) {
-        return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: "ondemand"})
+        return analyticsWrapper(arguments, () => {
+          return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: "ondemand"});
+        });
       }
 
       function RDS_#{engine[0].upcase}_RI(instanceType, region, purchaseTerm, paymentOption) {
-        // version 1 of AWS Pricing has purchaseTerm: 1 (instead of "1yr")
-        return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm: purchaseTerm + "yr", paymentOption})
+        return analyticsWrapper(arguments, () => {
+          // version 1 of AWS Pricing has purchaseTerm: 1 (instead of "1yr")
+          return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm: purchaseTerm + "yr", paymentOption});
+        });
       }
 
       EOF
@@ -217,8 +249,10 @@ def gen_rds(func_dir)
         # */
           func = <<~EOF
           function RDS_#{engine[0].upcase}_RI_#{payment_option[1].upcase}(instanceType, region, purchaseTerm) {
-            // version 1 of AWS Pricing has purchaseTerm: 1 (instead of "1yr")
-            return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm: purchaseTerm + "yr", paymentOption: "#{payment_option[0]}"});
+            return analyticsWrapper(arguments, () => {
+              // version 1 of AWS Pricing has purchaseTerm: 1 (instead of "1yr")
+              return fetchApiRDS({ dbEngine: "#{engine[1]}", instanceType, region, purchaseType: 'reserved-instance', purchaseTerm: purchaseTerm + "yr", paymentOption: "#{payment_option[0]}"});
+            });
           }
 
           EOF
@@ -250,11 +284,13 @@ def gen_rds_storage(func_dir)
     #  */
       func = <<~EOF
       function RDS_STORAGE_#{voltype.upcase}_GB(settingsOrSize, sizeOrRegion, region) {
-        if (typeof settingsOrSize === "string" || typeof settingsOrSize === "number") {
-            return fetchApiRDSStorage({ storageType: "#{voltype}", storageSize: settingsOrSize, region: sizeOrRegion });
-        } else {
-            return RDS_STORAGE_FROM_SETTINGS({settings: settingsOrSize, storageType: "#{voltype}", storageSize: sizeOrRegion, region});
-        }
+        return analyticsWrapper(arguments, () => {
+          if (typeof settingsOrSize === "string" || typeof settingsOrSize === "number") {
+              return fetchApiRDSStorage({ storageType: "#{voltype}", storageSize: settingsOrSize, region: sizeOrRegion });
+          } else {
+              return RDS_STORAGE_FROM_SETTINGS({settings: settingsOrSize, storageType: "#{voltype}", storageSize: sizeOrRegion, region});
+          }
+        });
       }
       EOF
       f.write(func)

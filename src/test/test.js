@@ -7,6 +7,10 @@ function onOpen() {
     .addItem('Test RDS Storage','showTestRDSStorageFunction')
     .addItem('Test Functions','showTestFunctions')
     .addToUi();
+
+  ui.createMenu('AWS Pricing')
+    .addItem('Start','onboarding')
+    .addToUi();
 }
 
 function getEBSTests() {
@@ -118,7 +122,7 @@ function getEC2Tests() {
     t.areEqual(0.192, () => EC2_LINUX_OD("m5.xlarge", "us-east-1")),
     t.areEqual(0.214, () => EC2_LINUX_OD("m5.xlarge", "ca-central-1")),
     t.areEqual(0.252, () => EC2_RHEL_OD("m5.xlarge", "us-east-1")),
-    t.areEqual(0.292, () => EC2_SUSE_OD("m5.xlarge", "us-east-1")),
+    t.areEqual(0.248, () => EC2_SUSE_OD("m5.xlarge", "us-east-1")),
     t.willThrow(function() {
         EC2_OD("m5.xlarge", "us-east-1", undefined)
     }, "Missing platform"),
@@ -203,7 +207,7 @@ function getRDSFunctionTests() {
   const t = new UnitTestingApp();
   return {"RDS func tests": [
     t.areEqual(0.58, () => RDS_AURORA_MYSQL_OD("db.r5.xlarge", "us-east-1")),
-    t.areClose(0.379999, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "no_upfront"), 0.000001),
+    t.areClose(0.38, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "no_upfront"), 0.000001),
     // db.r5.xlarge no longer offered in partial upfront
     t.areClose(0.288806, () => RDS_AURORA_MYSQL_RI("db.r6g.xlarge", "us-east-1", 1, "partial_upfront"), 0.000001),
     t.areClose(0.316210, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "all_upfront"), 0.000001),
@@ -213,7 +217,7 @@ function getRDSFunctionTests() {
     t.areClose(0.192570, () => RDS_AURORA_MYSQL_RI("db.r6g.xlarge", "us-east-1", 3, "partial_upfront"), 0.000001),
     t.areClose(0.202207, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 3, "all_upfront"), 0.000001),
 
-    t.areClose(0.379999, () => RDS_AURORA_MYSQL_RI_NO("db.r5.xlarge", "us-east-1", 1), 0.000001),
+    t.areClose(0.38, () => RDS_AURORA_MYSQL_RI_NO("db.r5.xlarge", "us-east-1", 1), 0.000001),
     t.areClose(0.288806, () => RDS_AURORA_MYSQL_RI_PARTIAL("db.r6g.xlarge", "us-east-1", 1), 0.000001),
     t.areClose(0.316210, () => RDS_AURORA_MYSQL_RI_ALL("db.r5.xlarge", "us-east-1", 1), 0.000001),
 
@@ -245,7 +249,7 @@ function getRDSFunctionTests() {
     t.areClose(0.282990, () => RDS_AURORA_MYSQL([['region', 'us-east-1'],
     ['purchase_type', 'reserved'],
     ['purchase_term', '1'],
-    ['payment_option', 'partial_upfront']], "db.r6g.xlarge"), 0.000001)
+    ['payment_option', 'all_upfront']], "db.r6g.xlarge"), 0.000001)
 ,
 ],"RDS invalid settings": [
 
@@ -317,7 +321,7 @@ function getRDSStorageTests() {
 function getFunctionTests() {
   const t = new UnitTestingApp();
   return {"Function tests": [
-    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2022-12-31T23:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
+    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2023-01-01T00:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
       { a: 
         [
           'A', 

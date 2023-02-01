@@ -47,7 +47,7 @@ function EC2(settingsValues, instanceType, region) {
       purchaseType: settings.purchase_type === "reserved" ? "reserved-instance" : "ondemand",
       platform: settings.platform || settings.operating_system, // earlier versions of the add-on used operating_system
       offeringClass: settings.offering_class,
-      purchaseTerm: settings.purchase_term,
+      purchaseTerm: settings.purchase_term + "yr", // purchaseTerm in v1 was just "1" or 1, in v2 it is "1yr"
       paymentOption: settings.payment_option
   }
 
@@ -73,7 +73,15 @@ function EC2_OD(instanceType, region, platform) {
 // purchaseTerm in v1 was just "1" or 1, in v2 it is "1yr"
 function EC2_RI(instanceType, region, platform, offeringClass,
   purchaseTerm, paymentOption) {
-  return fetchApiEC2({ instanceType, region, purchaseType: "reserved-instance", platform, offeringClass, purchaseTerm: purchaseTerm + "yr", paymentOption })
+  return fetchApiEC2({ 
+    instanceType, 
+    region, 
+    purchaseType: "reserved-instance", 
+    platform, 
+    offeringClass, 
+    purchaseTerm: purchaseTerm + "yr",
+    paymentOption 
+  })
 }
 
 function fetchApiEC2(options) {

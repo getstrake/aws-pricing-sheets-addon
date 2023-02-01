@@ -1,63 +1,3 @@
-function EC2_EBS_GB(settingsOrVolumeType, volumeTypeOrVolumeSize, volumeSizeOrRegion, region) {
-  if(typeof settingsOrVolumeType === "string") {
-    return fetchApiEBS({
-      volumeType: settingsOrVolumeType, 
-      volumeSize: volumeTypeOrVolumeSize, 
-      region: volumeSizeOrRegion, 
-      storageType: "storage"
-    }
-  )
-  } else { // first argument is a range selected from the sheet with settings
-    [ settings, 
-      volumeType,
-      volumeSize
-    ] = [settingsOrVolumeType, volumeTypeOrVolumeSize, volumeSizeOrRegion]
-    return EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType: "storage", volumeSize, region})
-  }
-}
-
-function EC2_EBS_SNAPSHOT_GB(a, b, c) {
-  return EC2_EBS(null, "snapshot", a, b, c);
-}
-
-function EC2_EBS_IO1_IOPS(a, b, c) {
-  return EC2_EBS('io1', 'iops', a, b, c);
-}
-
-function EC2_EBS_IO2_IOPS(a, b, c) {
-  return EC2_EBS('io2', 'iops', a, b, c);
-}
-
-function EC2_EBS_GP3_IOPS(a, b, c) {
-  return EC2_EBS('gp3', 'iops', a, b, c);
-}
-
-function EC2_EBS(volumeType, storageType, a, b, c) {
-  if(typeof a === "string" || typeof a === "number") {
-    const [volumeSize, region] = [a, b];
-    return fetchApiEBS({ volumeType, storageType, volumeSize, region });
-  }
-
-  // else
-  let [settings, volumeSize, region] = [a, b, c];
-  return EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType, volumeSize, region})
-}
-
-function EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType, volumeSize, region}) {
-  if ((!storageType || storageType.toString().toLowerCase() !== "snapshot") && !getVolumeTypeFullName(volumeType)) {
-    throw `invalid EBS volume type`
-  }
-  
-  settings = mapValuesToObjectWithLowerCaseValues(settings);
-
-  return fetchApiEBS({
-    volumeType,
-    volumeSize, 
-    region: region || settings.region, 
-    storageType
-  });
-}
-
 function fetchApiEBS(options) {
   options = getObjectWithLowerCaseValues(options);
   const { region, volumeSize } = options;
@@ -70,12 +10,9 @@ function fetchApiEBS(options) {
   const path = `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
   const url = `${cfg.baseHost}${path}`;
   const response = JSON.parse(fetchUrlCached(url));
-  if(cfg.testing) {
-    console.log({url, response});
-    saveToDrive(response, "ebs.json");
-  }
-  const price = getPriceEBS(response.prices, options);
-  return price * parseFloat(volumeSize) / cfg.hoursPerMonth;
+  const totalPrice = getTotalPriceEBS(response.prices, options);
+  const pricePerHour = totalPrice / cfg.hoursPerMonth;
+  return pricePerHour;
 }
 
 function getVolumeTypeFullName(volumeType) {
@@ -91,7 +28,7 @@ function getVolumeTypeFullName(volumeType) {
   return volumeTypeMap[volumeType?.toString().toLowerCase()]
 }
 
-const getPriceEBS = (prices, options) => {
+const getTotalPriceEBS = (prices, options) => {
   const { volumeType, storageType, volumeSize } = options;
 
   console.log({storageType, volumeType})
@@ -134,7 +71,7 @@ const getPriceEBS = (prices, options) => {
   if (prices.length > 1)
     throw "Multiple prices found";
 
-  return parseFloat(prices[0].price.USD);
+  return parseFloat(prices[0].price.USD) * parseFloat(volumeSize);
 }
 
 function tieredIO2IOPS(prices, volumeSize) {
