@@ -1,6 +1,6 @@
 function EC2_EBS_GB(settingsOrVolumeType, volumeTypeOrVolumeSize, volumeSizeOrRegion, region) {
   if(typeof settingsOrVolumeType === "string") {
-    return getHourlyPriceEBS({
+    return fetchApiEBS({
       volumeType: settingsOrVolumeType, 
       volumeSize: volumeTypeOrVolumeSize, 
       region: volumeSizeOrRegion, 
@@ -35,7 +35,7 @@ function EC2_EBS_GP3_IOPS(a, b, c) {
 function EC2_EBS(volumeType, storageType, a, b, c) {
   if(typeof a === "string" || typeof a === "number") {
     const [volumeSize, region] = [a, b];
-    return getHourlyPriceEBS({ volumeType, storageType, volumeSize, region });
+    return fetchApiEBS({ volumeType, storageType, volumeSize, region });
   }
 
   // else
@@ -50,7 +50,7 @@ function EC2_EBS_FROM_SETTINGS({settings, volumeType, storageType, volumeSize, r
   
   settings = map2dArrayToObjectWithLowerCaseValues(settings);
 
-  return getHourlyPriceEBS({
+  return fetchApiEBS({
     volumeType,
     volumeSize, 
     region: region || settings.region, 
