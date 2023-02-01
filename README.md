@@ -1,6 +1,6 @@
 # Macroscope - AWS-Pricing Sheet Add-on version 2
 
-This is a continuation of the AWS Pricing [found here](https://github.com/getmacroscope/aws-pricing)
+We're excited to bring AWS pricing data back to your Google Sheets and we'll be announcing some expanded features soon. In the meantime feel free to raise issues, and to collaborate on the project please reach out to us at hello@macroscope.io. We'd love to hear from you. This is a continuation of the AWS Pricing [found here](https://github.com/getmacroscope/aws-pricing)
 
 # AWS Pricing add-on for Google Sheets
 
