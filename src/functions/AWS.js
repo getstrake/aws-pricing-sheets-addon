@@ -17,6 +17,10 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
   return analyticsWrapper(arguments, () => {
     options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption });
     options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    if(options.purchaseType === "ondemand") {
+      if(purchaseTerm || paymentOption)
+        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances`
+    }
     return fetchApiEC2(options);
   });
 }
