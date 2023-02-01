@@ -15,12 +15,21 @@
  */
 function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, purchaseTerm, paymentOption) {
   return analyticsWrapper(arguments, () => {
+    // rewrite arguments to lowercase
     options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption });
-    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    
+    // validation
+    if(!["ondemand","reserved"].includes(options.purchaseType))
+      throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
+
     if(options.purchaseType === "ondemand") {
       if(purchaseTerm || paymentOption)
         throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances`
     }
+    
+    // rewrite purchaseType
+    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+
     return fetchApiEC2(options);
   });
 }
@@ -57,8 +66,16 @@ function AWS_EBS(volumeType, storageType, volumeSize, region) {
  */
 function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption) {
   return analyticsWrapper(arguments, () => {
+    // rewrite arguments to lowercase
     const options = getObjectWithValuesToLowerCase({ dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption });
+    
+    // validation
+    if(!["ondemand","reserved"].includes(options.purchaseType))
+      throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
+
+    // rewrite purchaseType
     options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    
     return fetchApiRDS(options);
   });
 }
