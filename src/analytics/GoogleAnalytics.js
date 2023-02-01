@@ -43,19 +43,25 @@ function sendToGoogleAnalytics(parameters) {
   const argumentsWithCommas = args.join(", ");
   const fullFunction = funcName + "(" + argumentsWithCommas + ")";
 
+  const emailFormattedForEventName = email
+    .replace(/@/g, "_at_") // event name can't have @
+    .replace(/\./g, "_dot_") // event name can't have .
+    .slice(0,44); // max size event name is 44 chars
+
   const data = {
       "client_id": email,
       "user_id": email,
       "events": [
         {
-          "name": funcName,
+          "name": emailFormattedForEventName,
           "params": {
             timeExecution,
             "session_id": Date.now(),
             userLocale,
             scriptTimeZone,
             email,
-            "function": fullFunction + " " + timeExecution + "ms",
+            functionName: funcName,
+            "fullFunction": fullFunction + " " + timeExecution + "ms",
           }
         }
       ]
