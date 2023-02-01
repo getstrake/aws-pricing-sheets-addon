@@ -4,6 +4,6 @@ function onboarding() {
   const ui = SpreadsheetApp.getUi();
   const template = HtmlService.createTemplateFromFile('src/Sidebar.html');
   const html = template.evaluate();
-  html.setTitle('Insert formula');
+  html.setTitle('AWS Pricing Add-on');
   ui.showSidebar(html);
 }
