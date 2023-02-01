@@ -6,6 +6,6 @@ Our focus for this update is to create and enhance the generic AWS functions, wh
 
 In version 1 of the AWS Pricing Add-on, you could select a range with settings as the first argument. Some functions in this folder were designed to check for this in the first argument. Additionally, parameters were included in the function name, for example: RI in the formula EC2_RI() stands for "reserved instance".  
 
-For further information about the formula's in version 1, you can refer to the documentation available in version 1 here: https://workspace.google.com/marketplace/app/aws_pricing/328915503637  
+For further information about the formula's in version 1, you can refer to the documentation available in version 1 here: https://github.com/getmacroscope/aws-pricing/blob/master/Help.md
 
 The github of version 1: https://github.com/getmacroscope/aws-pricing
