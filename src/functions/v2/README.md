@@ -1,0 +1,2 @@
+# AWS Pricing Add-on version 2
+This update of the AWS Pricing Add-on was rebuilt with simplicity in mind. Finding the right formula is now easier than ever, simply type "AWS" and the autocomplete feature will suggest functions from the AWS.js file, along with examples. We hope that this makes your experience using the AWS Pricing Add-on even more enjoyable.
