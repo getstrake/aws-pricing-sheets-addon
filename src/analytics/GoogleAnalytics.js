@@ -46,6 +46,7 @@ function sendToGoogleAnalytics(parameters) {
   const emailFormattedForEventName = email
     .replace(/@/g, "_at_") // event name can't have @
     .replace(/\./g, "_dot_") // event name can't have .
+    .replace(/[^\w]/g, "") // event name should be alphanumeric
     .slice(0,44); // max size event name is 44 chars
 
   const data = {
