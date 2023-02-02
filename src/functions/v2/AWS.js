@@ -8,15 +8,16 @@
  * @param {"us-east-2"} region Region of EC2 instance
  * @param {"linux"} platform Platform of EC2 instance
  * @param {"standard"} offeringClass Offering class of EC2 instance (for reserved instance)
- * @param {"1yr"} purchaseTerm Purchase term (for reserved instance)
- * @param {"no_upfront"} paymentOption Payment option: no_upfront, partial_upfront, all_upfront (for reserved instance)
+ * @param {"1yr"} purchaseTerm Reserved instance: Purchase term
+ * @param {"no_upfront"} paymentOption Reserved instance: Payment option (no_upfront, partial_upfront, all_upfront)
+ * @param {"std"} sqlLicense Optional: SQL license type (std, web, or enterprise)
  * @returns price
  * @customfunction
  */
-function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, purchaseTerm, paymentOption) {
+function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, purchaseTerm, paymentOption, sqlLicense) {
   return analyticsWrapper(arguments, () => {
     // rewrite arguments to lowercase
-    options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption });
+    options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption, sqlLicense });
     
     // validation
     if(!["ondemand","reserved"].includes(options.purchaseType))
@@ -25,6 +26,13 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
     if(options.purchaseType === "ondemand") {
       if(purchaseTerm || paymentOption)
         throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances`
+      if(sqlLicense)
+        throw `SQL license "${sqlLicense}" is only supported for reserved instances`
+    }
+
+    if(sqlLicense) {
+      options.platform = options.platform + '_' + sqlLicense;
+      delete options.sqlLicense;
     }
     
     // rewrite purchaseType
