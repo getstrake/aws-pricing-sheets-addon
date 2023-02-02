@@ -38,7 +38,12 @@ function fetchApiRDSStorage(options) {
 
   const path = '/pricing/1.0/rds/database-storage/index.json';
   const url = `${cfg.baseHost}${path}`;
-  const response = JSON.parse(fetchUrlCached(url));
+  let response;
+  try {
+    response = JSON.parse(fetchUrlCached(url));
+  } catch(err) {
+    throw 'We encountered a problem while fetching the price. Please try again later.'
+  }   
   const prices = filterRDSStorage(response.prices, options);
 
   if (prices.length === 0)

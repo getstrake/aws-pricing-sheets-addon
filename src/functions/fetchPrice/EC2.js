@@ -95,7 +95,12 @@ function fetchApiEC2(options) {
 
   const path = `/pricing/1.0/ec2/region/${region}/${purchaseType}/${platform}/index.json`;
   const url = `${cfg.baseHost}${path}`;
-  const response = JSON.parse(fetchUrlCached(url));
+  let response;
+  try {
+    response = JSON.parse(fetchUrlCached(url));
+  } catch(err) {
+    throw 'Unable to find the price. Make sure you have the correct region, purchase type and platform.'
+  }   
   const prices = filterPricesEC2(response.prices, options);
   if (prices.length === 0)
     throw "Can not find instance";
