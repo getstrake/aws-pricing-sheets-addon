@@ -47,7 +47,7 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
 function AWS_EBS(volumeType, storageType, volumeSize, region) {
   return analyticsWrapper(arguments, () => {
     options = getObjectWithValuesToLowerCase({ volumeType, storageType, volumeSize, region });
-    return getHourlyPriceEBS(options);
+    return fetchApiEBS(options);
   });
 }
 
