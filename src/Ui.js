@@ -1,3 +1,10 @@
+function onOpen(e) {
+  SpreadsheetApp.getUi()
+      .createAddonMenu()
+      .addItem('How to use AWS Pricing', 'onboarding')
+      .addToUi();
+}
+
 function onboarding() {
   const {email, userLocale} = saveUserInformation();
   createHubSpotContact({email, userLocale});

@@ -1,16 +1,23 @@
-function onOpen() {
-  const ui = SpreadsheetApp.getUi();
-  ui.createMenu('Test')
-    .addItem('Test EC2','showTestEC2')
-    .addItem('Test EBS','showTestEBS')
-    .addItem('Test RDS Functions','showTestRDSFunction')
-    .addItem('Test RDS Storage','showTestRDSStorageFunction')
-    .addItem('Test Functions','showTestFunctions')
-    .addToUi();
+// Run tests with the showTest functions below
 
-  ui.createMenu('AWS Pricing')
-    .addItem('Start','onboarding')
-    .addToUi();
+function showTestEBS() {
+  showTest(getEBSTests(), 'EBSTest');
+}
+
+function showTestEC2() {
+  showTest(getEC2Tests(), 'EC2Test');
+}
+
+function showTestRDSFunction() {
+  showTest(getRDSFunctionTests(), 'RDSFunctionTest');
+}
+
+function showTestRDSStorageFunction() {
+  showTest(getRDSStorageTests(), 'RDSStorageTest');
+}
+
+function showTestFunctions() {
+  showTest(getFunctionTests(), 'FunctionTest');
 }
 
 function getEBSTests() {
@@ -347,26 +354,6 @@ function paramsToSettings(region, platform, purchaseType, offeringClass, term, p
     ['purchase_term', term.toString()],
     ['payment_option', paymentOption]
   ]
-}
-
-function showTestEBS() {
-  showTest(getEBSTests(), 'EBSTest');
-}
-
-function showTestEC2() {
-  showTest(getEC2Tests(), 'EC2Test');
-}
-
-function showTestRDSFunction() {
-  showTest(getRDSFunctionTests(), 'RDSFunctionTest');
-}
-
-function showTestRDSStorageFunction() {
-  showTest(getRDSStorageTests(), 'RDSStorageTest');
-}
-
-function showTestFunctions() {
-  showTest(getFunctionTests(), 'FunctionTest');
 }
 
 function EC2Test(chapter, testIndex) {
