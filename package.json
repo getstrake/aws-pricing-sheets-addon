@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "gencode": "./scripts/gen-funcs.rb"
+    "gencode": "./scripts/gen-funcs.rb",
+    "create-help-dialog": "make help-dialog",
+    "deploy": "npm run gencode && make help-dialog && clasp push"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "clasp": "^1.0.0"
+    "clasp": "^1.0.0",
+    "marked": "^4.2.12"
   },
   "dependencies": {
     "@types/google-apps-script": "^1.0.56"
