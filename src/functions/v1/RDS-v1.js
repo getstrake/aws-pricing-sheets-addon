@@ -5,7 +5,7 @@ function RDS_FROM_SETTINGS(settingsRange, dbEngine, instanceType, region) {
 
   const settings = map2dArrayToObjectWithLowerCaseValues(settingsRange);
 
-  console.log({settings})
+  // console.log({settings})
   const options = {
     dbEngine: dbEngine || settings.db_engine,
     instanceType: instanceType,
@@ -14,6 +14,6 @@ function RDS_FROM_SETTINGS(settingsRange, dbEngine, instanceType, region) {
     purchaseTerm: settings.purchase_term + "yr", // version 1 of the add-on used purchase_term as a number 
     paymentOption: settings.payment_option
   }
-  console.log({options})
+  // console.log({options})
   return fetchApiRDS(options);
 }
