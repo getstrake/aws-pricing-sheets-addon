@@ -24,8 +24,8 @@ function createHubSpotContact({email, userLocale}) {
 
   try {
     var response = UrlFetchApp.fetch(url, options);
-    console.log(`Added user ${email} to Hubspot`)
+    // console.log(`Added user ${email} to Hubspot`)
   } catch(err) { 
-    console.log(err);
+    // console.log(err);
   }
 }

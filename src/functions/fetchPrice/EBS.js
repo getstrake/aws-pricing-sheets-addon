@@ -9,7 +9,12 @@ function fetchApiEBS(options) {
 
   const path = `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
   const url = `${cfg.baseHost}${path}`;
-  const response = JSON.parse(fetchUrlCached(url));
+  let response;
+  try {
+    response = JSON.parse(fetchUrlCached(url));
+  } catch(err) {
+    throw 'Unable to find the price. Make sure you have the correct region.'
+  }   
   const totalPrice = getTotalPriceEBS(response.prices, options);
   const pricePerHour = totalPrice / cfg.hoursPerMonth;
   return pricePerHour;
@@ -31,7 +36,7 @@ function getVolumeTypeFullName(volumeType) {
 const getTotalPriceEBS = (prices, options) => {
   const { volumeType, storageType, volumeSize } = options;
 
-  console.log({storageType, volumeType})
+  // console.log({storageType, volumeType})
 
   if (storageType === "iops") {
     if(volumeType === "io2")
@@ -61,8 +66,8 @@ const getTotalPriceEBS = (prices, options) => {
       p.attributes['aws:ec2:usagetype'].endsWith('EBS:VolumeP-IOPS.piops') //EBS:VolumeUsage.piops')
   }
 
-  console.log('filting on volumeTypeMap[volumeType] ' + getVolumeTypeFullName(volumeType));
-  console.log('filting on usageTypeFull(volumeType) ' + usageTypeFull(volumeType));
+  // console.log('filting on volumeTypeMap[volumeType] ' + getVolumeTypeFullName(volumeType));
+  // console.log('filting on usageTypeFull(volumeType) ' + usageTypeFull(volumeType));
 
   prices = prices.filter(filterStorageLib[storageType] || filterStorageLib.snapshot); // from v1: take snapshot if no storageType matches
 
@@ -116,13 +121,13 @@ function tieredGP3IOPS(prices, volumeSize) {
 
   // We fake the first tier since it is free
   let priceTiers = [{ price: { USD: 0.0 } }, priceTier[0]]
-  console.log({tiers, priceTiers: JSON.stringify(priceTiers.map(x => x.price)), volumeSize})
+  // console.log({tiers, priceTiers: JSON.stringify(priceTiers.map(x => x.price)), volumeSize})
 
   return totalPriceEBS(tiers, priceTiers, volumeSize);
 }
 
 function totalPriceEBS(tiers, priceTiers, volumeSize) {
-  console.log({volumeSize, tiers, priceTiers});
+  // console.log({volumeSize, tiers, priceTiers});
   volumeSize = parseFloat(volumeSize);
   let total = 0;
   for (var i = tiers.length - 1; i >= 0; i--) {

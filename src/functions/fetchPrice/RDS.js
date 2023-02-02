@@ -20,7 +20,12 @@ function fetchApiRDS(options) {
 
   const path = `/pricing/1.0/rds/region/${region}/${dbEngine}/${purchaseType}/single-az/index.json`;
   const url = `${cfg.baseHost}${path}`;
-  const response = JSON.parse(fetchUrlCached(url));
+  let response;
+  try {
+    response = JSON.parse(fetchUrlCached(url));
+  } catch(err) {
+    throw 'Unable to find the price. Make sure you have the correct region, database engine and purchase type.'
+  }   
   const prices = filterPricesRDS(response.prices, options);
   if (prices.length === 0)
     throw `Unable to find RDS instance ${instanceType} for DB engine ${dbEngine}`
