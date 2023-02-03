@@ -19,6 +19,7 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
     // rewrite arguments to lowercase
     options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption, sqlLicense });
     
+    if(options.purchaseType === "on-demand") options.purchaseType = "ondemand";
     // validation
     if(!["ondemand","reserved"].includes(options.purchaseType))
       throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
@@ -34,7 +35,7 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
     }
     
     // rewrite purchaseType
-    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
 
     return fetchApiEC2(options);
   });
@@ -77,12 +78,13 @@ function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, pay
     // rewrite arguments to lowercase
     const options = getObjectWithValuesToLowerCase({ dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption });
     
+    if(options.purchaseType === "on-demand") options.purchaseType = "ondemand";
     // validation
     if(!["ondemand","reserved"].includes(options.purchaseType))
       throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
 
     // rewrite purchaseType
-    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
     
     return fetchApiRDS(options);
   });
