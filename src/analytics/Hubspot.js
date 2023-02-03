@@ -1,4 +1,7 @@
 function createHubSpotContact({email, userLocale}) {
+  if(!credentials.accessTokenHubSpot) {
+    return;
+  }
   var url = "https://api.hubapi.com/crm/v3/objects/contacts";
 
   var data = {
