@@ -27,22 +27,30 @@ function getEBSTests() {
   ];
   return {"EBS GP2": [
     t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB("400", "us-east-1"), 0.000001),
-    t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB("400", "us-east-2"), 0.000001)
+    t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB("400", "us-east-2"), 0.000001),
+    t.areClose(400.0 * (0.10/730.0), () => AWS_EBS("gp2","storage","400", "us-east-1"), 0.000001),
+    t.areClose(400.0 * (0.10/730.0), () => AWS_EBS("gp2","storage","400", "us-east-2"), 0.000001)
 
 
 ],"EBS GP3": [
     t.areClose(400.0 * (0.08/730.0), () => EC2_EBS_GP3_GB("400", "us-east-1"), 0.000001),
-    t.areClose(400.0 * (0.08/730.0), () => EC2_EBS_GP3_GB("400", "us-east-2"), 0.000001)
+    t.areClose(400.0 * (0.08/730.0), () => EC2_EBS_GP3_GB("400", "us-east-2"), 0.000001),
+    t.areClose(400.0 * (0.08/730.0), () => AWS_EBS("gp3","storage","400", "us-east-1"), 0.000001),
+    t.areClose(400.0 * (0.08/730.0), () => AWS_EBS("gp3","storage","400", "us-east-2"), 0.000001)
 
 
 ],"EBS IO1 IOPs": [
     t.areClose(15000 * (0.065/730.0), () => EC2_EBS_IO1_IOPS(15000, "us-east-1"), 0.000001),
-    t.areClose(20000 * (0.072/730.0), () => EC2_EBS_IO1_IOPS(20000, "ca-central-1"), 0.000001)
+    t.areClose(20000 * (0.072/730.0), () => EC2_EBS_IO1_IOPS(20000, "ca-central-1"), 0.000001),
+    t.areClose(15000 * (0.065/730.0), () => AWS_EBS("io1","iops",15000, "us-east-1"), 0.000001),
+    t.areClose(20000 * (0.072/730.0), () => AWS_EBS("io1","iops",20000, "ca-central-1"), 0.000001)
 
 
 ],"EBS IO2 IOPs": [
     t.areClose(15000 * (0.065/730.0), () => EC2_EBS_IO2_IOPS(15000, "us-east-1"), 0.000001),
-    t.areClose(20000 * (0.072/730.0), () => EC2_EBS_IO2_IOPS(20000, "ca-central-1"), 0.000001)
+    t.areClose(20000 * (0.072/730.0), () => EC2_EBS_IO2_IOPS(20000, "ca-central-1"), 0.000001),
+    t.areClose(15000 * (0.065/730.0), () => AWS_EBS("io2","iops",15000, "us-east-1"), 0.000001),
+    t.areClose(20000 * (0.072/730.0), () => AWS_EBS("io2","iops",20000, "ca-central-1"), 0.000001)
 
 
 ],"EBS IO2 IOPs - tiered": [
@@ -50,18 +58,30 @@ function getEBSTests() {
      () => EC2_EBS_IO2_IOPS(60000, "us-east-1"), 0.000001),
 
      t.areClose(32000 * (0.065/730.0) + 32000 * (0.0455/730.0) + (70000-64000) * (0.03185/730.0),
-     () => EC2_EBS_IO2_IOPS(70000, "us-east-1"), 0.000001)
+     () => EC2_EBS_IO2_IOPS(70000, "us-east-1"), 0.000001),
+
+     t.areClose(32000 * (0.065/730.0) + (60000-32000) * (0.0455/730.0),
+      () => AWS_EBS("io2","iops",60000, "us-east-1"), 0.000001),
+ 
+      t.areClose(32000 * (0.065/730.0) + 32000 * (0.0455/730.0) + (70000-64000) * (0.03185/730.0),
+      () => AWS_EBS("io2","iops",70000, "us-east-1"), 0.000001)
 
 
 ],"EBS GP3 IOPs - tiered": [
      t.areClose(0.0, () => EC2_EBS_GP3_IOPS(2800, "us-east-1"), 0.000001),
 
-     t.areClose((7000 - 3000) * (0.005/730.0), () => EC2_EBS_GP3_IOPS(7000, "us-east-1"), 0.000001)
+     t.areClose((7000 - 3000) * (0.005/730.0), () => EC2_EBS_GP3_IOPS(7000, "us-east-1"), 0.000001),
+
+     t.areClose(0.0, () => AWS_EBS("gp3","iops",2800, "us-east-1"), 0.000001),
+
+     t.areClose((7000 - 3000) * (0.005/730.0), () => AWS_EBS("gp3","iops",7000, "us-east-1"), 0.000001)
 
 
 ],"EBS Snapshots": [
     t.areClose(2500 * (0.05/730.0), () => EC2_EBS_SNAPSHOT_GB(2500, "us-east-1"), 0.000001),
-    t.areClose(5500 * (0.055/730.0), () => EC2_EBS_SNAPSHOT_GB(5500, "ca-central-1"), 0.000001)
+    t.areClose(5500 * (0.055/730.0), () => EC2_EBS_SNAPSHOT_GB(5500, "ca-central-1"), 0.000001),
+    t.areClose(2500 * (0.05/730.0), () => AWS_EBS(null, "snapshot", 2500, "us-east-1"), 0.000001),
+    t.areClose(5500 * (0.055/730.0), () => AWS_EBS(null, "snapshot", 5500, "ca-central-1"), 0.000001)
 
 
 ],"EBS storage tests": [
@@ -69,10 +89,16 @@ function getEBSTests() {
     t.areClose(550.0 * (0.125/730.0), () => EC2_EBS_IO1_GB(550.0, "us-east-1"), 0.000001),
     t.areClose(550.0 * (0.125/730.0), () => EC2_EBS_IO2_GB(550.0, "us-east-1"), 0.000001),
     t.areClose(550.0 * (0.045/730.0), () => EC2_EBS_ST1_GB(550.0, "us-east-1"), 0.000001),
-    t.areClose(550.0 * (0.015/730.0), () => EC2_EBS_SC1_GB(550.0, "us-east-1"), 0.000001)
+    t.areClose(550.0 * (0.015/730.0), () => EC2_EBS_SC1_GB(550.0, "us-east-1"), 0.000001),
+
+    t.areClose(550.0 * (0.05/730.0), () => AWS_EBS("magnetic","storage",550.0, "us-east-1"), 0.000001),
+    t.areClose(550.0 * (0.125/730.0), () => AWS_EBS("io1","storage",550.0, "us-east-1"), 0.000001),
+    t.areClose(550.0 * (0.125/730.0), () => AWS_EBS("io2","storage",550.0, "us-east-1"), 0.000001),
+    t.areClose(550.0 * (0.045/730.0), () => AWS_EBS("st1","storage",550.0, "us-east-1"), 0.000001),
+    t.areClose(550.0 * (0.015/730.0), () => AWS_EBS("sc1","storage",550.0, "us-east-1"), 0.000001)
 
 
-],"EBS with settings range": [
+],"EBS with settings range in version 1": [
     t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB([['region', 'us-east-1']], "400"), 0.000001),
     t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB([['region', 'us-east-1']], 400), 0.000001),
     t.areClose(400.0 * (0.11/730.0), () => EC2_EBS_GP2_GB([['region', 'us-east-1']], 400, "ca-central-1"), 0.000001),
@@ -111,7 +137,19 @@ function getEBSTests() {
 
     t.willThrow(function() {
       return EC2_EBS_GB(s, 400, "gp2")
-    }, "invalid EBS volume type")
+    }, "invalid EBS volume type"),
+
+    t.willThrow(function() {
+      return AWS_EBS("gp2","storage",400, undefined)
+    }, "must specify region"),
+
+    t.willThrow(function() {
+      return AWS_EBS("gp2","storage", undefined, "us-east-1")
+    }, "must specify parameter"),
+
+    t.willThrow(function() {
+      return AWS_EBS("gp2","storage", "foo", "us-east-1")
+    }, "unable to parse volume units"),
   ]};
 }
 
@@ -124,89 +162,120 @@ function getEC2Tests() {
     ["operating_system", "linux"]
   ];
   return {"EC2 on-demand": [
-    t.areEqual(0.192, () => EC2_OD("m5.xlarge", "us-east-1", "linux")),
-    t.areEqual(0.214, () => EC2_OD("m5.xlarge", "ca-central-1", "linux")),
-    t.areEqual(0.192, () => EC2_LINUX_OD("m5.xlarge", "us-east-1")),
-    t.areEqual(0.214, () => EC2_LINUX_OD("m5.xlarge", "ca-central-1")),
-    t.areEqual(0.252, () => EC2_RHEL_OD("m5.xlarge", "us-east-1")),
-    t.areEqual(0.248, () => EC2_SUSE_OD("m5.xlarge", "us-east-1")),
-    t.willThrow(function() {
-        EC2_OD("m5.xlarge", "us-east-1", undefined)
-    }, "Missing platform"),
-    t.willThrow(function() {
-        EC2_LINUX_OD("mX5.xlarge", "us-east-1")
-    }, "Can not find instance"),
-    ], "EC2 Windows on-demand": [
+        t.areEqual(0.192, () => EC2_OD("m5.xlarge", "us-east-1", "linux")),
+        t.areEqual(0.214, () => EC2_OD("m5.xlarge", "ca-central-1", "linux")),
+        t.areEqual(0.192, () => EC2_LINUX_OD("m5.xlarge", "us-east-1")),
+        t.areEqual(0.214, () => EC2_LINUX_OD("m5.xlarge", "ca-central-1")),
+        t.areEqual(0.252, () => EC2_RHEL_OD("m5.xlarge", "us-east-1")),
+        t.areEqual(0.248, () => EC2_SUSE_OD("m5.xlarge", "us-east-1")),
+        t.willThrow(function() {
+            EC2_OD("m5.xlarge", "us-east-1", undefined)
+        }, "Missing platform"),
+        t.willThrow(function() {
+            EC2_LINUX_OD("mX5.xlarge", "us-east-1")
+        }, "Can not find instance"),
+
+        t.areEqual(0.192, () => AWS_EC2("ondemand", "m5.xlarge", "us-east-1", "linux")),
+        t.areEqual(0.214, () => AWS_EC2("ondemand", "m5.xlarge", "ca-central-1", "linux")),
+        t.areEqual(0.192, () => AWS_EC2("ondemand", "m5.xlarge", "us-east-1", "linux")),
+        t.areEqual(0.214, () => AWS_EC2("ondemand", "m5.xlarge", "ca-central-1", "linux")),
+        t.areEqual(0.252, () => AWS_EC2("ondemand", "m5.xlarge", "us-east-1", "rhel")),
+        t.areEqual(0.248, () => AWS_EC2("ondemand", "m5.xlarge", "us-east-1", "suse")),
+        t.willThrow(function() {
+          AWS_EC2("ondemand", "m5.xlarge", "us-east-1", undefined)
+        }, "Missing platform"),
+        t.willThrow(function() {
+          AWS_EC2("ondemand", "mX5.xlarge", "us-east-1", "linux")
+        }, "Can not find instance"),
+
     ],"EC2 Windows on-demand": [
-    t.areEqual(0.376, () => EC2_WINDOWS_OD("m5.xlarge", "us-east-1")),
-    t.areEqual(0.398, () => EC2_WINDOWS_OD("m5.xlarge", "ca-central-1")),
+        t.areEqual(0.376, () => EC2_WINDOWS_OD("m5.xlarge", "us-east-1")),
+        t.areEqual(0.398, () => EC2_WINDOWS_OD("m5.xlarge", "ca-central-1")),
+        t.areEqual(0.376, () => AWS_EC2("ondemand", "m5.xlarge", "us-east-1", "windows")),
+        t.areEqual(0.398, () => AWS_EC2("ondemand", "m5.xlarge", "ca-central-1", "windows")),
   ],"EC2 previous generation": [
-    t.areEqual(0.35, () => EC2_LINUX_OD("m1.xlarge", "us-east-1")),
-    t.areEqual(6.82, () => EC2_LINUX_OD("i2.8xlarge", "us-east-1")),
+        t.areEqual(0.35, () => EC2_LINUX_OD("m1.xlarge", "us-east-1")),
+        t.areEqual(6.82, () => EC2_LINUX_OD("i2.8xlarge", "us-east-1")),
+        t.areEqual(0.35, () => AWS_EC2("ondemand","m1.xlarge", "us-east-1","linux")),
+        t.areEqual(6.82, () => AWS_EC2("ondemand","i2.8xlarge", "us-east-1","linux")),
   ],"EC2 case sensitivity": [
-    t.areEqual(0.192, () => EC2_LINUX_OD("M5.XLARGE", "US-EAST-1")),
+        t.areEqual(0.192, () => EC2_LINUX_OD("M5.XLARGE", "US-EAST-1")),
+        t.areEqual(0.192, () => AWS_EC2("ondemand","M5.XLARGE", "US-EAST-1","linux")),
   // })
   ],"EC2 MSSQL": [
-    t.areEqual(0.282, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "web")),
-    t.areEqual(0.694, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "std")),
-    t.areEqual(1.714, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "enterprise")),
-    t.areEqual(0.466, () => EC2_WINDOWS_MSSQL_OD("m5.xlarge", "ca-central-1", "web")),
-    t.areEqual(0.282, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "WEB")),
-    t.willThrow(function() {
-        EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", undefined)
-    }, "Missing SQL License"),
+        t.areEqual(0.282, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "web")),
+        t.areEqual(0.694, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "std")),
+        t.areEqual(1.714, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "enterprise")),
+        t.areEqual(0.466, () => EC2_WINDOWS_MSSQL_OD("m5.xlarge", "ca-central-1", "web")),
+        t.areEqual(0.282, () => EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", "WEB")),
+        t.willThrow(function() {
+            EC2_LINUX_MSSQL_OD("m5.xlarge", "ca-central-1", undefined)
+        }, "Missing SQL License"),
+        t.areEqual(0.282, () => AWS_EC2("ondemand","m5.xlarge", "ca-central-1", "linux_web")),
+        t.areEqual(0.282, () => AWS_EC2("ondemand","m5.xlarge", "ca-central-1", "linux", "", "", "", "web")),
+        t.areEqual(0.694, () => AWS_EC2("ondemand","m5.xlarge", "ca-central-1", "linux_std")),
+        t.areEqual(1.714, () => AWS_EC2("ondemand","m5.xlarge", "ca-central-1", "linux_enterprise")),
+        t.areEqual(0.466, () => EC2_WINDOWS_MSSQL_OD("m5.xlarge", "ca-central-1", "web")),
+        t.areEqual(0.282, () => AWS_EC2("ondemand","m5.xlarge", "ca-central-1", "linux_WEB"))
   // })
   ],"EC2 with invalid settings": [
-    t.willThrow(function() {
-        EC2(undefined, undefined)
-    }, "Missing required settings range"),
-    t.willThrow(function() {
-        EC2([], "m5.xlarge")
-    }, "Missing required settings range"),
-    t.willThrow(function() {
-        EC2([["region"]], "m5.xlarge")
-    }, "Missing required settings range"),
-    t.willThrow(function() {
-        EC2([["region", ""]], "m5.xlarge")
-    }, "Missing region"),
-    t.willThrow(function() {
-        EC2([["region", undefined]], "m5.xlarge")
-    }, "Missing region"),
+        t.willThrow(function() {
+            EC2(undefined, undefined)
+        }, "Missing required settings range"),
+        t.willThrow(function() {
+            EC2([], "m5.xlarge")
+        }, "Missing required settings range"),
+        t.willThrow(function() {
+            EC2([["region"]], "m5.xlarge")
+        }, "Missing required settings range"),
+        t.willThrow(function() {
+            EC2([["region", ""]], "m5.xlarge")
+        }, "Missing region"),
+        t.willThrow(function() {
+            EC2([["region", undefined]], "m5.xlarge")
+        }, "Missing region"),
   // })
   ],"EC2 with valid settings": [
-    t.areEqual(0.192, () => EC2([
-      ["region", "us-east-1"],
-      ["purchase_term", "ondemand"],
-      ["operating_system", "linux"]
-  ], "m5.xlarge")),
-      // test override
-    t.areEqual(0.214, () => EC2([
-      ["region", "us-east-1"],
-      ["purchase_term", "ondemand"],
-      ["operating_system", "linux"]
-  ], "m5.xlarge", "ca-central-1")),
-    t.areEqual(0.214,
-          () => EC2(paramsToSettings("ca-central-1", "linux", "ondemand", "standard", 1, "all_upfront"), "m5.xlarge")),
-  // })
+        t.areEqual(0.192, () => EC2([
+          ["region", "us-east-1"],
+          ["purchase_term", "ondemand"],
+          ["operating_system", "linux"]
+      ], "m5.xlarge")),
+          // test override
+        t.areEqual(0.214, () => EC2([
+          ["region", "us-east-1"],
+          ["purchase_term", "ondemand"],
+          ["operating_system", "linux"]
+      ], "m5.xlarge", "ca-central-1")),
+        t.areEqual(0.214,
+              () => EC2(paramsToSettings("ca-central-1", "linux", "ondemand", "standard", 1, "all_upfront"), "m5.xlarge")),
+      // })
   ],"EC2 RI": [
-    t.areClose(0.115648, () => EC2(linuxRi('us-east-1', 'standard', 1, 'partial_upfront'), "m5.xlarge"), 0.00001),
-    t.areClose(0.134123, () => EC2(linuxRi('us-east-1', 'convertible', 1, 'partial_upfront'), "m5.xlarge"), 0.00001),
-    t.areClose(0.121, () => EC2(linuxRi('us-east-1', 'standard', 1, 'no_upfront'), "m5.xlarge"), 0.00001),
-    t.areClose(0.1129, () => EC2(linuxRi('us-east-1', 'standard', 1, 'all_upfront'), "m5.xlarge"), 0.00001),
-    t.areClose(0.072184, () => EC2(linuxRi('us-east-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001),
-    t.areClose(0.084209, () => EC2(linuxRi('us-west-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001),
+        t.areClose(0.115648, () => EC2(linuxRi('us-east-1', 'standard', 1, 'partial_upfront'), "m5.xlarge"), 0.00001),
+        t.areClose(0.134123, () => EC2(linuxRi('us-east-1', 'convertible', 1, 'partial_upfront'), "m5.xlarge"), 0.00001),
+        t.areClose(0.121, () => EC2(linuxRi('us-east-1', 'standard', 1, 'no_upfront'), "m5.xlarge"), 0.00001),
+        t.areClose(0.1129, () => EC2(linuxRi('us-east-1', 'standard', 1, 'all_upfront'), "m5.xlarge"), 0.00001),
+        t.areClose(0.072184, () => EC2(linuxRi('us-east-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001),
+        t.areClose(0.084209, () => EC2(linuxRi('us-west-1', 'standard', 3, 'all_upfront'), "m5.xlarge"), 0.00001),
   // })
   ],"EC2 RI functions": [
-    t.areClose(0.131621, () => EC2_LINUX_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001),
-    t.areClose(0.191667, () => EC2_RHEL_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001),
-    t.areClose(0.199201, () => EC2_LINUX_MSSQL_CONV_RI_ALL("m5.xlarge", "us-east-1", "web", "1"), 0.00001),
-    t.areClose(0.740395, () => EC2_WINDOWS_MSSQL_STD_RI_PARTIAL("m5.xlarge", "us-east-2", "std", "3"), 0.00001),
+        t.areClose(0.131621, () => EC2_LINUX_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001),
+        t.areClose(0.191667, () => EC2_RHEL_CONV_RI_ALL("m5.xlarge", "us-east-1", "1"), 0.00001),
+        t.areClose(0.199201, () => EC2_LINUX_MSSQL_CONV_RI_ALL("m5.xlarge", "us-east-1", "web", "1"), 0.00001),
+        t.areClose(0.740395, () => EC2_WINDOWS_MSSQL_STD_RI_PARTIAL("m5.xlarge", "us-east-2", "std", "3"), 0.00001),
+
+        t.areClose(0.131621, () => AWS_EC2("reserved","m5.xlarge", "us-east-1", "linux", "convertible", "1yr", "all_upfront"), 0.00001),
+        t.areClose(0.191667, () => AWS_EC2("reserved","m5.xlarge", "us-east-1", "rhel", "convertible", "1yr", "all_upfront"), 0.00001),
+        t.areClose(0.199201, () => AWS_EC2("reserved","m5.xlarge", "us-east-1", "linux", "convertible", "1yr", "all_upfront", "web"), 0.00001),
+        t.areClose(0.199201, () => AWS_EC2("reserved","m5.xlarge", "us-east-1", "linux_web", "convertible", "1yr", "all_upfront"), 0.00001),
+        t.areClose(0.740395, () => AWS_EC2("reserved","m5.xlarge", "us-east-2", "windows", "standard", "3yr", "partial_upfront", "std"), 0.00001),
+        t.areClose(0.740395, () => AWS_EC2("reserved","m5.xlarge", "us-east-2", "windows_std", "standard", "3yr", "partial_upfront"), 0.00001),
   ],"helper functions": [
-    t.areDeepEqual({
-      "region": "us-east-1",
-      "purchase_term": "ondemand",
-      "operating_system": "linux"
-    }, map2dArrayToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
+        t.areDeepEqual({
+          "region": "us-east-1",
+          "purchase_term": "ondemand",
+          "operating_system": "linux"
+        }, map2dArrayToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
   ]};
 }
 
@@ -238,6 +307,33 @@ function getRDSFunctionTests() {
     t.areClose(0.348097, () => RDS_MARIADB_RI("db.r5.2xlarge", "us-east-1", 3, "all_upfront"), 0.000001),
     t.areClose(0.348097, () => RDS_MYSQL_RI("db.r5.2xlarge", "us-east-1", 3, "all_upfront"), 0.000001),
     t.areClose(0.362595, () => RDS_POSTGRESQL_RI("db.r5.2xlarge", "us-east-1", 3, "all_upfront"), 0.000001)
+    ],
+"AWS_RDS func tests": [
+  t.areEqual(0.58, () => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1","ondemand")), // RDS_AURORA_MYSQL_OD("db.r5.xlarge", "us-east-1")),
+  t.areEqual(0.38, () => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1","reserved","1yr","no_upfront")), //RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "no_upfront"), 0.000001),
+  // db.r5.xlarge no longer offered in partial upfront
+  t.areClose(0.288806, () => AWS_RDS("aurora/mysql","db.r6g.xlarge", "us-east-1","reserved", "1yr", "partial_upfront"), 0.000001),
+  t.areClose(0.316210, () => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1", "reserved","1yr", "all_upfront"), 0.000001),
+
+  t.willThrow(
+      () => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1", "reserved", "3yr", "no_upfront"), "The No-Upfront payment option is not supported for 3 year RDS RIs"),
+  t.areClose(0.192570, () => AWS_RDS("aurora/mysql","db.r6g.xlarge", "us-east-1","reserved", "3yr", "partial_upfront"), 0.000001),
+  t.areClose(0.202207, () => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1", "reserved", "3yr", "all_upfront"), 0.000001),
+
+  t.areClose(0.38, () => AWS_RDS("aurora/mysql", "db.r5.xlarge", "us-east-1", "reserved", "1yr", "no_upfront"), 0.000001), //RDS_AURORA_MYSQL_RI_NO(
+  t.areClose(0.288806, () => AWS_RDS("aurora/mysql", "db.r6g.xlarge", "us-east-1", "reserved", "1yr", "partial_upfront"), 0.000001), // RDS_AURORA_MYSQL_RI_PARTIAL
+  t.areClose(0.316210, () => AWS_RDS("aurora/mysql", "db.r5.xlarge", "us-east-1", "reserved", "1yr", "all_upfront"), 0.000001), // RDS_AURORA_MYSQL_RI_ALL
+
+  t.areEqual(1.16, () => AWS_RDS("aurora/postgresql","db.r5.2xlarge", "us-east-1","ondemand")), // RDS_AURORA_POSTGRESQL_OD
+  t.areEqual(1.04, () => AWS_RDS("mariadb", "db.r5.2xlarge", "ca-central-1", "ondemand")), // RDS_MARIADB_OD
+  t.areEqual(1.0810, () => AWS_RDS("postgresql","db.r5.2XLARGE", "CA-CENTRAL-1", "ondemand")), // RDS_POSTGRESQL_OD
+  t.areEqual(1.04, () => AWS_RDS("mysql","db.r5.2xlarge", "ca-central-1", "ondemand")), // RDS_MYSQL_OD
+
+  // Verify all RI purchase types to ensure payload sizes fit in cache
+  t.areClose(0.404452, () => AWS_RDS("aurora/postgresql", "db.r5.2xlarge", "us-east-1", "reserved", "3yr", "all_upfront"), 0.000001), //RDS_AURORA_POSTGRESQL_RI
+  t.areClose(0.348097, () => AWS_RDS("mariadb", "db.r5.2xlarge", "us-east-1", "reserved", "3yr", "all_upfront"), 0.000001), // RDS_MARIADB_RI
+  t.areClose(0.348097, () => AWS_RDS("mysql", "db.r5.2xlarge", "us-east-1", "reserved", "3yr", "all_upfront"), 0.000001), // RDS_MYSQL_RI
+  t.areClose(0.362595, () => AWS_RDS("postgresql", "db.r5.2xlarge", "us-east-1", "reserved", "3yr", "all_upfront"), 0.000001) // RDS_POSTGRESQL_RI
 ,
 ],"RDS settings tests": [
     t.areEqual(0.58, () => RDS_AURORA_MYSQL([
@@ -276,8 +372,9 @@ function getRDSFunctionTests() {
         ['payment_option', 'partial_upfront']
     ], undefined), "Must specify a DB instance type"),
 
-    t.willThrow(() => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 2, "no_upfront"), "Only 1yr and 3yr purchase terms are supported for RDS RIs")
-    ]
+    t.willThrow(() => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 2, "no_upfront"), "Only 1yr and 3yr purchase terms are supported for RDS RIs"),
+    t.willThrow(() => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1", "reserved","2yr", "no_upfront"), "Only 1yr and 3yr purchase terms are supported for RDS RIs"),
+  ]
   }
 }
 
@@ -287,15 +384,18 @@ function getRDSStorageTests() {
       t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("aurora", 4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("gp2", 4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("piops", 4000, "us-west-1"), 0.000001),
-      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("magnetic", 4000, "us-west-1"), 0.000001)
-  ,
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("magnetic", 4000, "us-west-1"), 0.000001),
+
+      t.areClose(4000 * (0.11/730), () => AWS_RDS_STORAGE("aurora", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => AWS_RDS_STORAGE("gp2", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.138/730), () => AWS_RDS_STORAGE("piops", 4000, "us-west-1"), 0.000001),
+      t.areClose(4000 * (0.11/730), () => AWS_RDS_STORAGE("magnetic", 4000, "us-west-1"), 0.000001)
 
   ],"alias tests": [
       t.areClose(4000 * (0.11/730), () => RDS_STORAGE_AURORA_GB(4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GP2_GB(4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_PIOPS_GB(4000, "us-west-1"), 0.000001),
-      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_MAGNETIC_GB(4000, "us-west-1"), 0.000001)
-  ,
+      t.areClose(4000 * (0.11/730), () => RDS_STORAGE_MAGNETIC_GB(4000, "us-west-1"), 0.000001),
 
   ],"settings tests": [
       t.areClose(4000 * (0.127/730), () => RDS_STORAGE_GB(['region', 'ca-central-1'], "gp2", 4000), 0.000001),
@@ -310,7 +410,15 @@ function getRDSStorageTests() {
           "Missing region"),
 
       t.willThrow(() =>
+      AWS_RDS_STORAGE("gp2",4000, undefined),
+      "Missing region"),
+
+      t.willThrow(() =>
           RDS_STORAGE_GP2_GB(undefined, "us-east-1"),
+          "must specify a parameter"),
+
+      t.willThrow(() =>
+          AWS_RDS_STORAGE("gp2",undefined, "us-east-1"),
           "must specify a parameter"),
 
       t.willThrow(() =>

@@ -41,7 +41,9 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
 }
 
 /**
- * Returns the hourly cost for the amount of provisioned EBS storage Gigabytes.
+ * Returns the hourly cost for the amount of provisioned EBS storage Gigabytes. 
+ * When a formula has "snapshot" as storageType, the first field will be ignored. 
+ * In this example the first argument is empty: AWS_EBS("","snapshot",3000,"us-east-1")
  *
  * @param {"gp3"} volumeType Volume type of EBS volume. This field will be ignored, when storageType is "snapshot"
  * @param {"iops"} storageType Storage type of EBS volume
