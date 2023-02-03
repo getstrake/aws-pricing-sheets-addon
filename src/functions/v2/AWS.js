@@ -26,8 +26,6 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
     if(options.purchaseType === "ondemand") {
       if(purchaseTerm || paymentOption)
         throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances`
-      if(sqlLicense)
-        throw `SQL license "${sqlLicense}" is only supported for reserved instances`
     }
 
     if(sqlLicense) {
