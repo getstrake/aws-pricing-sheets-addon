@@ -1,4 +1,5 @@
 function analyticsWrapper(args, callback) {
+  try { credentials } catch(err) { return callback(); }
   if(!cfg.logCustomFunctionToAnalytics ||
      !credentials.measurement_id_analytics || 
      !credentials.api_secret_analytics) {
