@@ -26,7 +26,7 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
 
     if(options.purchaseType === "ondemand") {
       if(purchaseTerm || paymentOption)
-        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances`
+        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances. Remove these arguments for on-demand instances or leave them empty.`
     }
 
     if(sqlLicense) {
@@ -82,6 +82,11 @@ function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, pay
     // validation
     if(!["ondemand","reserved"].includes(options.purchaseType))
       throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
+
+    if(options.purchaseType === "ondemand") {
+      if(purchaseTerm || paymentOption)
+        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances. Remove these arguments for on-demand instances.`
+    }
 
     // rewrite purchaseType
     if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
