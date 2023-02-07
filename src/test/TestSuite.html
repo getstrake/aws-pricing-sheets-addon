@@ -40,6 +40,7 @@
             google.script.run
               .withSuccessHandler(e => printResult(e, '#' + testDiv.id))
               .withFailureHandler(failure)
+              // .executeTest("<?!= callback ?>", key, i);
               .<?!= callback ?>(key, i);
           }
         }

@@ -19,15 +19,14 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
     // rewrite arguments to lowercase
     options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption, sqlLicense });
     
+    if(options.purchaseType === "on-demand") options.purchaseType = "ondemand";
     // validation
     if(!["ondemand","reserved"].includes(options.purchaseType))
       throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
 
     if(options.purchaseType === "ondemand") {
       if(purchaseTerm || paymentOption)
-        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances`
-      if(sqlLicense)
-        throw `SQL license "${sqlLicense}" is only supported for reserved instances`
+        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances. Remove these arguments for on-demand instances or leave them empty.`
     }
 
     if(sqlLicense) {
@@ -36,16 +35,18 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
     }
     
     // rewrite purchaseType
-    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
 
     return fetchApiEC2(options);
   });
 }
 
 /**
- * Returns the hourly cost for the amount of provisioned EBS storage Gigabytes.
+ * Returns the hourly cost for the amount of provisioned EBS storage Gigabytes. 
+ * When a formula has "snapshot" as storageType, the first field will be ignored. 
+ * In this example the first argument is empty: AWS_EBS("","snapshot",3000,"us-east-1")
  *
- * @param {"gp3"} volumeType Volume type of EBS volume
+ * @param {"gp3"} volumeType Volume type of EBS volume. This field will be ignored, when storageType is "snapshot"
  * @param {"iops"} storageType Storage type of EBS volume
  * @param {4000} volumeSize Volume size in GB
  * @param {"us-east-2"} region Region of EBS volume
@@ -77,12 +78,18 @@ function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, pay
     // rewrite arguments to lowercase
     const options = getObjectWithValuesToLowerCase({ dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption });
     
+    if(options.purchaseType === "on-demand") options.purchaseType = "ondemand";
     // validation
     if(!["ondemand","reserved"].includes(options.purchaseType))
       throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
 
+    if(options.purchaseType === "ondemand") {
+      if(purchaseTerm || paymentOption)
+        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances. Remove these arguments for on-demand instances.`
+    }
+
     // rewrite purchaseType
-    options.purchaseType = options.purchaseType === "reserved" ? "reserved-instance" : "ondemand";
+    if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
     
     return fetchApiRDS(options);
   });

@@ -1,5 +1,10 @@
 function analyticsWrapper(args, callback) {
-  if(!cfg.logCustomFunctionToAnalytics) return callback();
+  try { credentials } catch(err) { return callback(); }
+  if(!cfg.logCustomFunctionToAnalytics ||
+     !credentials.measurement_id_analytics || 
+     !credentials.api_secret_analytics) {
+     return callback();
+  }
 
   const startTime = Date.now();
   const result = callback();
