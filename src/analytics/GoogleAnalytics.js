@@ -12,8 +12,6 @@ function analyticsWrapper(args, callback) {
     funcName: args.callee.name, 
     timeExecution: Date.now() - startTime,
     email: getUserEmail(),
-    userLocale: getUserLocale(),
-    scriptTimeZone: Session.getScriptTimeZone()
   };
   validateAndSendToGoogleAnalytics(options);
   return result;
@@ -42,7 +40,7 @@ function validateAndSendToGoogleAnalytics(options) {
 // if debug is true, it will send the data to the debug endpoint
 // that debug endpoint returns 
 function sendToGoogleAnalytics(parameters) {
-  const {funcName, timeExecution, debug, email, userLocale, scriptTimeZone} = parameters;
+  const {funcName, timeExecution, debug, email} = parameters;
 
   const emailFormattedForEventName = email
     .replace(/@/g, "_at_") // event name can't have @
@@ -59,8 +57,6 @@ function sendToGoogleAnalytics(parameters) {
           "params": {
             timeExecution,
             "session_id": Date.now(),
-            userLocale,
-            scriptTimeZone,
             email,
             functionName: funcName,
             funcAndTimeExecution: funcName + " " + timeExecution + "ms",
