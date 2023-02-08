@@ -10,7 +10,6 @@ function analyticsWrapper(args, callback) {
   const result = callback();
   const options = {
     funcName: args.callee.name, 
-    args: [...args], 
     timeExecution: Date.now() - startTime,
     email: getUserEmail(),
     userLocale: getUserLocale(),
@@ -43,10 +42,7 @@ function validateAndSendToGoogleAnalytics(options) {
 // if debug is true, it will send the data to the debug endpoint
 // that debug endpoint returns 
 function sendToGoogleAnalytics(parameters) {
-  const {funcName, args, timeExecution, debug, email, userLocale, scriptTimeZone} = parameters;
-
-  const argumentsWithCommas = args.join(", ");
-  const fullFunction = funcName + "(" + argumentsWithCommas + ")";
+  const {funcName, timeExecution, debug, email, userLocale, scriptTimeZone} = parameters;
 
   const emailFormattedForEventName = email
     .replace(/@/g, "_at_") // event name can't have @
@@ -67,7 +63,7 @@ function sendToGoogleAnalytics(parameters) {
             scriptTimeZone,
             email,
             functionName: funcName,
-            "fullFunction": fullFunction + " " + timeExecution + "ms",
+            funcAndTimeExecution: funcName + " " + timeExecution + "ms",
           }
         }
       ]
