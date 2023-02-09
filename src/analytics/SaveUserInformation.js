@@ -4,7 +4,7 @@
 function saveUserInformation() {
   const email = Session.getActiveUser().getEmail();
   const userLocale = Session.getActiveUserLocale();
-  PropertiesService.getUserProperties().setProperty('emailUser',email);
-  PropertiesService.getUserProperties().setProperty('userLocale',userLocale);
+  PropertiesService.getUserProperties().setProperty('emailUser', email);
+  PropertiesService.getUserProperties().setProperty('userLocale', userLocale); // we don't use this yet, maybe for later use
   return {email, userLocale};
 }

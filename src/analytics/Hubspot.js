@@ -1,14 +1,12 @@
-function createHubSpotContact({email, userLocale}) {
+function createHubSpotContact(email) {
   try { credentials } catch(err) { return; }
-  if(!credentials.accessTokenHubSpot) {
+  if(!credentials.accessTokenHubSpot || !email) {
     return;
   }
   var url = "https://api.hubapi.com/crm/v3/objects/contacts";
 
   var data = {
-      "properties": {
-          "script_timezone": Session.getScriptTimeZone(),
-          "userlocale": userLocale, // property userlocale should be lowercase
+      "properties": { // all property keys should be lowercase
           email,
           "lastname": email.split("@")[0],
           // "phone": "(123) 456-123456",

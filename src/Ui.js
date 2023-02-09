@@ -6,8 +6,8 @@ function onOpen(e) {
 }
 
 function onboarding() {
-  const {email, userLocale} = saveUserInformation();
-  createHubSpotContact({email, userLocale});
+  const {email} = saveUserInformation();
+  createHubSpotContact(email);
   const ui = SpreadsheetApp.getUi();
   const template = HtmlService.createTemplateFromFile('help_dialog_collapsed.html');
   const html = template.evaluate();
