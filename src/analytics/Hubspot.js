@@ -1,4 +1,5 @@
 function createHubSpotContact({email, userLocale}) {
+  try { credentials } catch(err) { return; }
   if(!credentials.accessTokenHubSpot) {
     return;
   }
