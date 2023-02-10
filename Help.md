@@ -145,7 +145,7 @@ All RDS functions return the effective price *per hour*.
 
 ### RDS Storage
 
-You can compute the cost of provisioned RDS storage using the `AWS_RDS_STORAGE` function. These functions all take the storage type, the size of the volume in Gigabytes and return the hourly cost for the amount of provisioned storage.  
+You can compute the cost of provisioned RDS storage using the `AWS_RDS_STORAGE` function. This function take the storage type, the size of the volume in Gigabytes and return the hourly cost for the amount of provisioned storage.  
 The supported `volumeType`'s are: *aurora*, *gp2*, *piops* and *magnetic*.
 
 * `AWS_RDS_STORAGE(storageType, storageSize, region)`
