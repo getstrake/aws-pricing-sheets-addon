@@ -10,11 +10,8 @@ function analyticsWrapper(args, callback) {
   const result = callback();
   const options = {
     funcName: args.callee.name, 
-    args: [...args], 
     timeExecution: Date.now() - startTime,
     email: getUserEmail(),
-    userLocale: getUserLocale(),
-    scriptTimeZone: Session.getScriptTimeZone()
   };
   validateAndSendToGoogleAnalytics(options);
   return result;
@@ -43,14 +40,12 @@ function validateAndSendToGoogleAnalytics(options) {
 // if debug is true, it will send the data to the debug endpoint
 // that debug endpoint returns 
 function sendToGoogleAnalytics(parameters) {
-  const {funcName, args, timeExecution, debug, email, userLocale, scriptTimeZone} = parameters;
-
-  const argumentsWithCommas = args.join(", ");
-  const fullFunction = funcName + "(" + argumentsWithCommas + ")";
+  const {funcName, timeExecution, debug, email} = parameters;
 
   const emailFormattedForEventName = email
     .replace(/@/g, "_at_") // event name can't have @
     .replace(/\./g, "_dot_") // event name can't have .
+    .replace(/\s/g, "_") // event name can't have spaces
     .replace(/[^\w]/g, "") // event name should be alphanumeric
     .slice(0,44); // max size event name is 44 chars
 
@@ -63,11 +58,9 @@ function sendToGoogleAnalytics(parameters) {
           "params": {
             timeExecution,
             "session_id": Date.now(),
-            userLocale,
-            scriptTimeZone,
             email,
             functionName: funcName,
-            "fullFunction": fullFunction + " " + timeExecution + "ms",
+            funcAndTimeExecution: funcName + " " + timeExecution + "ms",
           }
         }
       ]
