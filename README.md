@@ -1,3 +1,7 @@
+:mega: **This is a pre-release version of the new AWS Pricing Sheets add-on by Stake.** We will be announcing its general availability on the Google Workspace Marketplace soon.
+
+---
+
 ## About the AWS Pricing Plugin
 
 The [AWS Pricing Plug-in](https://workspace.google.com/marketplace/app/aws_pricing/328915503637) is an open-source project maintained by Strake that allows any google sheets user to analyze AWS public pricing using Google Sheets formulas. AWS cost management is a pain. The ability to bring AWS Pricing into Google Sheets and collaborate with your team makes it easier to forecast AWS costs and identify opportunities for savings.
