@@ -70,61 +70,25 @@ body { height: 100%; }
 .visible {
   display: block;
 }
+
+.collapsible::before {
+        content: " ";
+        display: inline-block;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-left: 5px solid currentColor;
+        vertical-align: middle;
+        margin-right: 0.7rem;
+        transform: rotate(0) translateY(-2px);
+        transition: transform 0.2s ease-out;
+      }
+
+      button.visible::before {
+        transform: rotate(90deg) translateX(-3px);
+      }
 </style>
 
 <script>
-  function debounce(func, wait, immediate){
-    var timeout, args, context, timestamp, result;
-    if (null == wait) wait = 100;
-
-    function later() {
-      var last = Date.now() - timestamp;
-
-      if (last < wait && last >= 0) {
-        timeout = setTimeout(later, wait - last);
-      } else {
-        timeout = null;
-        if (!immediate) {
-          result = func.apply(context, args);
-          context = args = null;
-        }
-      }
-    };
-
-    var debounced = function(){
-      context = this;
-      args = arguments;
-      timestamp = Date.now();
-      var callNow = immediate && !timeout;
-      if (!timeout) timeout = setTimeout(later, wait);
-      if (callNow) {
-        result = func.apply(context, args);
-        context = args = null;
-      }
-
-      return result;
-    };
-
-    debounced.clear = function() {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-    };
-    
-    debounced.flush = function() {
-      if (timeout) {
-        result = func.apply(context, args);
-        context = args = null;
-        
-        clearTimeout(timeout);
-        timeout = null;
-      }
-    };
-
-    return debounced;
-  };
-
   function showTooltip(evt, text) {
     let tooltip = document.getElementById("tooltip");
     tooltip.innerHTML = text;
@@ -152,12 +116,15 @@ body { height: 100%; }
   function collapsibleClicked(e) {
     const contentElement = e.target.nextElementSibling;
     let visibleTagName = 'visible';
+    e.target.classList.toggle(visibleTagName);
+    contentElement.classList.toggle(visibleTagName);
     document.querySelectorAll('.' + visibleTagName)?.forEach(element => {
-      if(element.classList.contains(visibleTagName) && element !== contentElement) {
+      if(element.classList.contains(visibleTagName)  
+        && element !== contentElement  
+        && element !== e.target) {
         element.classList.remove(visibleTagName);
       }
     });
-    contentElement.classList.toggle(visibleTagName);
   }
   </script>
 
