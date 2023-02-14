@@ -19,9 +19,7 @@ This addon supplies multiple custom functions that you can invoke from a Google 
 
 Functions are documented here without the required leading "`=`" for ease of reading.
 
-### EC2 Instances
-
-### Parameters
+### EC2 Instance Parameters
 
 These define the parameters used in the following functions and instance settings.
 
