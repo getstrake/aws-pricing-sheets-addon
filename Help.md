@@ -1,4 +1,4 @@
-# AWS Pricing add-on for Google Sheets
+# AWS Pricing add-on
 
 The AWS Pricing Google Sheets add-on allows you to incorporate the latest AWS pricing data in your Google Sheets spreadsheets. This makes it easy to perform cloud cost analysis directly in Sheets without error-prone copy-and-paste from pricing websites. Pricing data tracks the latest discounts from AWS.
 
@@ -56,7 +56,7 @@ Where `sqlLicense` is either *web*, *std*, or *enterprise* and `platform` is eit
 
 Prices are currently returned in hourly durations. The price is the *effective* hourly rate when using reserved instances.
 
-## EBS Storage
+### EBS Storage
 
 You can compute the cost of EBS storage and provisioned IOPS with the `AWS_EBS()` functions. 
 
@@ -96,7 +96,7 @@ Note that the first argument is empty.
 
 * `AWS_EBS("", "snapshot", volumeSize, region)`
 
-## RDS Instances
+### RDS Instances
 
 *AWS Pricing* supports custom functions for RDS on-demand and reserved-instance pricing.
 
