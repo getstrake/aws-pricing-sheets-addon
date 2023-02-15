@@ -1,4 +1,11 @@
 {
+  "addOns": {
+    "common": {
+      "name": "AWS Pricing by Strake™",
+      "logoUrl": "https://cdn.x.macroscope.io/assets/aws-pricing/logo.png"
+    },
+    "sheets": {}
+  },
   "dependencies": {
   },
   "exceptionLogging": "STACKDRIVER",
@@ -9,6 +16,13 @@
   "oauthScopes": [
     "https://www.googleapis.com/auth/script.container.ui",
     "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/userinfo.profile",
     "https://www.googleapis.com/auth/userinfo.email"
+
+  ],
+  "timeZone": "America/Denver",
+  "urlFetchWhitelist": [
+    "https://cdn.x.macroscope.io/aws-pricing/"
   ]
 }
