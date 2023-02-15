@@ -2,7 +2,10 @@
   "addOns": {
     "common": {
       "name": "AWS Pricing by Strake™",
-      "logoUrl": "https://cdn.x.macroscope.io/assets/aws-pricing/logo.png"
+      "logoUrl": "https://cdn.x.macroscope.io/assets/aws-pricing/logo.png",
+      "homepageTrigger": {
+        "runFunction": "buildSideBar"
+      }
     },
     "sheets": {}
   },

@@ -24,3 +24,15 @@ function onboarding() {
   html.setTitle('AWS Pricing Add-on');
   ui.showSidebar(html);
 }
+
+function buildSideBar() {
+  try {
+    const {email} = saveUserInformation
+    createHubSpotContact(email);
+  } catch(err) {}
+
+  return CardService.newCardBuilder()
+      .setName("AWS Pricing")
+      .setHeader(CardService.newCardHeader().setTitle("Use menu Extensions"))
+      .build();
+}
