@@ -8,12 +8,21 @@ function analyticsWrapper(args, callback) {
 
   const startTime = Date.now();
   const result = callback();
+  const timeExecution = Date.now() - startTime;
+  const email = getUserEmail();
+  const funcName = args.callee.name;
   const options = {
-    funcName: args.callee.name, 
-    timeExecution: Date.now() - startTime,
-    email: getUserEmail(),
+    funcName, 
+    timeExecution,
+    email
   };
   validateAndSendToGoogleAnalytics(options);
+  trackSegmentEvent({
+    email, 
+    eventKey: cfg.segment.event.PLUGIN_FORMULA_EXECUTE_CELL, 
+    funcName, 
+    timeExecution
+  })
   return result;
 }
 
