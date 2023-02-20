@@ -2,6 +2,10 @@ function onOpen(e) {
   SpreadsheetApp.getUi()
       .createAddonMenu()
       .addItem('How to use AWS Pricing', 'onboarding')
+      .addSeparator()
+      .addItem('Visit Strake’s website', 'openStrakeWebsite')
+      .addItem('AWS Pricing on GitHub', 'openStrakeGithub')
+      .addItem('Join our Slack Community', 'openSlackInvite')
       .addToUi();
 }
 
