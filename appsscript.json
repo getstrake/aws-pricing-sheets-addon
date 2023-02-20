@@ -24,6 +24,9 @@
   ],
   "timeZone": "America/Denver",
   "urlFetchWhitelist": [
-    "https://cdn.x.macroscope.io/aws-pricing/"
+    "https://cdn.x.macroscope.io/aws-pricing/",
+    "https://www.google-analytics.com/",
+    "https://api.hubapi.com/",
+    "https://api.segment.io/"
   ]
 }
