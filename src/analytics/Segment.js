@@ -35,6 +35,8 @@ function trackSegmentEvent({ email, eventKey, funcName, timeExecution, data4 }) 
       "event": environment,
       "properties": {
           "AccountID": "xyz",
+          'app_user_id': '',
+          'app_org_id': '',
           'Data 1 Label': email || '',
           'Data 2 Label': funcName || '',
           'Data 3 Label': timeExecution || '',
