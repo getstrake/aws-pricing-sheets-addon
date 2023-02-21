@@ -29,9 +29,10 @@ function trackSegmentEvent({ email, eventKey, funcName, timeExecution, data4 }) 
   try {
     const authToken = Utilities.base64Encode(credentials.segmentWriteKey + ":");
     const url = "https://api.segment.io/v1/track";
+    const environment = cfg.environment?.toLowerCase() === "production" ? "Production" : "Development";
     const payload = {
       "userId": email,
-      "event": "Development",
+      "event": environment,
       "properties": {
           "AccountID": "xyz",
           'Data 1 Label': email || '',

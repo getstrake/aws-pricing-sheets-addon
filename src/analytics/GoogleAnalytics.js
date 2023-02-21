@@ -16,7 +16,13 @@ function analyticsWrapper(args, callback) {
     timeExecution,
     email
   };
-  validateAndSendToGoogleAnalytics(options);
+  if(cfg.environment?.toLowerCase() === "development") {
+    validateAndSendToGoogleAnalytics(options)
+  } else if(cfg.environment?.toLowerCase() === "production") {
+    options.debug = false;
+    sendToGoogleAnalytics(options);
+  }
+
   trackSegmentEvent({
     email, 
     eventKey: cfg.segment.event.PLUGIN_FORMULA_EXECUTE_CELL, 
