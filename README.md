@@ -29,10 +29,10 @@ Starting a new sheet will prompt a short onboarding where you can see the sideba
 
 ## Community
 Understanding AWS costs is a messy business. If you have questions about the project or want to talk to some AWS cost experts, here are some resources:
--  🖥️ [Visit our website](https://www.macroscope.io) to learn about features and download AWS Pricing templates.
+-  🖥️ [Visit our website](https://getstrake.com) to learn about features and download AWS Pricing templates.
 -  🚀 [Create a GitHub Issue](https://github.com/getmacroscope/aws-pricing/issues) for bugs or if you have ideas to improve the project.
 -  💭 [Join the Strake community](https://join.slack.com/t/strake-community/shared_invite/zt-1nisfazzn-uO5O_I28Z7N6sZ6iM2H1xA) if you have questions or want to stay updated with Strake.
 
 </hr>
 
-Copyright 2023, Macroscope Inc.
+Copyright 2023, Strake Technologies
