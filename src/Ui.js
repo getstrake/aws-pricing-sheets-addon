@@ -10,7 +10,10 @@ function onOpen(e) {
 }
 
 /**
- * The onInstall(e) trigger runs automatically when a user installs an Editor add-on from within Google Docs, Sheets, Slides, or Forms. The trigger won't run when a user installs the add-on from the Google Workspace Marketplace website.
+ * The onInstall(e) trigger runs automatically when a user installs an Editor add-on from within
+ * Google Docs, Sheets, Slides, or Forms. The trigger won't run when a user installs the add-on
+ * from the Google Workspace Marketplace website.
+ *
  * @param {Event} e The onInstall event.
  * @see https://developers.google.com/apps-script/guides/triggers#oninstalle
  */
