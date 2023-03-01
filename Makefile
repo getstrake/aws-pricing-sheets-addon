@@ -9,9 +9,9 @@
 #
 
 clean:
-	rm help_dialog.html
+	rm help_dialog_collapsed.html
 
-help-dialog: help_dialog.html
+help-dialog: help_dialog_collapsed.html
 
 # Old version without collapsible headers
 # help_dialog.html: Help.md assets/templates/help_dialog.html
