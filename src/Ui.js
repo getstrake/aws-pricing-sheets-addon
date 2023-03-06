@@ -23,6 +23,7 @@ function onInstall(e) {
 }
 
 function onboarding() {
+  /*
   const {email} = saveUserInformation();
   createHubSpotContact(email);
   identifySegment(email);
@@ -31,6 +32,7 @@ function onboarding() {
     eventKey: cfg.segment.event.PLUGIN_EXECUTE_MENU, 
     funcName: 'onboarding'
   })
+  */
   const ui = SpreadsheetApp.getUi();
   const template = HtmlService.createTemplateFromFile('help_dialog_collapsed.html');
   const html = template.evaluate();
