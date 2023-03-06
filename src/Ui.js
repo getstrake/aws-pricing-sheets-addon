@@ -23,8 +23,8 @@ function onInstall(e) {
 }
 
 function onboarding() {
-  /*
   const {email} = saveUserInformation();
+  /*
   createHubSpotContact(email);
   identifySegment(email);
   trackSegmentEvent({
