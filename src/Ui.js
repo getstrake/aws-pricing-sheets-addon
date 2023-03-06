@@ -73,7 +73,7 @@ function openUrl( url ){
 
 function buildSideBar() {
   try {
-    const {email} = saveUserInformation
+    const {email} = saveUserInformation();
     createHubSpotContact(email);
   } catch(err) {}
 
