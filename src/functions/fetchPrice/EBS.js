@@ -1,4 +1,4 @@
-function fetchApiEBS(options) {
+function fetchApiEBS(options, funcName) {
   options = getObjectWithLowerCaseValues(options);
   const { region, volumeSize } = options;
 
@@ -11,7 +11,7 @@ function fetchApiEBS(options) {
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {
-    response = JSON.parse(fetchUrlCached(url));
+    response = JSON.parse(fetchUrlCached(url, funcName));
   } catch(err) {
     throw 'Unable to find the price. Make sure you have the correct region.'
   }   

@@ -3,21 +3,20 @@ function createHubSpotContact(email) {
   if(!credentials.accessTokenHubSpot || !email) {
     return;
   }
-  var url = "https://api.hubapi.com/crm/v3/objects/contacts";
+  let url = "https://api.hubapi.com/crm/v3/objects/contacts";
 
-  var data = {
+  let data = {
       "properties": { // all property keys should be lowercase
           email,
           "lastname": email.split("@")[0],
-          // "phone": "(123) 456-123456",
-          // "website": "test.nl"
+          // if you want to register other custom fields, you have to add this column first to hubspot, otherwise the registration won't work!
       }
   }
-  var headers = {
+  let headers = {
       'authorization': 'Bearer ' + credentials.accessTokenHubSpot
   };
 
-  var options = {
+  let options = {
       "method": "POST",
       "headers": headers,
       "contentType": "application/json",
@@ -25,7 +24,7 @@ function createHubSpotContact(email) {
   }
 
   try {
-    var response = UrlFetchApp.fetch(url, options);
+    let response = UrlFetchApp.fetch(url, options);
     // console.log(`Added user ${email} to Hubspot`)
   } catch(err) { 
     // console.log(err);

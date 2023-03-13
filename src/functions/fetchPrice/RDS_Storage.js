@@ -1,4 +1,4 @@
-function fetchApiRDSStorage(options) {
+function fetchApiRDSStorage(options, funcName) {
   options = getObjectWithValuesToLowerCase(options);
   const { storageType, storageSize, region } = options;
 
@@ -12,7 +12,7 @@ function fetchApiRDSStorage(options) {
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {
-    response = JSON.parse(fetchUrlCached(url));
+    response = JSON.parse(fetchUrlCached(url, funcName));
   } catch(err) {
     throw 'We encountered a problem while fetching the price. Please try again later.'
   }   

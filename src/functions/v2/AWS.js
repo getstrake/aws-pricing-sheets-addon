@@ -37,7 +37,7 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
     // rewrite purchaseType
     if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
 
-    return fetchApiEC2(options);
+    return fetchApiEC2(options, arguments.callee.name);
   });
 }
 
@@ -56,7 +56,7 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
 function AWS_EBS(volumeType, storageType, volumeSize, region) {
   return analyticsWrapper(arguments, () => {
     options = getObjectWithValuesToLowerCase({ volumeType, storageType, volumeSize, region });
-    return fetchApiEBS(options);
+    return fetchApiEBS(options, arguments.callee.name);
   });
 }
 
@@ -91,7 +91,7 @@ function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, pay
     // rewrite purchaseType
     if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
     
-    return fetchApiRDS(options);
+    return fetchApiRDS(options, arguments.callee.name);
   });
 }
 
@@ -107,6 +107,6 @@ function AWS_RDS(dbEngine, instanceType, region, purchaseType, purchaseTerm, pay
 function AWS_RDS_STORAGE(storageType, storageSize, region) {
   return analyticsWrapper(arguments, () => {
     const options = getObjectWithValuesToLowerCase({ storageType, storageSize, region });
-    return fetchApiRDSStorage(options);
+    return fetchApiRDSStorage(options, arguments.callee.name);
   });
 }

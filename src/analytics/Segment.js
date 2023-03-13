@@ -1,11 +1,12 @@
-function identifySegment(email) {
+function identifySegment(email, spreadsheetId) {
   try {
     const authToken = Utilities.base64Encode(credentials.segmentWriteKey + ":"); // documentation: https://segment.com/docs/connections/sources/catalog/libraries/server/http-api/
     const url = "https://api.segment.io/v1/identify";
     const payload = {
-      "userId": email,
+      "userId": spreadsheetId,
       "traits": {
-          "email": email
+          "email": email,
+          "spreadsheet_id": spreadsheetId,
       }
     }
     
@@ -25,19 +26,19 @@ function identifySegment(email) {
   }
 }
 
-function trackSegmentEvent({ email, eventKey, funcName, timeExecution, data4 }) {
+function trackSegmentEvent({ userId, eventKey, funcName, timeExecution, data4 }) {
   try {
     const authToken = Utilities.base64Encode(credentials.segmentWriteKey + ":");
     const url = "https://api.segment.io/v1/track";
     const environment = cfg.environment?.toLowerCase() === "production" ? "Production" : "Development";
     const payload = {
-      "userId": email,
+      "userId": userId,
       "event": environment,
       "properties": {
           "AccountID": "xyz",
           'app_user_id': '',
           'app_org_id': '',
-          'Data 1 Label': email || '',
+          'Data 1 Label': userId || '',
           'Data 2 Label': funcName || '',
           'Data 3 Label': timeExecution || '',
           'Data 4 Label': data4 || '',

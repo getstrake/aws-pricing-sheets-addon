@@ -1,4 +1,4 @@
-function fetchApiRDS(options) {
+function fetchApiRDS(options, funcName) {
   options = getObjectWithValuesToLowerCase(options);
   const { dbEngine, instanceType, region, purchaseType, purchaseTerm, paymentOption } = options;
 
@@ -22,7 +22,7 @@ function fetchApiRDS(options) {
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {
-    response = JSON.parse(fetchUrlCached(url));
+    response = JSON.parse(fetchUrlCached(url, funcName));
   } catch(err) {
     throw 'Unable to find the price. Make sure you have the correct region, database engine and purchase type.'
   }   

@@ -1,4 +1,4 @@
-function fetchApiEC2(options) {
+function fetchApiEC2(options, funcName) {
   options = getObjectWithValuesToLowerCase(options);
   const { instanceType, region, purchaseType, platform, offeringClass, purchaseTerm, paymentOption } = options;
 
@@ -11,7 +11,7 @@ function fetchApiEC2(options) {
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {
-    response = JSON.parse(fetchUrlCached(url));
+    response = JSON.parse(fetchUrlCached(url, funcName));
   } catch(err) {
     throw 'Unable to find the price. Make sure you have the correct region, purchase type and platform.'
   }   

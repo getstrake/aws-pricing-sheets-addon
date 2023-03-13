@@ -1,35 +1,42 @@
 function analyticsWrapper(args, callback) {
-  try { credentials } catch(err) { return callback(); }
-  if(!cfg.logCustomFunctionToAnalytics ||
-     !credentials.measurement_id_analytics || 
-     !credentials.api_secret_analytics) {
-     return callback();
-  }
+  // this is moved to function fetchUrl in src/Fetch.js
+  // and there we use fetchAll, so we can fetch to Segment and AWS Pricing at the same time for better performance
+  // below you'll find the original code, it's slower because it requires seperates requests to Segment and Google Analytics
+  // we also decided to leave out google analytics for now in function fetchAll
 
-  const startTime = Date.now();
-  const result = callback();
-  const timeExecution = Date.now() - startTime;
-  const email = getUserEmail();
-  const funcName = args.callee.name;
-  const options = {
-    funcName, 
-    timeExecution,
-    email
-  };
-  if(cfg.environment?.toLowerCase() === "development") {
-    validateAndSendToGoogleAnalytics(options)
-  } else if(cfg.environment?.toLowerCase() === "production") {
-    options.debug = false;
-    sendToGoogleAnalytics(options);
-  }
+  return callback();
 
-  trackSegmentEvent({
-    email, 
-    eventKey: cfg.segment.event.PLUGIN_FORMULA_EXECUTE_CELL, 
-    funcName, 
-    timeExecution
-  })
-  return result;
+  // try { credentials } catch(err) { return callback(); }
+  // if(!cfg.logCustomFunctionToAnalytics ||
+  //    !credentials.measurement_id_analytics || 
+  //    !credentials.api_secret_analytics) {
+  //    return callback();
+  // }
+
+  // const startTime = Date.now();
+  // const result = callback();
+  // const timeExecution = Date.now() - startTime;
+  // const email = getUserEmail();
+  // const funcName = args.callee.name;
+  // const options = {
+  //   funcName, 
+  //   timeExecution,
+  //   email
+  // };
+  // if(cfg.environment?.toLowerCase() === "development") {
+  //   validateAndSendToGoogleAnalytics(options)
+  // } else if(cfg.environment?.toLowerCase() === "production") {
+  //   options.debug = false;
+  //   sendToGoogleAnalytics(options);
+  // }
+
+  // trackSegmentEvent({
+  //   email, 
+  //   eventKey: cfg.segment.event.PLUGIN_FORMULA_EXECUTE_CELL, 
+  //   funcName, 
+  //   timeExecution
+  // })
+  // return result;
 }
 
 function getUserEmail() {
