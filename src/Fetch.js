@@ -6,9 +6,16 @@ function fetchUrlCached(url, funcName) {
 
 // also fetches to segment api to track user's activity
 function fetchUrl(url, funcName) {
-    const optionsTrackSegment = getOptionsTrackSegment(funcName, url);
-    // fetch simultaneously to Segment and AWS Pricing
-    const resp = UrlFetchApp.fetchAll([{url}, optionsTrackSegment])[0]; 
+    let fetches = [{url}];
+    try { // will catch error when credentials is not defined
+        // fetch simultaneously to Segment and AWS Pricing
+        const optionsTrackSegment = getOptionsTrackSegment(funcName, url);
+        fetches.push(optionsTrackSegment);
+    } catch(err) { 
+        // console.error('Unable to fetch to Segment: ' + err);
+        // console.log('Still fetching to AWS Pricing CDN')
+    }
+    const resp = UrlFetchApp.fetchAll(fetches)[0]; 
     if (resp.getResponseCode() != 200) throw "Unable to load the URL: " + url;
     return resp.getContentText();
 }
