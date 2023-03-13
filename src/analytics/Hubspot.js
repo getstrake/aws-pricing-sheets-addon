@@ -9,8 +9,7 @@ function createHubSpotContact(email) {
       "properties": { // all property keys should be lowercase
           email,
           "lastname": email.split("@")[0],
-          // "phone": "(123) 456-123456",
-          // "website": "test.nl"
+          // if you want to register other custom fields, you have to add this column first to hubspot, otherwise the registration won't work!
       }
   }
   var headers = {

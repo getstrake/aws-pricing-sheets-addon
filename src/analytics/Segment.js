@@ -5,7 +5,8 @@ function identifySegment(email) {
     const payload = {
       "userId": email,
       "traits": {
-          "email": email
+          "email": email,
+          "spreadsheet_id": SpreadsheetApp.getActiveSpreadsheet().getId(),
       }
     }
     
