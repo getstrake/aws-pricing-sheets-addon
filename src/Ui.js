@@ -24,11 +24,12 @@ function onInstall(e) {
 
 function onboarding() {
   const {email} = saveUserInformation();
+  const spreadsheetId = SpreadsheetApp.getActiveSpreadsheet().getId();
   
   createHubSpotContact(email);
-  identifySegment(email);
+  identifySegment(email, spreadsheetId);
   trackSegmentEvent({
-    email, 
+    userId: spreadsheetId, 
     eventKey: cfg.segment.event.PLUGIN_EXECUTE_MENU, 
     funcName: 'onboarding'
   })
