@@ -23,16 +23,17 @@ function onInstall(e) {
 }
 
 function onboarding() {
-  /*
   const {email} = saveUserInformation();
+  const spreadsheetId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  
   createHubSpotContact(email);
-  identifySegment(email);
+  identifySegment(email, spreadsheetId);
   trackSegmentEvent({
-    email, 
+    userId: spreadsheetId, 
     eventKey: cfg.segment.event.PLUGIN_EXECUTE_MENU, 
     funcName: 'onboarding'
   })
-  */
+  
   const ui = SpreadsheetApp.getUi();
   const template = HtmlService.createTemplateFromFile('help_dialog_collapsed.html');
   const html = template.evaluate();
@@ -73,7 +74,7 @@ function openUrl( url ){
 
 function buildSideBar() {
   try {
-    const {email} = saveUserInformation
+    const {email} = saveUserInformation();
     createHubSpotContact(email);
   } catch(err) {}
 
