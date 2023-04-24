@@ -2,6 +2,7 @@ function onOpen(e) {
   SpreadsheetApp.getUi()
       .createAddonMenu()
       .addItem('How to use AWS Pricing', 'onboarding')
+      .addItem('Formula Builder', 'showFormulaBuilder')
       .addSeparator()
       .addItem('Visit Strake’s website', 'openStrakeWebsite')
       .addItem('AWS Pricing on GitHub', 'openStrakeGithub')
@@ -20,6 +21,32 @@ function onOpen(e) {
 function onInstall(e) {
   onOpen(e);
   try { onboarding() } catch(err) { }
+}
+
+function showFormulaBuilder() {
+  // const {email} = saveUserInformation();
+  // const spreadsheetId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  
+  // createHubSpotContact(email);
+  // identifySegment(email, spreadsheetId);
+  // trackSegmentEvent({
+  //   userId: spreadsheetId, 
+  //   eventKey: cfg.segment.event.PLUGIN_EXECUTE_MENU, 
+  //   funcName: 'showFormulaBuilder'
+  // })
+  
+  const ui = SpreadsheetApp.getUi();
+  const template = HtmlService.createTemplateFromFile('formula_builder.html');
+  const html = template.evaluate();
+  html.setTitle('AWS Pricing Formula Builder');
+  ui.showSidebar(html);
+}
+
+function insertFormula(formula) {
+  if(!formula) throw "Should send formula as argument"
+  const activeSheet = SpreadsheetApp.getActiveSheet();
+  const activeRange = activeSheet.getActiveRange();
+  activeSheet.getRange(activeRange.getRow(),activeRange.getColumn()).setValue('=' + formula);
 }
 
 function onboarding() {
