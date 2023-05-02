@@ -46,7 +46,10 @@ function insertFormula(formula) {
   if(!formula) throw "Should send formula as argument"
   const activeSheet = SpreadsheetApp.getActiveSheet();
   const activeRange = activeSheet.getActiveRange();
-  activeSheet.getRange(activeRange.getRow(),activeRange.getColumn()).setValue('=' + formula);
+  const cell = activeSheet.getRange(activeRange.getRow(),activeRange.getColumn())
+  const cellName = cell.getA1Notation();
+  cell.setValue('=' + formula);
+  SpreadsheetApp.getActiveSpreadsheet().toast(`Formula is inserted into cell ${cellName}. To undo this, press Ctrl+Z`)
 }
 
 function onboarding() {
