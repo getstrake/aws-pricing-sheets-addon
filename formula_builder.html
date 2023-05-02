@@ -270,7 +270,7 @@
               </table>
             </div>
             <textarea ref={textareaRef} value={formula} onChange={event => setFormula(event.target.value)}></textarea>
-            <button onClick={insertFormula}>Insert Formula</button>
+            <button onClick={insertFormula}>Insert Formula in active cell</button>
             {renderServiceComponent(service, setFormula, setArgs)}
 
             <div className="sidebar bottom">
