@@ -49,7 +49,7 @@ function insertFormula(formula) {
   const cell = activeSheet.getRange(activeRange.getRow(),activeRange.getColumn())
   const cellName = cell.getA1Notation();
   cell.setValue('=' + formula);
-  SpreadsheetApp.getActiveSpreadsheet().toast(`Formula is inserted into cell ${cellName}. To undo this, press Ctrl+Z`)
+  SpreadsheetApp.getActiveSpreadsheet().toast(`Formula is inserted into cell ${cellName}. To undo this, click on the sheet and press Ctrl+Z`)
 }
 
 function onboarding() {
