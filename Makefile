@@ -20,8 +20,8 @@ help-dialog: help_dialog_collapsed.html
 
 # New version, adds collapsible headers
 # replaces h3 headers with buttons and content below in a div to make collapsible headers
-help_dialog.html: Help.md assets/templates/help_dialog_collapsed.html
-	echo "$$(npx marked Help.md) </div>" | sed -e '/__CONTENT__/{r /dev/stdin' -e 'd;}' \
+help_dialog_collapsed.html: Help.md assets/templates/help_dialog_collapsed.html
+	echo "$$(npx marked Help.md | sed 's/<a href/<a target="_blank" href/g') </div>" | sed -e '/__CONTENT__/{r /dev/stdin' -e 'd;}' \
 		assets/templates/help_dialog_collapsed.html | \
 		sed -E 's/<h3([^>]*)>/<\/div><button type="button" class="collapsible">/g' | \
 		sed -E 's/<\/h3>/<\/button>\n<div class="content">/g' | \

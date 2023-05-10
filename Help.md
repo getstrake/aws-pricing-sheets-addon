@@ -153,4 +153,3 @@ Storage type can be "aurora", "gp2", "piops" and "magnetic"
 ### Backwards compatibility
 
 This add-on is compatible with a previous version, allowing you to continue using the function notation from that version in your sheets. However, note that the sheets editor's pop-up suggestion feature will not be available. For more information about the formulas from version 1, please refer to [the following link](https://github.com/getmacroscope/aws-pricing/blob/master/Help.md)
-

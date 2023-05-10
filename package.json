@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "gencode": "./scripts/gen-funcs.rb",
-    "create-help-dialog": "make help-dialog",
-    "deploy": "npm run gencode && make help-dialog && clasp push"
+    "create-help-dialog": "make help_dialog_collapsed.html",
+    "deploy": "npm run gencode && make help_dialog_collapsed.html && clasp push"
   },
   "keywords": [],
   "author": "",
