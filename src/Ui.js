@@ -42,14 +42,79 @@ function showFormulaBuilder() {
   ui.showSidebar(html);
 }
 
-function insertFormula(formula) {
-  if(!formula) throw "Should send formula as argument"
+function insertFormula(formula, args) {
+  if(!formula) throw "Should send formula as argument";
+  if(args.join("").includes("/"))
+    return insertFormulaWithCompare(formula, args);
   const activeSheet = SpreadsheetApp.getActiveSheet();
   const activeRange = activeSheet.getActiveRange();
   const cell = activeSheet.getRange(activeRange.getRow(),activeRange.getColumn())
   const cellName = cell.getA1Notation();
   cell.setValue('=' + formula);
   SpreadsheetApp.getActiveSpreadsheet().toast(`Formula is inserted into cell ${cellName}. To undo this, click on the sheet and press Ctrl+Z`)
+}
+
+function insertFormulaWithCompare(formula, args) {
+  const functionName = formula.match(/[^(]+/);
+  const compareSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('compare') || SpreadsheetApp.getActiveSpreadsheet().insertSheet("compare");
+  let header, header2, index1, index2;
+  for(const [index, arg] of args.entries()) {
+    if(arg.includes("/")) {
+      if(!header) {
+        index1 = index;
+        header = arg.split("/");
+      } else {
+        index2 = index;
+        header2 = arg.split("/");
+      }
+    }
+  }
+  
+
+  const values = createEmpty2DArray(header2 ? header2.length + 1 : 2,header.length,"");
+
+  for(let i=0;i<header.length;i++) {
+    if(header2) { // 2 headers => 2d array of possibilities
+      values[0] = [""].concat(header);
+      for(let k=0;k<header2.length;k++) {
+        values[k+1][0] = header2[k];
+        values[k+1][i+1] = "=" + functionName + "(" + args.map((x, index) => {
+          if(index === index1)
+            return indexToColumnLetter(i+1) + "1";
+          else if(index === index2)
+            return "A" + (k+2);
+          else
+            return `"${x}"`;
+        }).join(",") + ")";
+      }
+    } else if(header) { // 1 header
+      values[0] = header;
+      values[1][i] = "=" + functionName + "(" + args.map(x => x.includes("/") ? indexToColumnLetter(i) + "1" : `"${x}"`).join(",") + ")";
+    }
+  }
+  
+  compareSheet.getRange(1, 1, values.length, values[0].length).setValues(values);
+}
+
+function createEmpty2DArray(rows, cols, value) {
+  const arr = [];
+  for(let i=0;i<rows;i++) {
+    arr[i] = [];
+    for(let j=0;j<cols;j++) {
+      arr[i][j] = value;
+    }
+  }
+  return arr;
+}
+
+function indexToColumnLetter(index) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  while (index >= 0) {
+    result = alphabet[index % 26] + result;
+    index = Math.floor(index / 26) - 1;
+  }
+  return result;
 }
 
 function onboarding() {
