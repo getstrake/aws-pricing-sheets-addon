@@ -154,25 +154,46 @@
     }
 
     button {
-      display: block;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 4px;
       padding: 8px;
       font-size: 16px;
       font-family: Arial, sans-serif;
-      color: #ffffff;
-      background-color: #372753;
       cursor: pointer;
-      width: 100%;
       transition: background-color 0.3s ease;
     }
+
+    button.halfWidth {
+      display: inline-block;
+      width: 50%;
+    }
+    button.fullWidth {
+      display: block;
+      width: 100%;
+    }
+
+    button.purple {
+      color: #ffffff;
+      background-color: #372753;
+    }
+    button.border {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button.active {
+      background-color: #372753;
+      color: #e7def4;
+    }
+
     button:focus {
       outline: none;
     }
     button:hover {
       background-color: #5c418a;
       color: #e7def4;
+    }
+
+    .tabs {
+      margin-bottom: 4px;
     }
 
     .header {
@@ -211,6 +232,7 @@
       const [args, setArgs] = React.useState([]);
       const [service, setService] = React.useState('ec2');
       const tooltipRef = React.useRef(null);
+      const [compareFeature, setCompareFeature] = React.useState(false);
 
       React.useEffect(() => {
         const textarea = textareaRef.current;
@@ -251,12 +273,21 @@
         return text.replace(/"[^"]+?\/[^"]+?"/g, '"*compare"');
       }
 
+      function showFormulaTab() {
+        setCompareFeature(false);
+      }
+
+      function showCompareFormulaTab() {
+        setCompareFeature(true);
+      }
+
 
         return (
           <div className="App">
             <div ref={tooltipRef} id="tooltip" style={{ display: "none" }}></div>
-            <div className="header">
-              AWS Pricing Formula Builder
+            <div className="tabs">
+              <button onClick={showFormulaTab} className={"halfWidth tab" + (!compareFeature && " active")}>Formula</button>
+              <button onClick={showCompareFormulaTab} className={"halfWidth tab" + (compareFeature && " active")}>Compare</button>
             </div>
             <div className="header">
               <table>
@@ -274,7 +305,7 @@
               </table>
             </div>
             <textarea ref={textareaRef} value={displayFormula(formula)} onChange={event => setFormula(event.target.value)}></textarea>
-            <button onClick={insertFormula}>Insert Formula in active cell</button>
+            <button className="fullWidth border purple" onClick={insertFormula}>Insert Formula in active cell</button>
             {renderServiceComponent(service, setFormula, setArgs)}
 
             <div className="sidebar bottom">
