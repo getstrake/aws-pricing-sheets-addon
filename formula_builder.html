@@ -342,7 +342,7 @@
       const offeringClasses = ["standard","convertible"];
       const purchaseTerms = ["1yr", "3yr"];
       const paymentOptions = ["no_upfront", "partial_upfront", "all_upfront"];
-      const sqlLicenses = ["std", "web", "enterprise"]
+      const sqlLicenses = ["std", "web", "enterprise", "none"]
 
       React.useEffect(() => {
         handleChange();
@@ -360,7 +360,9 @@
       function getArgsForFormula() {
         let args = [purchaseType, instanceType, region, platform];
         if(purchaseType === 'reserved')
-          args = args.concat([offeringClass, purchaseTerm, paymentOption, sqlLicense]);
+          args = args.concat([offeringClass, purchaseTerm, paymentOption]);
+        if(sqlLicense !== "none")
+          args = args.concat([sqlLicense]);
         return args;
       }
 
