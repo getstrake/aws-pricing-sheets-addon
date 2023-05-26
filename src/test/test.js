@@ -1,23 +1,70 @@
-// Run tests with the showTest functions below
+// Run tests from the web app
+// when you visit the web app url, it will run the doGet function below
+function doGet(e) {
+  console.time('template')
+  console.log('start template')
+  const template = HtmlService.createTemplateFromFile('src/test/TestSuite.html');
+  template.tests = {...getEBSTests(), ...getEC2Tests(), ...getRDSFunctionTests(), ...getRDSStorageTests(), ...getFunctionTests()};  
+  console.timeEnd('template')
+  console.log('end template')
+  // console.log(template.tests)
+  return template.evaluate();
+}
 
+// test the web app in the sidebar in the spreadsheet
+function testWebApp() {
+  const ui = SpreadsheetApp.getUi();
+  ui.showSidebar(doGet());
+}
+
+// Run tests in spreadsheet sidebar with the showTest functions below
 function showTestEBS() {
-  showTest(getEBSTests(), 'EBSTest');
+  showTest(getEBSTests());
 }
 
 function showTestEC2() {
-  showTest(getEC2Tests(), 'EC2Test');
+  showTest(getEC2Tests());
 }
 
 function showTestRDSFunction() {
-  showTest(getRDSFunctionTests(), 'RDSFunctionTest');
+  showTest(getRDSFunctionTests());
 }
 
 function showTestRDSStorageFunction() {
-  showTest(getRDSStorageTests(), 'RDSStorageTest');
+  showTest(getRDSStorageTests());
 }
 
 function showTestFunctions() {
-  showTest(getFunctionTests(), 'FunctionTest');
+  showTest(getFunctionTests());
+}
+
+function catchError(func) {
+  try {
+    return func();
+  } catch(err) {
+    return "❌ " + err;
+  }
+}
+
+// These functions will be called when you run the test suite in the sidebar/web app
+function EC2Test(chapter, testIndex) {
+  return catchError(() => getEC2Tests()["EC2Test"][chapter][testIndex]);
+}
+
+function EBSTest(chapter, testIndex) {
+  return catchError(() => getEBSTests()["EBSTest"][chapter][testIndex]);
+}
+
+function RDSFunctionTest(chapter, testIndex) {
+  return catchError(() => getRDSFunctionTests()["RDSFunctionTest"][chapter][testIndex]);
+}
+
+function RDSStorageTest(chapter, testIndex) {
+  return catchError(() => getRDSStorageTests()["RDSStorageTest"][chapter][testIndex]);
+}
+
+function FunctionTest(chapter, testIndex) {
+  return catchError(() => getFunctionTests()["FunctionTest"][chapter][testIndex]);
 }
 
 function getEBSTests() {
@@ -25,7 +72,8 @@ function getEBSTests() {
   let s = [ // testing range
       ['region', 'us-east-1']
   ];
-  return {"EBS GP2": [
+  const tests = {
+    "EBS GP2": [
     t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB("400", "us-east-1"), 0.000001),
     t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB("400", "us-east-2"), 0.000001),
     t.areClose(400.0 * (0.10/730.0), () => AWS_EBS("gp2","storage","400", "us-east-1"), 0.000001),
@@ -151,8 +199,8 @@ function getEBSTests() {
       return AWS_EBS("gp2","storage", "foo", "us-east-1")
     }, "unable to parse volume units"),
   ]};
+  return {"EBSTest": tests}// executes the tests in google apps script via EBSTest function
 }
-
 
 function getEC2Tests() {
   const t = new UnitTestingApp();
@@ -161,7 +209,7 @@ function getEC2Tests() {
     ["purchase_term", "ondemand"],
     ["operating_system", "linux"]
   ];
-  return {"EC2 on-demand": [
+  const tests =  {"EC2 on-demand": [
         t.areEqual(0.192, () => EC2_OD("m5.xlarge", "us-east-1", "linux")),
         t.areEqual(0.214, () => EC2_OD("m5.xlarge", "ca-central-1", "linux")),
         t.areEqual(0.192, () => EC2_LINUX_OD("m5.xlarge", "us-east-1")),
@@ -277,11 +325,12 @@ function getEC2Tests() {
           "operating_system": "linux"
         }, map2dArrayToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
   ]};
+  return {"EC2Test": tests};
 }
 
 function getRDSFunctionTests() {
   const t = new UnitTestingApp();
-  return {"RDS func tests": [
+  const tests =  {"RDS func tests": [
     t.areEqual(0.58, () => RDS_AURORA_MYSQL_OD("db.r5.xlarge", "us-east-1")),
     t.areClose(0.38, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "no_upfront"), 0.000001),
     // db.r5.xlarge no longer offered in partial upfront
@@ -376,11 +425,12 @@ function getRDSFunctionTests() {
     t.willThrow(() => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1", "reserved","2yr", "no_upfront"), "Only 1yr and 3yr purchase terms are supported for RDS RIs"),
   ]
   }
+  return {"RDSFunctionTest": tests};
 }
 
 function getRDSStorageTests() {
   const t = new UnitTestingApp();
-  return {"volume type tests": [
+  const tests = {"volume type tests": [
       t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("aurora", 4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("gp2", 4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("piops", 4000, "us-west-1"), 0.000001),
@@ -431,11 +481,12 @@ function getRDSStorageTests() {
           RDS_STORAGE_GB(['region', 'us-east-1'], 400, "gp2"),
           "invalid storage type")
       ]}
+  return { "RDSStorageTest": tests};
 }
 
 function getFunctionTests() {
   const t = new UnitTestingApp();
-  return {"Function tests": [
+  const tests = {"Function tests": [
     t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2023-01-01T00:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
       { a: 
         [
@@ -447,6 +498,7 @@ function getFunctionTests() {
         ] 
     })),
   ]}
+  return {"FunctionTest": tests};
 }
 
 function linuxRi(region, offeringClass, term, paymentOption) {
@@ -462,26 +514,6 @@ function paramsToSettings(region, platform, purchaseType, offeringClass, term, p
     ['purchase_term', term.toString()],
     ['payment_option', paymentOption]
   ]
-}
-
-function EC2Test(chapter, testIndex) {
-  return getEC2Tests()[chapter][testIndex];
-}
-
-function EBSTest(chapter, testIndex) {
-  return getEBSTests()[chapter][testIndex];
-}
-
-function RDSFunctionTest(chapter, testIndex) {
-  return getRDSFunctionTests()[chapter][testIndex];
-}
-
-function RDSStorageTest(chapter, testIndex) {
-  return getRDSStorageTests()[chapter][testIndex];
-}
-
-function FunctionTest(chapter, testIndex) {
-  return getFunctionTests()[chapter][testIndex];
 }
 
 function showTest(tests, callback) {

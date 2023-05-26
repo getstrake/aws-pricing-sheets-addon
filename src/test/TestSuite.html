@@ -11,48 +11,124 @@
   <body>
     <h1>Test Suite</h1>
     <p>Ps: tests are run in parallel</p>
-    <div id="results">
+    <div style="background: lightgrey; padding: 10px; font-size: 10px">
+      <div id="timestamp"></div>
+      <div id="statistics"></div>
     </div>
+    <div id="results"></div>
     <script>
-      const tests = <?!= JSON.stringify(tests) ?>;
-      createResultsDivs();
-      // tests.forEach((testName, index) => {
-        // google.script.run
-        //   .withSuccessHandler(e => printResult(e, index))
-        //   .withFailureHandler(failure)
-        //   .<?!= callback ?>(testName);
-      // })
+      const unitTests = [];
+      let maxSimultaneousTests = 30;
+      let latestUnitTestIndex = maxSimultaneousTests - 1;
+      const allTests = <?!= JSON.stringify(tests) ?>;
+      const statistics = {
+        failureCount: 0,
+        successCount: 0,
+        failures: []
+      }
+
+      function main() {
+        createTimestamp();
+        renderStatisticsDiv();
+        createResultsDivs();
+      }
+
+      main();
+
+      function createTimestamp() {
+        const timestampElement = document.getElementById('timestamp');
+        const options = {
+          dateStyle: 'short',
+          timeStyle: 'short',
+          hour12: false,
+          timeZone: 'UTC'
+        };
+        const timestamp = new Date().toLocaleString('en-US', options);
+        timestampElement.textContent = "Timestamp: " + timestamp;
+      }
 
       function createResultsDivs() {
         const resultsDiv = document.getElementById('results');
-        for(let key in tests) {
-          const chapterDiv = document.createElement('div');
-          chapterDiv.id = `chapter-${key}`;
-          chapterDiv.className = 'chapter';
-          chapterDiv.innerHTML = `<h2>${key}</h2>`;
-          resultsDiv.appendChild(chapterDiv);
-          for (let i = 0; i < tests[key].length; i++) {
-            const testDiv = document.createElement('div');
-            testDiv.id = `result-${key}-${i}`.replace(/\s/g, '');
-            testDiv.className = 'result';
-            testDiv.innerHTML = 'Running...';
-            chapterDiv.appendChild(testDiv);
-            google.script.run
-              .withSuccessHandler(e => printResult(e, '#' + testDiv.id))
-              .withFailureHandler(failure)
-              // .executeTest("<?!= callback ?>", key, i);
-              .<?!= callback ?>(key, i);
+        for (const [callback, tests] of Object.entries(allTests)) {
+          for(let key in tests) {
+            const chapterDiv = document.createElement('div');
+            chapterDiv.id = `chapter-${key}`;
+            chapterDiv.className = 'chapter';
+            chapterDiv.innerHTML = `<h2>${key}</h2>`;
+            resultsDiv.appendChild(chapterDiv);
+            for (let i = 0; i < tests[key].length; i++) {
+              const testDiv = document.createElement('div');
+              testDiv.id = `result-${key}-${i}`.replace(/\s/g, '');
+              testDiv.className = 'result';
+              testDiv.innerHTML = 'Running...';
+              chapterDiv.appendChild(testDiv);
+              const unitTest = () => google.script.run
+                .withSuccessHandler(e => printResult(e, '#' + testDiv.id))
+                .withFailureHandler(failure)
+                [callback](key, i);
+              unitTests.push(unitTest);
+              console.log({callback, key, i, selector: '#' + testDiv.id})
+            }
           }
         }
+        console.log({unitTests})
+        unitTests.slice(0,maxSimultaneousTests).forEach(x => x());
       }
 
-      function failure(e) {
-        printResult('Error in apps script: ' + e);
+      function failure(error) {
+        console.log('Error in apps script: ' + error);
+        statistics.failureCount++;
+        statistics.failures.push({error});
+        renderStatisticsDiv();
       }
 
       function printResult(text, selector) {
+        console.log('printResult', {text, selector})
         const textDiv = document.querySelector(selector);
+        console.log({textDiv})
         textDiv.innerHTML = text;
+        if(text.indexOf('❌') === 0) {
+          statistics.failureCount++;
+          statistics.failures.push({error: text});
+        } else {
+          statistics.successCount++;
+        }
+        renderStatisticsDiv();
+        runNextUnitTest();
+      }
+
+      function renderStatisticsDiv() {
+        const container = document.createElement('div');
+        container.setAttribute('id', 'statisticsContainer');
+
+        const failureCountElement = document.createElement('p');
+        failureCountElement.textContent = `Failure Count: ${statistics.failureCount}`;
+        const successCountElement = document.createElement('p');
+        successCountElement.textContent = `Success Count: ${statistics.successCount}`;
+        const failuresList = document.createElement('ul');
+        failuresList.textContent = 'Failures:';
+
+        // Add failures as list items
+        statistics.failures.forEach(failure => {
+          const listItem = document.createElement('li');
+          listItem.textContent = failure.error;
+          failuresList.appendChild(listItem);
+        });
+
+        // Append elements to container
+        container.appendChild(failureCountElement);
+        container.appendChild(successCountElement);
+        container.appendChild(failuresList);
+
+        // Append container to the body
+        const statisticsDiv = document.getElementById("statistics");
+        console.log({statisticsDiv})
+        statisticsDiv.innerHTML = '';
+        statisticsDiv.appendChild(container);
+      }
+
+      function runNextUnitTest() {
+        unitTests[++latestUnitTestIndex]?.(); // if next unit test exists, execute
       }
     </script>
   </body>
