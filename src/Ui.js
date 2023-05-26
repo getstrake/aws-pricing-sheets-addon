@@ -54,15 +54,12 @@ function insertFormula(formula, args) {
   SpreadsheetApp.getActiveSpreadsheet().toast(`Formula is inserted into cell ${cellName}. To undo this, click on the sheet and press Ctrl+Z`)
 }
 
-function insertFormulaWithCompare(formula, args) {
-  const ui = SpreadsheetApp.getUi();
-  const response = ui.alert("This will overwrite any values in the sheet 'compare'. Are you sure you want to continue?", ui.ButtonSet.YES_NO);
-  if(response !== ui.Button.YES) return;
-  
-  const functionName = formula.match(/[^(]+/);
+function getOrCreateSheet(name) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  const compareSheet = spreadsheet.getSheetByName('compare') || SpreadsheetApp.getActiveSpreadsheet().insertSheet("compare");
+  return spreadsheet.getSheetByName(name) || spreadsheet.insertSheet(name);
+}
 
+function getHeaderIndices(args) {
   let header, header2, index1, index2;
   for(const [index, arg] of args.entries()) {
     if(arg.includes("/")) {
@@ -75,10 +72,13 @@ function insertFormulaWithCompare(formula, args) {
       }
     }
   }
+  return {header, header2, index1, index2};
+}
 
+function prepareValues(functionName, args, header, header2, index1, index2) {
   const values = createEmpty2DArray(header.length * header2.length + 1,3,"");
   values[0] = ["arg1","arg2","price"];
-
+  
   for(let i=0;i<header.length;i++) {
     for(let k=0;k<header2.length;k++) {
       const rowIndex = i*header2.length + k + 1;
@@ -94,11 +94,27 @@ function insertFormulaWithCompare(formula, args) {
       values[rowIndex] = row;
     }
   }
+  return values;
+}
 
+function insertFormulaWithCompare(formula, args) {
+  const response = alertUser();
+  const ui = SpreadsheetApp.getUi();
+
+  if(response !== ui.Button.YES) return;
+  
+  const functionName = formula.match(/[^(]+/);
+  const compareSheet = getOrCreateSheet('compare');
+  const {header, header2, index1, index2} = getHeaderIndices(args);
+  const values = prepareValues(functionName, args, header, header2, index1, index2);
+  
   compareSheet.clear();
   compareSheet.getRange(1, 1, values.length, values[0].length).setValues(values);
+  
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   spreadsheet.setActiveSheet(compareSheet);
 }
+
 
 
 
