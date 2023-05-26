@@ -245,7 +245,7 @@
         google.script.run.insertFormula(formula, args);
       }
     
-      function renderServiceComponent(service, setFormula, setArgs) {
+      function renderServiceComponent(service, setFormula, setArgs, compareFeature) {
         const serviceComponents = {
           ec2: EC2,
           ebs: EBS,
@@ -253,7 +253,7 @@
           rdsStorage: RDSStorage
         };
         const ServiceComponent = serviceComponents[service];
-        return ServiceComponent ? <ServiceComponent setFormula={setFormula} setArgs={setArgs} /> : null;
+        return ServiceComponent ? <ServiceComponent setFormula={setFormula} setArgs={setArgs} compareFeature={compareFeature}/> : null;
       }
       
       function showTooltip(evt, text) {
@@ -306,7 +306,7 @@
             </div>
             <textarea ref={textareaRef} value={displayFormula(formula)} onChange={event => setFormula(event.target.value)}></textarea>
             <button className="fullWidth border purple" onClick={insertFormula}>Insert Formula in active cell</button>
-            {renderServiceComponent(service, setFormula, setArgs)}
+            {renderServiceComponent(service, setFormula, setArgs, compareFeature)}
 
             <div className="sidebar bottom">
               <span className="gray logolinks">
@@ -352,7 +352,7 @@
         )
     }
   
-  function EC2({setFormula, setArgs}) {
+  function EC2({setFormula, setArgs, compareFeature}) {
       const [purchaseType, setPurchaseType] = React.useState('ondemand');
       const [instanceType, setInstanceType] = React.useState('m5.xlarge');
       const [region, setRegion] = React.useState('us-east-1');
@@ -371,16 +371,22 @@
 
       // const regionCodesForReservedInstances = ["af-south-1", "ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "ap-south-1", "ap-south-2", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ap-southeast-4", "ca-central-1", "eu-central-1", "eu-central-2", "eu-north-1", "eu-south-1", "eu-south-2", "eu-west-1", "eu-west-2", "eu-west-3", "me-central-1", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-gov-east-1", "us-gov-west-1", "us-west-1", "us-west-2"];
 
-      const regions = ["af-south-1","ap-east-1","ap-northeast-1","ap-northeast-2","ap-northeast-3","ap-south-1","ap-south-2","ap-southeast-1","ap-southeast-2","ap-southeast-3","ap-southeast-4","ca-central-1","eu-central-1","eu-central-2","eu-north-1","eu-south-1","eu-south-2","eu-west-1","eu-west-2","eu-west-3","me-central-1","me-south-1","sa-east-1","us-east-1","us-east-2","us-gov-east-1","us-gov-west-1","us-west-1","us-west-2","*compare"];
+      const regions = ["af-south-1","ap-east-1","ap-northeast-1","ap-northeast-2","ap-northeast-3","ap-south-1","ap-south-2","ap-southeast-1","ap-southeast-2","ap-southeast-3","ap-southeast-4","ca-central-1","eu-central-1","eu-central-2","eu-north-1","eu-south-1","eu-south-2","eu-west-1","eu-west-2","eu-west-3","me-central-1","me-south-1","sa-east-1","us-east-1","us-east-2","us-gov-east-1","us-gov-west-1","us-west-1","us-west-2"];
 
-      const platforms = ["linux","rhel","windows","suse","linux_web","linux_std","linux_enterprise","windows_web","windows_std","windows_enterprise","*compare"];
+      const platforms = ["linux","rhel","windows","suse","linux_web","linux_std","linux_enterprise","windows_web","windows_std","windows_enterprise"];
       
       // const platformsFromCdn = ["linux","linux_enterprise","linux_std","linux_web","rhel","rhel-ha","rhel-ha_enterprise","rhel-ha_std","rhel_enterprise","rhel_std","rhel_web","suse","windows","windows_enterprise","windows_std","windows_web"];
 
       const offeringClasses = ["standard","convertible"];
       const purchaseTerms = ["1yr", "3yr"];
-      const paymentOptions = ["no_upfront", "partial_upfront", "all_upfront","*compare"];
+      const paymentOptions = ["no_upfront", "partial_upfront", "all_upfront"];
       const sqlLicenses = ["std", "web", "enterprise", "none"]
+
+      if(compareFeature) {
+        regions.push("*compare");
+        platforms.push("*compare");
+        paymentOptions.push("*compare");
+      }
 
       React.useEffect(() => {
         handleChange();
@@ -506,7 +512,7 @@
     }
 
 
-  function EBS({ setFormula, setArgs }) {
+  function EBS({ setFormula, setArgs, compareFeature}) {
     const [baseFormula, setBaseFormula] = React.useState('EBS');
     const [volumeType, setVolumeType] = React.useState('magnetic');
     const [storageType, setStorageType] = React.useState('storage');
@@ -584,7 +590,7 @@
   }
 
 
-  function RDS({ setFormula, setArgs }) {
+  function RDS({ setFormula, setArgs, compareFeature }) {
     const [dbEngine, setDbEngine] = React.useState('aurora/mysql');
     const [instanceType, setInstanceType] = React.useState('db.r6g.xlarge');
     const [region, setRegion] = React.useState('us-east-1');
@@ -698,7 +704,7 @@
   }
 
 
-  function RDSStorage({ setFormula, setArgs }) {
+  function RDSStorage({ setFormula, setArgs, compareFeature }) {
     const [baseFormula, setBaseFormula] = React.useState('RDS_STORAGE');
     const [storageType, setStorageType] = React.useState('gp2');
     const [storageSize, setStorageSize] = React.useState(4000);
