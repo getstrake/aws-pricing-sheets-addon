@@ -242,7 +242,14 @@
       function insertFormula() {
         console.log('formula ' + formula);
         console.log('args ' + args.join(', '));
-        google.script.run.insertFormula(formula, args);
+        const argumentsPerComponent = {
+          ec2: ["purchaseType", "instanceType", "region", "platform", "offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"],
+          ebs: ["volumeType", "storageType", "volumeSize", "region"],
+          rds: ["dbEngine", "instanceType", "region", "purchaseType", "purchaseTerm", "paymentOption"],
+          rdsStorage: ["storageType", "storageSize", "region"]
+        }
+        const argumentNames = argumentsPerComponent[service]
+        google.script.run.insertFormula(formula, args, argumentNames);
       }
     
       function renderServiceComponent(service, setFormula, setArgs, compareFeature) {
@@ -352,6 +359,16 @@
         )
     }
   
+  function SelectInput({options, value, disabled, onChange}) {
+    const displayValue = value.includes("/") ? "*compare" : value;
+    
+    return (
+        <select disabled={disabled} value={displayValue} onChange={onChange}>
+            {options.map(x => <option value={x}>{x}</option>)}
+        </select>
+    );
+  }
+
   function EC2({setFormula, setArgs, compareFeature}) {
       const [purchaseType, setPurchaseType] = React.useState('ondemand');
       const [instanceType, setInstanceType] = React.useState('m5.xlarge');
@@ -412,97 +429,57 @@
         return purchaseType !== 'reserved' ? ['-'].concat(arr) : arr;
       }
 
-      function handleOfferingClassChange(value) {
-        if(value === "*compare")
-          setOfferingClass(offeringClasses.slice(0,-1).join("/"));
-        else
-        setOfferingClass(value);
-      }
-
-      function handlePurchaseTermChange(value) {
-        if(value === "*compare")
-          setPurchaseTerm(purchaseTerms.slice(0,-1).join("/"));
-        else
-        setPurchaseTerm(value);
-      }
-
-      function handlePaymentOptionChange(value) {
-        if(value === "*compare")
-          setPaymentOption(paymentOptions.slice(0,-1).join("/"));
-        else
-        setPaymentOption(value);
-      }
+      const handleChangeWithCompareOptionInList = (setter, value, allOptions) => {
+        if(value === "*compare") {
+          if(allOptions[allOptions.length-2] === "none") // replace 'none' with empty string for sqlLicense
+            setter(allOptions.slice(0,-2).concat("").join("/"));
+          else
+            setter(allOptions.slice(0,-1).join("/"));
+        } else {
+          setter(value);
+        }
+      };
 
       return (
         <div>
           <table>
-            <tr>
-              <td>Purchase Type</td>
-              <td>
-                <select value={purchaseType} onChange={e => setPurchaseType(e.target.value)}>
-                  {purchaseTypes.map(x => <option value={x}>{x}</option>)}
-                </select>
-            </td>
-            </tr>
-            <tr>
-              <td>Instance Type</td>
-              <td>
-                <select value={instanceType} onChange={e => setInstanceType(e.target.value)}>
-                  {instanceTypes.map(x => <option value={x}>{x}</option>)}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Region</td>
-              <td>
-                <select value={region.includes("/") ? "*compare" : region}>
-                  {regions.map(x => <option value={x}>{x}</option>)}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Platform</td>
-              <td>
-                <select value={platform.includes("/") ? "*compare" : platform}>
-                  {platforms.map(x => <option value={x}>{x}</option>)}
-                </select>
-              </td>
-            </tr>
-              <tr>
-                <td>Offering Class</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : (offeringClass.includes("/") ? "*compare" : offeringClass)} onChange={e => handleOfferingClassChange(e.target.value)}>
-                    {
-                      prependOptionMinusWhenReservedInstance(offeringClasses).map(x => <option value={x}>{x}</option>)
-                    }
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>Purchase Term</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : (purchaseTerm.includes("/") ? "*compare" : purchaseTerm)} onChange={e => handlePurchaseTermChange(e.target.value)}>
-                    { prependOptionMinusWhenReservedInstance(purchaseTerms).map(x => <option value={x}>{x}</option>)}
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>Payment Option</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : (paymentOption.includes("/") ? "*compare" : paymentOption)} onChange={e => handlePaymentOptionChange(e.target.value)}>
-                    {prependOptionMinusWhenReservedInstance(paymentOptions).map(x => <option value={x}>{x}</option>)}
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>SQL License</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : sqlLicense} onChange={e => setSQLLicense(e.target.value)}>
-                    {prependOptionMinusWhenReservedInstance(sqlLicenses).map(x => <option value={x}>{x}</option>)}
-                  </select>
-                </td>
-              </tr>
-          </table>
+                <tr>
+                    <td>Purchase Type</td>
+                    <td>
+                        <SelectInput options={purchaseTypes} value={purchaseType} onChange={e => setPurchaseType(e.target.value)} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Instance Type</td>
+                    <td>
+                        <SelectInput options={instanceTypes} value={instanceType} onChange={e => setInstanceType(e.target.value)} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Offering Class</td>
+                    <td>
+                        <SelectInput options={offeringClasses} value={offeringClass} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setOfferingClass, e.target.value, offeringClasses)} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Purchase Term</td>
+                    <td>
+                        <SelectInput options={purchaseTerms} value={purchaseTerm} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setPurchaseTerm, e.target.value, purchaseTerms)} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Payment Option</td>
+                    <td>
+                        <SelectInput options={paymentOptions} value={paymentOption} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setPaymentOption, e.target.value, paymentOptions)} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>SQL License</td>
+                    <td>
+                        <SelectInput options={sqlLicenses} value={sqlLicense} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setSQLLicense, e.target.value, sqlLicenses)} />
+                    </td>
+                </tr>
+            </table>
         </div>
       );
     }

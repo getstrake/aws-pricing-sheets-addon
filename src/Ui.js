@@ -42,10 +42,10 @@ function showFormulaBuilder() {
   ui.showSidebar(html);
 }
 
-function insertFormula(formula, args) {
+function insertFormula(formula, args, argumentNames) {
   if(!formula) throw "Should send formula as argument";
   if(args.join("").includes("/"))
-    return insertFormulaWithCompare(formula, args);
+    return insertFormulaWithCompare(formula, args, argumentNames);
   const activeSheet = SpreadsheetApp.getActiveSheet();
   const activeRange = activeSheet.getActiveRange();
   const cell = activeSheet.getRange(activeRange.getRow(),activeRange.getColumn())
@@ -54,7 +54,7 @@ function insertFormula(formula, args) {
   SpreadsheetApp.getActiveSpreadsheet().toast(`Formula is inserted into cell ${cellName}. To undo this, click on the sheet and press Ctrl+Z`)
 }
 
-function insertFormulaWithCompare(formula, args) {
+function insertFormulaWithCompare(formula, args, argumentNames) {
   const ui = SpreadsheetApp.getUi();
   const response = ui.alert("This will overwrite any values in the sheet 'compare'. Are you sure you want to continue?", ui.ButtonSet.YES_NO);
 
@@ -62,7 +62,7 @@ function insertFormulaWithCompare(formula, args) {
   
   const functionName = formula.match(/[^(]+/);
   const compareSheet = getOrCreateSheet('compare');
-  const values = prepareValues(functionName, args);
+  const values = prepareValues(functionName, args, argumentNames);
   
   compareSheet.clear();
   compareSheet.getRange(1, 1, values.length, values[0].length).setValues(values);
@@ -77,46 +77,56 @@ function getOrCreateSheet(name) {
   return spreadsheet.getSheetByName(name) || spreadsheet.insertSheet(name);
 }
 
-function getHeaderAndIndicesFromFormulaArguments(args) {
-  let header, header2, index1, index2;
+function getHeadersAndIndicesFromFormulaArguments(args) {
+  let headers = [], indices = [];
   for(const [index, arg] of args.entries()) {
     if(arg.includes("/")) {
-      if(!header) {
-        index1 = index;
-        header = arg.split("/");
-      } else {
-        index2 = index;
-        header2 = arg.split("/");
-      }
+      indices.push(index);
+      headers.push(arg.split("/"));
     }
   }
-  return {header, header2, index1, index2};
+  return {headers, indices};
 }
 
-function prepareValues(functionName, args) {
-  const {header, header2, index1, index2} = getHeaderAndIndicesFromFormulaArguments(args);
-  const values = createEmpty2DArray(header.length * header2.length + 1,3,"");
-  values[0] = ["arg1","arg2","price"];
-  
-  for(let i=0;i<header.length;i++) {
-    for(let k=0;k<header2.length;k++) {
-      const rowIndex = i*header2.length + k + 1;
-      const row = [header[i],header2[k],`=${functionName}(${args.map((x, index) => {
-        if(index === index1)
-          return "A" + (rowIndex+1);
-        else if(index === index2)
-          return "B" + (rowIndex+1);
-        else
-          return `"${x}"`;
-      }).join(",")})`];
+function prepareValues(functionName, args, argumentNames) {
+  const {headers, indices} = getHeadersAndIndicesFromFormulaArguments(args);
+  if(headers.length < 1) {
+    throw new Error("At least one header must be present");
+  }
 
-      values[rowIndex] = row;
-    }
+  let totalRows = 1;
+  for(let i=0; i<headers.length; i++) {
+    totalRows *= headers[i].length;
+  }
+  
+  const values = createEmpty2DArray(totalRows + 1, headers.length + 1, "");
+
+  for(let i=0; i<headers.length; i++) {
+    values[0][i] = argumentNames[indices[i]];
+  }
+  values[0][headers.length] = "price";
+
+  const combinations = cartesianProduct(headers);
+  for(let i=0; i<combinations.length; i++) {
+    const row = [...combinations[i], `=${functionName}(${args.map((x, index) => {
+      const columnIndex = indices.indexOf(index);
+      if(columnIndex !== -1)
+        return String.fromCharCode(65 + columnIndex) + (i+2);
+      else
+        return `"${x}"`;
+    }).join(",")})`];
+
+    values[i+1] = row;
   }
   return values;
 }
 
-
+// Helper function to generate cartesian product of input arrays
+function cartesianProduct(arrays) {
+  return arrays.reduce((a, b) =>
+    a.map(x => b.map(y => [...x, y])).reduce((a, b) => a.concat(b), []), [[]]
+  );
+}
 
 // the first header goes horizontally, the second vertically
 // you will get a 2d table of all the possibilities
