@@ -383,9 +383,7 @@
       const sqlLicenses = ["std", "web", "enterprise", "none"]
 
       if(compareFeature) {
-        regions.push("*compare");
-        platforms.push("*compare");
-        paymentOptions.push("*compare");
+        [offeringClasses, purchaseTerms, paymentOptions, sqlLicenses].forEach(x => x.push("*compare"));
       }
 
       React.useEffect(() => {
@@ -414,18 +412,18 @@
         return purchaseType !== 'reserved' ? ['-'].concat(arr) : arr;
       }
 
-      function handleRegionChange(value) {
+      function handleOfferingClassChange(value) {
         if(value === "*compare")
-          setRegion(regions.slice(0,-1).join("/"));
+          setOfferingClass(offeringClasses.slice(0,-1).join("/"));
         else
-        setRegion(value);
+        setOfferingClass(value);
       }
 
-      function handlePlatformChange(value) {
+      function handlePurchaseTermChange(value) {
         if(value === "*compare")
-          setPlatform(platforms.slice(0,-1).join("/"));
+          setPurchaseTerm(purchaseTerms.slice(0,-1).join("/"));
         else
-        setPlatform(value);
+        setPurchaseTerm(value);
       }
 
       function handlePaymentOptionChange(value) {
@@ -435,8 +433,6 @@
         setPaymentOption(value);
       }
 
-      // purchaseType, instanceType, region, platform, offeringClass, (reserved: purchaseTerm, paymentOption, sqlLicense)
-      // "reserved", "m5.xlarge", "us-east-2", "linux", "standard",   (reserved: "1yr", "no_upfront", "std")
       return (
         <div>
           <table>
@@ -459,7 +455,7 @@
             <tr>
               <td>Region</td>
               <td>
-                <select value={region.includes("/") ? "*compare" : region} onChange={e => handleRegionChange(e.target.value)}>
+                <select value={region.includes("/") ? "*compare" : region}>
                   {regions.map(x => <option value={x}>{x}</option>)}
                 </select>
               </td>
@@ -467,7 +463,7 @@
             <tr>
               <td>Platform</td>
               <td>
-                <select value={platform.includes("/") ? "*compare" : platform} onChange={e => handlePlatformChange(e.target.value)}>
+                <select value={platform.includes("/") ? "*compare" : platform}>
                   {platforms.map(x => <option value={x}>{x}</option>)}
                 </select>
               </td>
@@ -475,7 +471,7 @@
               <tr>
                 <td>Offering Class</td>
                 <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : offeringClass} onChange={e => setOfferingClass(e.target.value)}>
+                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : (offeringClass.includes("/") ? "*compare" : offeringClass)} onChange={e => handleOfferingClassChange(e.target.value)}>
                     {
                       prependOptionMinusWhenReservedInstance(offeringClasses).map(x => <option value={x}>{x}</option>)
                     }
@@ -485,7 +481,7 @@
               <tr>
                 <td>Purchase Term</td>
                 <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : purchaseTerm} onChange={e => setPurchaseTerm(e.target.value)}>
+                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : (purchaseTerm.includes("/") ? "*compare" : purchaseTerm)} onChange={e => handlePurchaseTermChange(e.target.value)}>
                     { prependOptionMinusWhenReservedInstance(purchaseTerms).map(x => <option value={x}>{x}</option>)}
                   </select>
                 </td>
