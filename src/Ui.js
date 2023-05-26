@@ -55,6 +55,57 @@ function insertFormula(formula, args) {
 }
 
 function insertFormulaWithCompare(formula, args) {
+  const ui = SpreadsheetApp.getUi();
+  const response = ui.alert("This will overwrite any values in the sheet 'compare'. Are you sure you want to continue?", ui.ButtonSet.YES_NO);
+  if(response !== ui.Button.YES) return;
+  
+  const functionName = formula.match(/[^(]+/);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const compareSheet = spreadsheet.getSheetByName('compare') || SpreadsheetApp.getActiveSpreadsheet().insertSheet("compare");
+
+  let header, header2, index1, index2;
+  for(const [index, arg] of args.entries()) {
+    if(arg.includes("/")) {
+      if(!header) {
+        index1 = index;
+        header = arg.split("/");
+      } else {
+        index2 = index;
+        header2 = arg.split("/");
+      }
+    }
+  }
+
+  const values = createEmpty2DArray(header.length * header2.length + 1,3,"");
+  values[0] = ["arg1","arg2","price"];
+
+  for(let i=0;i<header.length;i++) {
+    for(let k=0;k<header2.length;k++) {
+      const rowIndex = i*header2.length + k + 1;
+      const row = [header[i],header2[k],`=${functionName}(${args.map((x, index) => {
+        if(index === index1)
+          return "A" + (rowIndex+1);
+        else if(index === index2)
+          return "B" + (rowIndex+1);
+        else
+          return `"${x}"`;
+      }).join(",")})`];
+
+      values[rowIndex] = row;
+    }
+  }
+
+  compareSheet.clear();
+  compareSheet.getRange(1, 1, values.length, values[0].length).setValues(values);
+  spreadsheet.setActiveSheet(compareSheet);
+}
+
+
+
+
+// the first header goes horizontally, the second vertically
+// you will get a 2d table of all the possibilities
+function insertFormulaWithCompare2DTable(formula, args) {
   const functionName = formula.match(/[^(]+/);
   const compareSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('compare') || SpreadsheetApp.getActiveSpreadsheet().insertSheet("compare");
   let header, header2, index1, index2;
