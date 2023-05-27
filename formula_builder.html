@@ -221,6 +221,58 @@
       z-index:10;
     }
 
+    .dropdown-check-list {
+      display: inline-block;
+    }
+
+    .dropdown-check-list .anchor {
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      padding: 5px 50px 5px 10px;
+      border: 1px solid #ccc;
+      max-width: 120px;
+    }
+
+    .dropdown-check-list .anchor:after {
+      position: absolute;
+      content: "";
+      border-left: 2px solid black;
+      border-top: 2px solid black;
+      padding: 5px;
+      right: 10px;
+      top: 20%;
+      -moz-transform: rotate(-135deg);
+      -ms-transform: rotate(-135deg);
+      -o-transform: rotate(-135deg);
+      -webkit-transform: rotate(-135deg);
+      transform: rotate(-135deg);
+    }
+
+    .dropdown-check-list .anchor:active:after {
+      right: 8px;
+      top: 21%;
+    }
+
+    .dropdown-check-list ul.items {
+      padding: 2px;
+      margin: 0;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+
+    .dropdown-check-list ul.items li {
+      list-style: none;
+    }
+
+    .dropdown-check-list.visible .anchor {
+      color: #0094ff;
+    }
+
+    .dropdown-check-list.visible .items {
+      display: block;
+    }
+
   </style>
 </head>
 <body>
@@ -369,6 +421,52 @@
     );
   }
 
+  function SelectInputWithMultipleOptions({ options, value, disabled, setter }) {
+    const [isDropdownVisible, setDropdownVisible] = React.useState(false);
+
+    const toggleDropdown = () => {
+      setDropdownVisible(!isDropdownVisible);
+    };
+
+    const handleCheckboxChange = (e, option) => {
+      // Implement your logic for handling checkbox change here
+      // For example, you can update the selected options or trigger the onChange event
+      console.log({ e: e.target.checked, option });
+      if(e.target.checked) {
+        setter(value.split("/").filter(x=>x).concat(option).sort().join("/"));
+      } else {
+        setter(value.split("/").filter(x => x !== option).sort().join("/"));
+      }
+    };
+
+    const displayValue = v => v.split("/").slice(0, 2).join("/") + (v.split("/").length > 2 ? "/" + '...' : '');
+
+    return (
+      <div className="dropdown-check-list" tabIndex="100">
+        <span className="anchor" onClick={toggleDropdown}>
+          {displayValue(value)}
+        </span>
+        {isDropdownVisible && (
+          <ul className="items">
+            {options.map((option) => (
+              <li key={option}>
+                <label>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleCheckboxChange(e, option)}
+                    checked={value.split("/").includes(option)}
+                  />
+                  {option}
+                </label>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
+
   function EC2({setFormula, setArgs, compareFeature}) {
       const [purchaseType, setPurchaseType] = React.useState('ondemand');
       const [instanceType, setInstanceType] = React.useState('m5.xlarge');
@@ -452,8 +550,22 @@
                 <tr>
                     <td>Instance Type</td>
                     <td>
-                        <SelectInput options={instanceTypes} value={instanceType} onChange={e => setInstanceType(e.target.value)} />
+                        {compareFeature ? 
+                          <SelectInputWithMultipleOptions options={instanceTypes} value={instanceType} setter={setInstanceType}/> : 
+                          <SelectInput options={instanceTypes} value={instanceType} onChange={e => setInstanceType(e.target.value)} />}
                     </td>
+                </tr>
+                <tr>
+                  <td>Region</td>
+                  <td>
+                    {compareFeature ? <SelectInputWithMultipleOptions options={regions} value={region} setter={setRegion}/> : <SelectInput options={regions} value={region} onChange={e => setRegion(e.target.value)} />}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Platform</td>
+                  <td>
+                    {compareFeature ? <SelectInputWithMultipleOptions options={platforms} value={platform} setter={setPlatform}/> : <SelectInput options={platforms} value={platform} onChange={e => setPlatform(e.target.value)} />}
+                  </td>
                 </tr>
                 <tr>
                     <td>Offering Class</td>
