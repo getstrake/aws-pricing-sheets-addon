@@ -221,6 +221,14 @@
       z-index:10;
     }
 
+    td:nth-child(1) {
+      width: 100px;
+    }
+
+    td:nth-child(2) {
+      width: 300px;
+    }
+
     .dropdown-check-list {
       display: inline-block;
     }
@@ -231,16 +239,25 @@
       display: inline-block;
       padding: 5px 50px 5px 10px;
       border: 1px solid #ccc;
-      max-width: 120px;
+      /* max-width: 120px; */
+      /* Allows the text to break onto the next line */
+      white-space: normal;  
+      /* Break the word if it's too long */
+      overflow-wrap: break-word;  
+      /* Padding to ensure the text doesn't overlap with the dropdown symbol */
+      padding-right: 30px;  
+      /* To include padding and border in element's total width and height */
+      box-sizing: border-box;  
     }
 
     .dropdown-check-list .anchor:after {
       position: absolute;
       content: "";
-      border-left: 2px solid black;
-      border-top: 2px solid black;
+      border-left: 2px solid #666666;
+      border-top: 2px solid #666666;
       padding: 5px;
-      right: 10px;
+      /* Adjust this if needed to match the new padding on the right of .anchor */
+      right: 10px;  
       top: 20%;
       -moz-transform: rotate(-135deg);
       -ms-transform: rotate(-135deg);
@@ -255,10 +272,16 @@
     }
 
     .dropdown-check-list ul.items {
-      padding: 2px;
+      padding: 5px;
       margin: 0;
       border: 1px solid #ccc;
       border-top: none;
+      max-height: 220px; /* Adjust this value according to your needs */
+      overflow: auto;
+    }
+
+    .dropdown-check-list ul.items label {
+      cursor: pointer;
     }
 
     .dropdown-check-list ul.items li {
