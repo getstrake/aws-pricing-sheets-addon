@@ -318,7 +318,7 @@
       const [args, setArgs] = React.useState([]);
       const [service, setService] = React.useState('ec2');
       const tooltipRef = React.useRef(null);
-      const [compareFeature, setCompareFeature] = React.useState(false);
+      const [comparisonEnabled, setComparisonEnabled] = React.useState(false);
 
       React.useEffect(() => {
         const textarea = textareaRef.current;
@@ -338,7 +338,7 @@
         google.script.run.insertFormula(formula, args, argumentNames);
       }
     
-      function renderServiceComponent(service, setFormula, setArgs, compareFeature) {
+      function renderServiceComponent(service, setFormula, setArgs, comparisonEnabled) {
         const serviceComponents = {
           ec2: EC2,
           ebs: EBS,
@@ -346,7 +346,7 @@
           rdsStorage: RDSStorage
         };
         const ServiceComponent = serviceComponents[service];
-        return ServiceComponent ? <ServiceComponent setFormula={setFormula} setArgs={setArgs} compareFeature={compareFeature}/> : null;
+        return ServiceComponent ? <ServiceComponent setFormula={setFormula} setArgs={setArgs} comparisonEnabled={comparisonEnabled}/> : null;
       }
       
       function showTooltip(evt, text) {
@@ -367,11 +367,11 @@
       }
 
       function showFormulaTab() {
-        setCompareFeature(false);
+        setComparisonEnabled(false);
       }
 
       function showCompareFormulaTab() {
-        setCompareFeature(true);
+        setComparisonEnabled(true);
       }
 
 
@@ -379,8 +379,8 @@
           <div className="App">
             <div ref={tooltipRef} id="tooltip" style={{ display: "none" }}></div>
             <div className="tabs">
-              <button onClick={showFormulaTab} className={"halfWidth tab" + (!compareFeature && " active")}>Formula</button>
-              <button onClick={showCompareFormulaTab} className={"halfWidth tab" + (compareFeature && " active")}>Compare</button>
+              <button onClick={showFormulaTab} className={"halfWidth tab" + (!comparisonEnabled && " active")}>Formula</button>
+              <button onClick={showCompareFormulaTab} className={"halfWidth tab" + (comparisonEnabled && " active")}>Compare</button>
             </div>
             <div className="header">
               <table>
@@ -398,8 +398,8 @@
               </table>
             </div>
             <textarea ref={textareaRef} value={displayFormula(formula)} onChange={event => setFormula(event.target.value)}></textarea>
-            <button className="fullWidth border purple" onClick={insertFormula}>Insert Formula in active cell</button>
-            {renderServiceComponent(service, setFormula, setArgs, compareFeature)}
+            <button className="fullWidth border purple" onClick={insertFormula}>{comparisonEnabled ? `Insert formula's in sheet "compare"` : 'Insert Formula in active cell'}</button>
+            {renderServiceComponent(service, setFormula, setArgs, comparisonEnabled)}
 
             <div className="sidebar bottom">
               <span className="gray logolinks">
@@ -530,8 +530,35 @@
     );
   }
 
+  const SelectInputWithCompareFunctionality = ({ comparisonEnabled, options, value, setter }) => {
 
-  function EC2({setFormula, setArgs, compareFeature}) {
+    React.useEffect(() => {
+      if(!comparisonEnabled) {
+        // when you switch from comparison to non-comparison mode, remove the comparison part
+        setter(value.split("/")[0]);
+      }
+    },[comparisonEnabled])
+
+    if (comparisonEnabled) {
+      return (
+        <SelectInputWithMultipleOptions
+          options={options}
+          value={value}
+          setter={setter}
+        />
+      );
+    } else {
+      return (
+        <SelectInput
+          options={options}
+          value={value}
+          onChange={e => setter(e.target.value)}
+        />
+      );
+    }
+  }
+
+  function EC2({setFormula, setArgs, comparisonEnabled}) {
       const [purchaseType, setPurchaseType] = React.useState('ondemand');
       const [instanceType, setInstanceType] = React.useState('m5.xlarge');
       const [region, setRegion] = React.useState('us-east-1');
@@ -561,13 +588,19 @@
       const paymentOptions = ["no_upfront", "partial_upfront", "all_upfront"];
       const sqlLicenses = ["std", "web", "enterprise", "none"]
 
-      if(compareFeature) {
+      if(comparisonEnabled) {
         [offeringClasses, purchaseTerms, paymentOptions, sqlLicenses].forEach(x => x.push("*compare"));
       }
 
       React.useEffect(() => {
         handleChange();
       }, [purchaseType, instanceType, region, platform, offeringClass, purchaseTerm, paymentOption, sqlLicense]);
+
+      React.useEffect(() => {
+        if(!comparisonEnabled) {
+
+        }
+      },[comparisonEnabled])
 
     function handleChange() {
       const displayStringOrNumber = x => typeof x === 'number' ? x : `"${x}"`;
@@ -614,21 +647,19 @@
                 <tr>
                     <td>Instance Type</td>
                     <td>
-                        {compareFeature ? 
-                          <SelectInputWithMultipleOptions options={instanceTypes} value={instanceType} setter={setInstanceType}/> : 
-                          <SelectInput options={instanceTypes} value={instanceType} onChange={e => setInstanceType(e.target.value)} />}
+                      <SelectInputWithCompareFunctionality comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType}/>
                     </td>
                 </tr>
                 <tr>
                   <td>Region</td>
                   <td>
-                    {compareFeature ? <SelectInputWithMultipleOptions options={regions} value={region} setter={setRegion}/> : <SelectInput options={regions} value={region} onChange={e => setRegion(e.target.value)} />}
+                    <SelectInputWithCompareFunctionality comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion}/>
                   </td>
                 </tr>
                 <tr>
                   <td>Platform</td>
                   <td>
-                    {compareFeature ? <SelectInputWithMultipleOptions options={platforms} value={platform} setter={setPlatform}/> : <SelectInput options={platforms} value={platform} onChange={e => setPlatform(e.target.value)} />}
+                    <SelectInputWithCompareFunctionality comparisonEnabled={comparisonEnabled} options={platforms} value={platform} setter={setPlatform}/>
                   </td>
                 </tr>
                 <tr>
@@ -661,7 +692,7 @@
     }
 
 
-  function EBS({ setFormula, setArgs, compareFeature}) {
+  function EBS({ setFormula, setArgs, comparisonEnabled}) {
     const [baseFormula, setBaseFormula] = React.useState('EBS');
     const [volumeType, setVolumeType] = React.useState('magnetic');
     const [storageType, setStorageType] = React.useState('storage');
@@ -739,7 +770,7 @@
   }
 
 
-  function RDS({ setFormula, setArgs, compareFeature }) {
+  function RDS({ setFormula, setArgs, comparisonEnabled }) {
     const [dbEngine, setDbEngine] = React.useState('aurora/mysql');
     const [instanceType, setInstanceType] = React.useState('db.r6g.xlarge');
     const [region, setRegion] = React.useState('us-east-1');
@@ -853,7 +884,7 @@
   }
 
 
-  function RDSStorage({ setFormula, setArgs, compareFeature }) {
+  function RDSStorage({ setFormula, setArgs, comparisonEnabled }) {
     const [baseFormula, setBaseFormula] = React.useState('RDS_STORAGE');
     const [storageType, setStorageType] = React.useState('gp2');
     const [storageSize, setStorageSize] = React.useState(4000);
