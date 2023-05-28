@@ -273,6 +273,12 @@
       display: block;
     }
 
+    .dropdown-check-list .search {
+      width: 150px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
   </style>
 </head>
 <body>
@@ -423,14 +429,13 @@
 
   function SelectInputWithMultipleOptions({ options, value, disabled, setter }) {
     const [isDropdownVisible, setDropdownVisible] = React.useState(false);
+    const [searchTerm, setSearchTerm] = React.useState("");
 
     const toggleDropdown = () => {
       setDropdownVisible(!isDropdownVisible);
     };
 
     const handleCheckboxChange = (e, option) => {
-      // Implement your logic for handling checkbox change here
-      // For example, you can update the selected options or trigger the onChange event
       console.log({ e: e.target.checked, option });
       if(e.target.checked) {
         setter(value.split("/").filter(x=>x).concat(option).sort().join("/"));
@@ -441,14 +446,27 @@
 
     const displayValue = v => v.split("/").slice(0, 2).join("/") + (v.split("/").length > 2 ? "/" + '...' : '');
 
+    const filteredOptions = options.filter(option => 
+      option.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
+    );
+
     return (
       <div className="dropdown-check-list" tabIndex="100">
         <span className="anchor" onClick={toggleDropdown}>
           {displayValue(value)}
         </span>
         {isDropdownVisible && (
-          <ul className="items">
-            {options.map((option) => (
+          <div>
+            
+            {options.length > 10 && <input
+              type="text"
+              className="search"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />}
+            <ul className="items">
+            {filteredOptions.map((option) => (
               <li key={option}>
                 <label>
                   <input
@@ -461,6 +479,7 @@
               </li>
             ))}
           </ul>
+          </div>
         )}
       </div>
     );
