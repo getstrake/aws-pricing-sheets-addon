@@ -444,6 +444,38 @@
           </div>
         )
     }
+
+  const SelectInputWithCompareOption = ({ comparisonEnabled, options, value, isDisabled, onChange }) => {
+
+    React.useEffect(() => {
+      if(!comparisonEnabled) {
+        // when you switch from comparison to non-comparison mode, remove the "*compare" value
+        if(value === "*compare")
+          setter("");
+      }
+    },[comparisonEnabled])
+
+    const handleChange = (event) => {
+        const { value } = event.target;
+        if(value === "*compare") {
+            if(options[options.length-2] === "none") // replace 'none' with empty string for sqlLicense
+                onChange(options.slice(0,-2).concat("").join("/"));
+            else
+                onChange(options.slice(0,-1).join("/"));
+        } else {
+            onChange(value);
+        }
+    };
+
+    return (
+        <SelectInput
+            options={options}
+            value={value}
+            disabled={isDisabled}
+            onChange={handleChange}
+        />
+    );
+};
   
   function SelectInput({options, value, disabled, onChange}) {
     const displayValue = value.includes("/") ? "*compare" : value;
@@ -530,7 +562,7 @@
     );
   }
 
-  const SelectInputWithCompareFunctionality = ({ comparisonEnabled, options, value, setter }) => {
+  const SelectInputWithCheckboxes = ({ comparisonEnabled, options, value, setter }) => {
 
     React.useEffect(() => {
       if(!comparisonEnabled) {
@@ -647,43 +679,43 @@
                 <tr>
                     <td>Instance Type</td>
                     <td>
-                      <SelectInputWithCompareFunctionality comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType}/>
+                      <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType}/>
                     </td>
                 </tr>
                 <tr>
                   <td>Region</td>
                   <td>
-                    <SelectInputWithCompareFunctionality comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion}/>
+                    <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion}/>
                   </td>
                 </tr>
                 <tr>
                   <td>Platform</td>
                   <td>
-                    <SelectInputWithCompareFunctionality comparisonEnabled={comparisonEnabled} options={platforms} value={platform} setter={setPlatform}/>
+                    <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={platforms} value={platform} setter={setPlatform}/>
                   </td>
                 </tr>
                 <tr>
                     <td>Offering Class</td>
                     <td>
-                        <SelectInput options={offeringClasses} value={offeringClass} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setOfferingClass, e.target.value, offeringClasses)} />
+                      <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} isDisabled={purchaseType !== 'reserved'} onChange={setOfferingClass} />
                     </td>
                 </tr>
                 <tr>
                     <td>Purchase Term</td>
                     <td>
-                        <SelectInput options={purchaseTerms} value={purchaseTerm} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setPurchaseTerm, e.target.value, purchaseTerms)} />
+                        <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} isDisabled={purchaseType !== 'reserved'} onChange={setPurchaseTerm} />
                     </td>
                 </tr>
                 <tr>
                     <td>Payment Option</td>
                     <td>
-                        <SelectInput options={paymentOptions} value={paymentOption} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setPaymentOption, e.target.value, paymentOptions)} />
+                        <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} isDisabled={purchaseType !== 'reserved'} onChange={setPaymentOption} />
                     </td>
                 </tr>
                 <tr>
                     <td>SQL License</td>
                     <td>
-                        <SelectInput options={sqlLicenses} value={sqlLicense} disabled={purchaseType !== 'reserved'} onChange={e => handleChangeWithCompareOptionInList(setSQLLicense, e.target.value, sqlLicenses)} />
+                        <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} isDisabled={purchaseType !== 'reserved'} onChange={setSQLLicense} />
                     </td>
                 </tr>
             </table>
