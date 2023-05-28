@@ -458,6 +458,19 @@
   function SelectInputWithMultipleOptions({ options, value, disabled, setter }) {
     const [isDropdownVisible, setDropdownVisible] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState("");
+    const dropdownRef = React.useRef(null);
+
+    React.useEffect(() => {
+      function handleClickOutside(event) {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setDropdownVisible(false);
+        }
+      }
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
 
     const toggleDropdown = () => {
       setDropdownVisible(!isDropdownVisible);
@@ -483,7 +496,7 @@
     );
 
     return (
-      <div className="dropdown-check-list" tabIndex="100">
+      <div className="dropdown-check-list" tabIndex="100" ref={dropdownRef}>
         <span className="anchor" onClick={toggleDropdown}>
           {displayValue(value)}
         </span>
