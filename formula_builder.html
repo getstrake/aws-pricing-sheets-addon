@@ -292,6 +292,11 @@
       color: #0094ff;
     }
 
+    span.anchor {
+      display: inline-block;
+      min-height: 1.9em;
+    }
+
     .dropdown-check-list.visible .items {
       display: block;
     }
@@ -459,6 +464,10 @@
     };
 
     const handleCheckboxChange = (e, option) => {
+      if(option === "unselect all") {
+        setter("");
+        return;
+      }
       console.log({ e: e.target.checked, option });
       if(e.target.checked) {
         setter(value.split("/").filter(x=>x).concat(option).sort().join("/"));
@@ -489,7 +498,7 @@
               onChange={e => setSearchTerm(e.target.value)}
             />}
             <ul className="items">
-            {filteredOptions.map((option) => (
+            {["unselect all"].concat(filteredOptions).map((option) => (
               <li key={option}>
                 <label>
                   <input
