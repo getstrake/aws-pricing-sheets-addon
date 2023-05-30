@@ -447,35 +447,6 @@
           </div>
         )
     }
-
-  const SelectInputWithCompareOption = ({ comparisonEnabled, options, value, disabled, setter }) => {
-
-    React.useEffect(() => {
-      if(!comparisonEnabled) {
-        // when you switch from comparison to non-comparison mode, remove the "compare" value
-        if(value === "compare")
-          setter("");
-      }
-    },[comparisonEnabled])
-
-    const handleChange = (event) => {
-        const { value } = event.target;
-        if(value === "compare") {
-            setter(options.map(x => x === "no sql license" ? "" : x)); // the formula needs an empty string so that it compares it with a "no sql license" instance
-        } else {
-            setter(value);
-        }
-    };
-
-    return (
-        <SelectInput
-            options={options}
-            value={value}
-            disabled={disabled}
-            onChange={handleChange}
-        />
-    );
-};
   
   function SelectInput({options, value, disabled, onChange}) {
     const displayValue = value.includes("/") ? "compare" : value;
