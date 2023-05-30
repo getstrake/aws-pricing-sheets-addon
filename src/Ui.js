@@ -70,8 +70,15 @@ function insertFormulaWithCompare(formula, args, argumentNames) {
   
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   spreadsheet.setActiveSheet(compareSheet);
+  resizeColumnsAndStylizeSheet(compareSheet);
 }
 
+function resizeColumnsAndStylizeSheet(sheet) {
+  const firstRow = sheet.getRange('1:1');
+  sheet.autoResizeColumns(1, sheet.getLastColumn());
+  sheet.setFrozenRows(1);
+  firstRow.setFontWeight('bold');
+}
 
 function getOrCreateSheet(name) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
