@@ -586,7 +586,7 @@
     );
   }
 
-  const SelectInputWithCheckboxes = ({ comparisonEnabled, options, value, setter }) => {
+  const SelectInputWithCheckboxes = ({ comparisonEnabled, options, value, setter, disabled }) => {
 
     React.useEffect(() => {
       if(!comparisonEnabled) {
@@ -601,6 +601,7 @@
           options={options}
           value={value}
           setter={setter}
+          disabled={disabled}
         />
       );
     } else {
@@ -609,6 +610,7 @@
           options={options}
           value={value}
           onChange={e => setter(e.target.value)}
+          disabled={disabled}
         />
       );
     }
