@@ -500,6 +500,21 @@
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    React.useEffect(() => {
+      if (isDropdownVisible) {
+        const dropdownBottom = dropdownRef.current.getBoundingClientRect().bottom;
+        const windowHeight = window.innerHeight;
+        const footerHeight = 50;
+        const dropdownMargin = 50;
+
+        if (dropdownBottom > windowHeight - footerHeight - dropdownMargin) {
+          window.scrollTo({
+            top: dropdownMargin + footerHeight + window.pageYOffset + (dropdownBottom - windowHeight),
+            behavior: "smooth"
+          });
+        }
+      }
+    }, [isDropdownVisible]);
 
     const toggleDropdown = () => {
       setDropdownVisible(!isDropdownVisible);
