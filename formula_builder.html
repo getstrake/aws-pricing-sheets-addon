@@ -364,7 +364,7 @@
       }
 
       function displayFormula(text) {
-        return text.replace(/"[^"]+?\/[^"]+?"/g, '"*compare"');
+        return text.replace(/"[^"]+?\/[^"]+?"/g, '"compare"');
       }
 
       function showFormulaTab() {
@@ -452,15 +452,15 @@
 
     React.useEffect(() => {
       if(!comparisonEnabled) {
-        // when you switch from comparison to non-comparison mode, remove the "*compare" value
-        if(value === "*compare")
+        // when you switch from comparison to non-comparison mode, remove the "compare" value
+        if(value === "compare")
           setter("");
       }
     },[comparisonEnabled])
 
     const handleChange = (event) => {
         const { value } = event.target;
-        if(value === "*compare") {
+        if(value === "compare") {
             setter(options.map(x => x === "no sql license" ? "" : x)); // the formula needs an empty string so that it compares it with a "no sql license" instance
         } else {
             setter(value);
@@ -478,7 +478,7 @@
 };
   
   function SelectInput({options, value, disabled, onChange}) {
-    const displayValue = value.includes("/") ? "*compare" : value;
+    const displayValue = value.includes("/") ? "compare" : value;
     
     return (
         <select disabled={disabled} value={displayValue} onChange={onChange}>
