@@ -37,6 +37,7 @@ function showFormulaBuilder() {
   
   const ui = SpreadsheetApp.getUi();
   const template = HtmlService.createTemplateFromFile('formula_builder.html');
+  template.delimiter = cfg.delimiter;
   const html = template.evaluate();
   html.setTitle('AWS Pricing Formula Builder');
   ui.showSidebar(html);
@@ -44,7 +45,7 @@ function showFormulaBuilder() {
 
 function insertFormula(formula, args, argumentNames) {
   if(!formula) throw "Should send formula as argument";
-  if(args.join("").includes("/"))
+  if(args.join("").includes(cfg.delimiter))
     return insertFormulaWithCompare(formula, args, argumentNames);
   const activeSheet = SpreadsheetApp.getActiveSheet();
   const activeRange = activeSheet.getActiveRange();
@@ -80,9 +81,9 @@ function getOrCreateSheet(name) {
 function getHeadersAndIndicesFromFormulaArguments(args) {
   let headers = [], indices = [];
   for(const [index, arg] of args.entries()) {
-    if(arg.includes("/")) {
+    if(arg.includes(cfg.delimiter)) {
       indices.push(index);
-      headers.push(arg.split("/"));
+      headers.push(arg.split(cfg.delimiter));
     }
   }
   return {headers, indices};
@@ -135,13 +136,13 @@ function insertFormulaWithCompare2DTable(formula, args) {
   const compareSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('compare') || SpreadsheetApp.getActiveSpreadsheet().insertSheet("compare");
   let header, header2, index1, index2;
   for(const [index, arg] of args.entries()) {
-    if(arg.includes("/")) {
+    if(arg.includes(cfg.delimiter)) {
       if(!header) {
         index1 = index;
-        header = arg.split("/");
+        header = arg.split(cfg.delimiter);
       } else {
         index2 = index;
-        header2 = arg.split("/");
+        header2 = arg.split(cfg.delimiter);
       }
     }
   }
@@ -165,7 +166,7 @@ function insertFormulaWithCompare2DTable(formula, args) {
       }
     } else if(header) { // 1 header
       values[0] = header;
-      values[1][i] = "=" + functionName + "(" + args.map(x => x.includes("/") ? indexToColumnLetter(i) + "1" : `"${x}"`).join(",") + ")";
+      values[1][i] = "=" + functionName + "(" + args.map(x => x.includes(cfg.delimiter) ? indexToColumnLetter(i) + "1" : `"${x}"`).join(",") + ")";
     }
   }
   

@@ -8,5 +8,6 @@ const cfg = {
       PLUGIN_FORMULA_EXECUTE_CELL: "PLUGIN_FORMULA_EXECUTE_CELL",
       PLUGIN_EXECUTE_MENU: "PLUGIN_EXECUTE_MENU"
     }
-  }
+  },
+  delimiter: ", ", // formula builder compare functionality, dividing multiple variables in formula argument
 }

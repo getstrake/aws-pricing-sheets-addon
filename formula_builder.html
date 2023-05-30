@@ -313,6 +313,10 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
+    const cfg = {
+      delimiter: '<?= delimiter ?>', // for comparing multiple variables in formula
+    }
+
     function App() {
       const textareaRef = React.useRef(null);
       const [formula, setFormula] = React.useState('');
@@ -364,7 +368,15 @@
       }
 
       function displayFormula(text) {
-        return text.replace(/"[^"]+?\/[^"]+?"/g, '"compare"');
+        const escapeSpecialRegexChars = (x) => {
+          return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        };
+
+        const delimiter = escapeSpecialRegexChars(cfg.delimiter);
+        const pattern = new RegExp(`"[^"]+?${delimiter}[^"]+?"`, 'g'); // any argument with multiple options divided by the delimiter
+        const replacement = '"compare"';
+
+        return text.replace(pattern, replacement);
       }
 
       function showFormulaTab() {
@@ -400,7 +412,7 @@
             </div>
             <textarea ref={textareaRef} value={displayFormula(formula)} onChange={event => setFormula(event.target.value)}></textarea>
             <button className="fullWidth border purple" onClick={insertFormula}>
-              {comparisonEnabled && args.join("").indexOf("/") > -1 ? `Insert formula's in sheet "compare"` : 'Insert Formula in active cell'}
+              {comparisonEnabled && args.join("").indexOf(cfg.delimiter) > -1 ? `Insert formula's in sheet "compare"` : 'Insert Formula in active cell'}
             </button>
             {renderServiceComponent(service, setFormula, setArgs, comparisonEnabled)}
 
@@ -449,7 +461,7 @@
     }
   
   function SelectInput({options, value, disabled, onChange}) {
-    const displayValue = value.includes("/") ? "compare" : value;
+    const displayValue = value.includes(cfg.delimiter) ? "compare" : value;
     
     return (
         <select disabled={disabled} value={displayValue} onChange={onChange}>
@@ -501,13 +513,13 @@
       }
       console.log({ e: e.target.checked, option });
       if(e.target.checked) {
-        setter(value.split("/").filter(x=>x).concat(option).sort().join("/"));
+        setter(value.split(cfg.delimiter).filter(x=>x).concat(option).sort().join(cfg.delimiter));
       } else {
-        setter(value.split("/").filter(x => x !== option).sort().join("/"));
+        setter(value.split(cfg.delimiter).filter(x => x !== option).sort().join(cfg.delimiter));
       }
     };
 
-    const displayValue = v => v.split("/").slice(0, 2).join("/") + (v.split("/").length > 2 ? "/" + '...' : '');
+    const displayValue = v => v.split(cfg.delimiter).slice(0, 2).join(cfg.delimiter) + (v.split(cfg.delimiter).length > 2 ? cfg.delimiter + '...' : '');
 
     const filteredOptions = options.filter(option => 
       option.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
@@ -547,7 +559,7 @@
                   <input
                     type="checkbox"
                     onChange={(e) => handleCheckboxChange(e, option)}
-                    checked={value.split("/").includes(option)}
+                    checked={value.split(cfg.delimiter).includes(option)}
                   />
                   {option}
                 </label>
@@ -565,7 +577,7 @@
     React.useEffect(() => {
       if(!comparisonEnabled) {
         // when you switch from comparison to non-comparison mode, remove the comparison part
-        setter(value.split("/")[0]);
+        setter(value.split(cfg.delimiter)[0]);
       }
     },[comparisonEnabled])
 
