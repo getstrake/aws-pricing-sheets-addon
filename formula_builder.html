@@ -644,9 +644,9 @@
         if(purchaseType === 'reserved')
           args = args.concat([offeringClass, purchaseTerm, paymentOption])
 
-        const filteredSqlLicense = sqlLicense.split("/").map(x => x === "no sql license" ? "" : x).join("/")
-        if(filteredSqlLicense)
-          args = args.concat(filteredSqlLicense);
+        if(sqlLicense !== "no sql license")
+          args = args.concat(sqlLicense);
+
         return args;
       }
 
