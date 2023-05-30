@@ -539,6 +539,18 @@
       option.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
     );
 
+    const addExtraOptions = (options) => {
+      if(options.length > 10) {
+        return ["unselect all", ...filteredOptions];
+      } else {
+        return options;
+      }
+    }
+
+    if(disabled) {
+      return <SelectInput options={options} value={value} disabled={disabled} onChange={setter} />
+    }
+
     return (
       <div className="dropdown-check-list" tabIndex="100" ref={dropdownRef}>
         <span className="anchor" onClick={toggleDropdown}>
@@ -555,7 +567,7 @@
               onChange={e => setSearchTerm(e.target.value)}
             />}
             <ul className="items">
-            {["unselect all"].concat(filteredOptions).map((option) => (
+            {addExtraOptions(options).map((option) => (
               <li key={option}>
                 <label>
                   <input
