@@ -644,11 +644,7 @@
       const offeringClasses = ["standard","convertible"];
       const purchaseTerms = ["1yr", "3yr"];
       const paymentOptions = ["no_upfront", "partial_upfront", "all_upfront"];
-      const sqlLicenses = ["std", "web", "enterprise", "none"]
-
-      if(comparisonEnabled) {
-        [offeringClasses, purchaseTerms, paymentOptions, sqlLicenses].forEach(x => x.push("*compare"));
-      }
+      const sqlLicenses = ["std", "web", "enterprise", "no sql license"]
 
       React.useEffect(() => {
         handleChange();
@@ -672,26 +668,17 @@
       function getArgsForFormula() {
         let args = [purchaseType, instanceType, region, platform];
         if(purchaseType === 'reserved')
-          args = args.concat([offeringClass, purchaseTerm, paymentOption]);
-        if(sqlLicense !== "none")
-          args = args.concat([sqlLicense]);
+          args = args.concat([offeringClass, purchaseTerm, paymentOption])
+
+        const filteredSqlLicense = sqlLicense.split("/").map(x => x === "no sql license" ? "" : x).join("/")
+        if(filteredSqlLicense)
+          args = args.concat(filteredSqlLicense);
         return args;
       }
 
       function prependOptionMinusWhenReservedInstance(arr) {
         return purchaseType !== 'reserved' ? ['-'].concat(arr) : arr;
       }
-
-      const handleChangeWithCompareOptionInList = (setter, value, allOptions) => {
-        if(value === "*compare") {
-          if(allOptions[allOptions.length-2] === "none") // replace 'none' with empty string for sqlLicense
-            setter(allOptions.slice(0,-2).concat("").join("/"));
-          else
-            setter(allOptions.slice(0,-1).join("/"));
-        } else {
-          setter(value);
-        }
-      };
 
       return (
         <div>
