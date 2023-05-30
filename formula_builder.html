@@ -710,25 +710,25 @@
                 <tr>
                     <td>Offering Class</td>
                     <td>
-                      <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} isDisabled={purchaseType !== 'reserved'} onChange={setOfferingClass} />
+                      <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} disabled={purchaseType !== 'reserved'} setter={setOfferingClass} />
                     </td>
                 </tr>
                 <tr>
                     <td>Purchase Term</td>
                     <td>
-                        <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} isDisabled={purchaseType !== 'reserved'} onChange={setPurchaseTerm} />
+                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={purchaseType !== 'reserved'} setter={setPurchaseTerm} />
                     </td>
                 </tr>
                 <tr>
                     <td>Payment Option</td>
                     <td>
-                        <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} isDisabled={purchaseType !== 'reserved'} onChange={setPaymentOption} />
+                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={purchaseType !== 'reserved'} setter={setPaymentOption} />
                     </td>
                 </tr>
                 <tr>
                     <td>SQL License</td>
                     <td>
-                        <SelectInputWithCompareOption comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} isDisabled={purchaseType !== 'reserved'} onChange={setSQLLicense} />
+                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} disabled={purchaseType !== 'reserved'} setter={setSQLLicense} />
                     </td>
                 </tr>
             </table>
