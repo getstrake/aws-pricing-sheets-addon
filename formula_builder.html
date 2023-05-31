@@ -320,6 +320,15 @@
       transform: scale(1.15);
     }
 
+    .dropdown-button-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-button-container .message {
+      margin-left: 10px;
+    }
+
   </style>
 </head>
 <body>
@@ -562,9 +571,12 @@
 
     return (
       <div className="dropdown-check-list" tabIndex="100" ref={dropdownRef}>
-        <span className="anchor" onClick={toggleDropdown}>
-          {displayValue(value)}
-        </span>
+        <div className="dropdown-button-container">
+          <span className="anchor" onClick={toggleDropdown}>
+            {displayValue(value)}
+          </span>
+          {value === "" && <span className="message">please select</span>}
+        </div>
         {isDropdownVisible && (
           <div>
             
