@@ -59,8 +59,8 @@ function insertFormulaWithCompare(formula, args, argumentNames) {
   const functionName = formula.match(/[^(]+/);
   const newSheetName = createNewSheetName(cfg.baseNameForCompareResults);
   const compareSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(newSheetName);
-  SpreadsheetApp.getActiveSpreadsheet().toast(`Please wait while "${newSheetName}" is being populated. This may take a few seconds.`);
   const values = prepareValues(functionName, args, argumentNames);
+  SpreadsheetApp.getActiveSpreadsheet().toast(`Please wait while "${newSheetName}" is being populated. This may take a few seconds. It will contain ${values.length - 1} formulas.`);
   
   compareSheet.clear();
   compareSheet.getRange(1, 1, values.length, values[0].length).setValues(values);
