@@ -412,7 +412,7 @@
             </div>
             <textarea ref={textareaRef} value={displayFormula(formula)} onChange={event => setFormula(event.target.value)}></textarea>
             <button className="fullWidth border purple" onClick={insertFormula}>
-              {comparisonEnabled && args.join("").indexOf(cfg.delimiter) > -1 ? `Insert formula's in sheet "compare"` : 'Insert Formula in active cell'}
+              {comparisonEnabled && args.join("").indexOf(cfg.delimiter) > -1 ? `Insert formula's in new sheet` : 'Insert Formula in active cell'}
             </button>
             {renderServiceComponent(service, setFormula, setArgs, comparisonEnabled)}
 
