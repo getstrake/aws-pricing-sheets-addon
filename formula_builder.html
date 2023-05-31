@@ -312,7 +312,7 @@
       padding: 10px;
     }
 
-    .image-zoom {
+    .reset {
       width: 20px;
       cursor: pointer;
       transition: width 0.3s ease;
@@ -320,8 +320,8 @@
       border-radius: 5px;
     }
 
-    .image-zoom:hover {
-      transform: scale(1.15);
+    .reset:hover {
+      color: red;
     }
 
     .dropdown-button-container {
@@ -440,8 +440,8 @@
                       <option value="rdsStorage">RDS storage</option>
                     </select>
                 </td>
-                <td>
-                  <img className="image-zoom" onClick={resetFormula} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADEklEQVR4nO2aXW9MQRjHfwm6klbTN60Lid6hCcpnELJNaS+oRj8DkX4LtlRDuMONWy/VJuUDiIgQBNslmlRJsCS4UStWJnkqm+kz+3LOnN1zpL9kkt3N2ZnnvzPPy8wsrPH/0g4MARlgFsgCX4FlaV/ksxngDDAMtBITUsAYMAf8Boo1tgJwDzgmfZXDCP8EfAQO44mNwDjwPoDxrvYBOFFGUOlYSz5EpIE3HgXY7S2wXxnXfi7ULFyqYMRjYAI4AuwWv9kANMlr89kIcBZ4WqafP8Bla3a8COkBHjkG/QacBrYH6HenCP/u6Ps+sMWXkF7gtdLRL4lQbYSnCzgnzm+PkwO2hhXS4xDxQpaJb/YBr5TxNJ+sySe05XQDaCY6WoHpKoJC1WiOfQVYR/SsB677EJJ2zERUIgaAhRrDdEVMyJu3vmTebyI6FgPkm4qMK9EpCscu5Z1vISml7DAFXtSkJaMXfQkZU5KdjzxRd+5aQkzGThztSikepOxoOMNKAZhIJiwh5n0imbGEmFI8keQsIbtIKHlLSAfxZEC2ukuSf1axbAkxu7o4slBio0miiRSSsmz8Wc3S6iR+dFk2ftYemk+As++xbDS7yUSG3xHLRrOTXEUmAQlxsppacMh66Anx47ll46D2UJtSNO4gPvQpGz7nIfhcAzZVQWvBmXIPH1c2Vqa8bzSdwA/LttFKCWcphk5/3rJpsZqEfUpZiyZ+N4q9ylGquX6oSEpulup5HOSiGXhp2ZKr4lLoHweVU4ubdTplLD1tvK1cN2h3J2W5qIi5Wscj02vK+FNBOjPT91Dp7BbQQnS0KDNh2oMwFXm3snNcKdb6icaxs8p4xkc3h+281yGmIJczHZ7yhAmxBYeIbXii27HMinJtlpESolb6JE/Zya5YspxCz4TmMxccA660ZzJLRyX3dMi6bpJfvV9K8UmlALSj01TUu9QDjqXmq2WDhNgws3My4HWAq5myo9wfBiKlSYq3WYejVmoFqWJH43TY0QocktL/joTofMmfavJSbkzLzm6wQWXPGtSDv2/hK0X7Ng8JAAAAAElFTkSuQmCC"/>
+                  <td>
+                    <span className="reset" onClick={resetFormula}>RESET</span>
                   </td>
                 </tr>
               </table>
