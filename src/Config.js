@@ -10,4 +10,5 @@ const cfg = {
     }
   },
   delimiter: ", ", // formula builder compare functionality, dividing multiple variables in formula argument
+  baseNameForCompareResults: "Pricing", // formula builder compare functionality: sheet name for results will be pricing, pricing-1, pricing-2, etc.
 }

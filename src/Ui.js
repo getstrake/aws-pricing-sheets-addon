@@ -56,13 +56,10 @@ function insertFormula(formula, args, argumentNames) {
 }
 
 function insertFormulaWithCompare(formula, args, argumentNames) {
-  const ui = SpreadsheetApp.getUi();
-  const response = ui.alert("This will overwrite any values in the sheet 'compare'. Are you sure you want to continue?", ui.ButtonSet.YES_NO);
-
-  if(response !== ui.Button.YES) return;
-  
   const functionName = formula.match(/[^(]+/);
-  const compareSheet = getOrCreateSheet('compare');
+  const newSheetName = createNewSheetName(cfg.baseNameForCompareResults);
+  const compareSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(newSheetName);
+  SpreadsheetApp.getActiveSpreadsheet().toast(`Please wait while "${newSheetName}" is being populated. This may take a few seconds.`);
   const values = prepareValues(functionName, args, argumentNames);
   
   compareSheet.clear();
@@ -80,9 +77,20 @@ function resizeColumnsAndStylizeSheet(sheet) {
   firstRow.setFontWeight('bold');
 }
 
-function getOrCreateSheet(name) {
+// generates a new sheet name: baseName, then baseName-1, then baseName-2, etc.
+function createNewSheetName(baseName) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  return spreadsheet.getSheetByName(name) || spreadsheet.insertSheet(name);
+  const sheets = spreadsheet.getSheets();
+  const sheetNames = sheets.map(x => x.getName());
+
+  let count = 1;
+  let newSheetName = baseName;
+  while (sheetNames.includes(newSheetName)) {
+    newSheetName = `${baseName}-${count}`;
+    count++;
+  }
+
+  return newSheetName;
 }
 
 function getHeadersAndIndicesFromFormulaArguments(args) {
