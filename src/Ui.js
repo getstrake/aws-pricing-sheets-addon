@@ -144,50 +144,6 @@ function cartesianProduct(arrays) {
   );
 }
 
-// the first header goes horizontally, the second vertically
-// you will get a 2d table of all the possibilities
-function insertFormulaWithCompare2DTable(formula, args) {
-  const functionName = formula.match(/[^(]+/);
-  const compareSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('compare') || SpreadsheetApp.getActiveSpreadsheet().insertSheet("compare");
-  let header, header2, index1, index2;
-  for(const [index, arg] of args.entries()) {
-    if(arg.includes(cfg.delimiter)) {
-      if(!header) {
-        index1 = index;
-        header = arg.split(cfg.delimiter);
-      } else {
-        index2 = index;
-        header2 = arg.split(cfg.delimiter);
-      }
-    }
-  }
-  
-
-  const values = createEmpty2DArray(header2 ? header2.length + 1 : 2,header.length,"");
-
-  for(let i=0;i<header.length;i++) {
-    if(header2) { // 2 headers => 2d array of possibilities
-      values[0] = [""].concat(header);
-      for(let k=0;k<header2.length;k++) {
-        values[k+1][0] = header2[k];
-        values[k+1][i+1] = "=" + functionName + "(" + args.map((x, index) => {
-          if(index === index1)
-            return indexToColumnLetter(i+1) + "1";
-          else if(index === index2)
-            return "A" + (k+2);
-          else
-            return `"${x}"`;
-        }).join(",") + ")";
-      }
-    } else if(header) { // 1 header
-      values[0] = header;
-      values[1][i] = "=" + functionName + "(" + args.map(x => x.includes(cfg.delimiter) ? indexToColumnLetter(i) + "1" : `"${x}"`).join(",") + ")";
-    }
-  }
-  
-  compareSheet.getRange(1, 1, values.length, values[0].length).setValues(values);
-}
-
 function createEmpty2DArray(rows, cols, value) {
   const arr = [];
   for(let i=0;i<rows;i++) {
@@ -197,16 +153,6 @@ function createEmpty2DArray(rows, cols, value) {
     }
   }
   return arr;
-}
-
-function indexToColumnLetter(index) {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let result = "";
-  while (index >= 0) {
-    result = alphabet[index % 26] + result;
-    index = Math.floor(index / 26) - 1;
-  }
-  return result;
 }
 
 function onboarding() {
