@@ -127,7 +127,7 @@ function prepareValues(functionName, args, argumentNames) {
     const row = [...combinations[i], `=${functionName}(${args.map((x, index) => {
       const columnIndex = indices.indexOf(index);
       if(columnIndex !== -1)
-        return String.fromCharCode(65 + columnIndex) + (i+2);
+        return indexToColumnLetter(columnIndex) + (i+2);
       else
         return `"${x}"`;
     }).join(",")})`];
@@ -135,6 +135,19 @@ function prepareValues(functionName, args, argumentNames) {
     values[i+1] = row;
   }
   return values;
+}
+
+function indexToColumnLetter(n) {
+  var ordA = 'a'.charCodeAt(0);
+  var ordZ = 'z'.charCodeAt(0);
+  var len = ordZ - ordA + 1;
+
+  var s = "";
+  while(n >= 0) {
+      s = String.fromCharCode(n % len + ordA) + s;
+      n = Math.floor(n / len) - 1;
+  }
+  return s;
 }
 
 // Helper function to generate cartesian product of input arrays
