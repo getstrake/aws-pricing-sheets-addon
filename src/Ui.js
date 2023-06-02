@@ -56,7 +56,7 @@ function insertFormula(formula, args, argumentNames) {
 }
 
 function insertFormulaWithCompare(formula, args, argumentNames) {
-  const functionName = formula.match(/[^(]+/);
+  const functionName = formula.match(/[^(]+/)[0];
   const newSheetName = createNewSheetName(cfg.baseNameForCompareResults);
   const compareSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(newSheetName);
   const values = prepareValues(functionName, args, argumentNames);
@@ -109,32 +109,56 @@ function prepareValues(functionName, args, argumentNames) {
   if(headers.length < 1) {
     throw new Error("At least one header must be present");
   }
-
-  let totalRows = 1;
-  for(let i=0; i<headers.length; i++) {
-    totalRows *= headers[i].length;
-  }
   
-  const values = createEmpty2DArray(totalRows + 1, headers.length + 1, "");
-
-  for(let i=0; i<headers.length; i++) {
-    values[0][i] = argumentNames[indices[i]];
-  }
-  values[0][headers.length] = "price";
-
+  const header = headers.map((_, i) => argumentNames[indices[i]]).concat("price");
+  const values = [header];
   const combinations = cartesianProduct(headers);
-  for(let i=0; i<combinations.length; i++) {
-    const row = [...combinations[i], `=${functionName}(${args.map((x, index) => {
-      const columnIndex = indices.indexOf(index);
-      if(columnIndex !== -1)
-        return indexToColumnLetter(columnIndex) + (i+2);
-      else
-        return `"${x}"`;
-    }).join(",")})`];
+  let row = [];
+  
+  combinations.forEach(combination => {
+    const rowHasEC2OnDemand = functionName === "AWS_EC2" &&
+                              argumentNames.includes("purchaseType") &&
+                              combination[argumentNames.indexOf("purchaseType")] === "ondemand";
 
-    values[i+1] = row;
-  }
+    const slicedArgs = rowHasEC2OnDemand ? args.slice(0,4) : args;
+    const formula = `=${functionName}(${replaceCellReference(slicedArgs, values.length + 1, indices).join(",")})`;
+                      
+    if(rowHasEC2OnDemand) {
+      const RESERVED_INSTANCE_ARGS = ["offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"];
+      
+      // Special case: on-demand vs reserved instances
+      // Fill unnecessary arguments with "-"
+
+      row = [...combination, formula].map((value, index) => 
+        RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
+      )
+      duplicateRow = isDuplicateRowExceptLastColumn(values, row);
+      if(duplicateRow) {
+        return; // skip this row
+      }
+    } else {
+      row = [...combination, formula];
+    }
+
+    values.push(row);
+  });
   return values;
+}
+
+// because last cell has a formula with a cell reference in it, we can't compare it
+function isDuplicateRowExceptLastColumn(values, row) {
+  concatRowWithoutLastCell = cells => cells.slice(0,-1).join("");
+  const flatRows = values.map(concatRowWithoutLastCell);
+  return flatRows.includes(concatRowWithoutLastCell(row)); 
+}
+
+function replaceCellReference(args, row, indices) {
+  return args.map((value, index) => {
+    const columnIndex = indices.indexOf(index);
+    return columnIndex !== -1 ?
+      indexToColumnLetter(columnIndex) + row :
+      `"${value}"`;
+  })
 }
 
 function indexToColumnLetter(n) {
@@ -155,17 +179,6 @@ function cartesianProduct(arrays) {
   return arrays.reduce((a, b) =>
     a.map(x => b.map(y => [...x, y])).reduce((a, b) => a.concat(b), []), [[]]
   );
-}
-
-function createEmpty2DArray(rows, cols, value) {
-  const arr = [];
-  for(let i=0;i<rows;i++) {
-    arr[i] = [];
-    for(let j=0;j<cols;j++) {
-      arr[i][j] = value;
-    }
-  }
-  return arr;
 }
 
 function onboarding() {

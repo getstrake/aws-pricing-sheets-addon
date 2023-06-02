@@ -692,7 +692,7 @@
 
       function getArgsForFormula() {
         let args = [purchaseType, instanceType, region, platform];
-        if(purchaseType === 'reserved')
+        if(purchaseType.includes('reserved'))
           args = args.concat([offeringClass, purchaseTerm, paymentOption])
 
         if(sqlLicense !== "no sql license")
@@ -701,8 +701,9 @@
         return args;
       }
 
+      // old
       function prependOptionMinusWhenReservedInstance(arr) {
-        return purchaseType !== 'reserved' ? ['-'].concat(arr) : arr;
+        return purchaseType.includes('reserved') ? ['-'].concat(arr) : arr;
       }
 
       return (
@@ -711,7 +712,7 @@
                 <tr>
                     <td>Purchase Type</td>
                     <td>
-                        <SelectInput options={purchaseTypes} value={purchaseType} onChange={e => setPurchaseType(e.target.value)} />
+                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={purchaseTypes} value={purchaseType} setter={setPurchaseType} />
                     </td>
                 </tr>
                 <tr>
@@ -735,25 +736,25 @@
                 <tr>
                     <td>Offering Class</td>
                     <td>
-                      <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} disabled={purchaseType !== 'reserved'} setter={setOfferingClass} />
+                      <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} disabled={!purchaseType.includes('reserved')} setter={setOfferingClass} />
                     </td>
                 </tr>
                 <tr>
                     <td>Purchase Term</td>
                     <td>
-                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={purchaseType !== 'reserved'} setter={setPurchaseTerm} />
+                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={!purchaseType.includes('reserved')} setter={setPurchaseTerm} />
                     </td>
                 </tr>
                 <tr>
                     <td>Payment Option</td>
                     <td>
-                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={purchaseType !== 'reserved'} setter={setPaymentOption} />
+                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={!purchaseType.includes('reserved')} setter={setPaymentOption} />
                     </td>
                 </tr>
                 <tr>
                     <td>SQL License</td>
                     <td>
-                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} disabled={purchaseType !== 'reserved'} setter={setSQLLicense} />
+                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} disabled={!purchaseType.includes('reserved')} setter={setSQLLicense} />
                     </td>
                 </tr>
             </table>
@@ -887,13 +888,13 @@
 
     function getArgsForFormula() {
       let args = [dbEngine, instanceType, region, purchaseType];
-      if (purchaseType === 'reserved')
+      if (purchaseType.includes('reserved'))
         args = args.concat([purchaseTerm, paymentOption]);
       return args;
     }
 
     function prependOptionMinusWhenReservedInstance(arr) {
-      return purchaseType !== 'reserved' ? ['-'].concat(arr) : arr;
+      return purchaseType.includes('reserved') ? ['-'].concat(arr) : arr;
     }
 
     return (
@@ -935,7 +936,7 @@
             <tr>
               <td>Purchase Term</td>
               <td>
-                <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : purchaseTerm} onChange={e => setPurchaseTerm(e.target.value)}>
+                <select disabled={!purchaseType.includes('reserved')} value={!purchaseType.includes('reserved') ? '-' : purchaseTerm} onChange={e => setPurchaseTerm(e.target.value)}>
                   {prependOptionMinusWhenReservedInstance(purchaseTerms).map(x => <option value={x}>{x}</option>)}
                 </select>
               </td>
@@ -943,7 +944,7 @@
             <tr>
               <td>Payment Option</td>
               <td>
-                <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : paymentOption} onChange={e => setPaymentOption(e.target.value)}>
+                <select disabled={!purchaseType.includes('reserved')} value={!purchaseType.includes('reserved') ? '-' : paymentOption} onChange={e => setPaymentOption(e.target.value)}>
                   {prependOptionMinusWhenReservedInstance(paymentOptions).map(x => <option value={x}>{x}</option>)}
                 </select>
               </td>
