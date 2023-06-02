@@ -342,6 +342,22 @@
       delimiter: '<?= delimiter ?>', // for comparing multiple variables in formula
     }
 
+    const DropdownContext = React.createContext();
+    const DropdownProvider = ({ children }) => {
+      const [openDropdown, setOpenDropdown] = React.useState(null);
+
+      const handleOpenDropdown = (id) => setOpenDropdown(id);
+      const handleCloseDropdown = () => setOpenDropdown(null);
+
+      return (
+        <DropdownContext.Provider value={{ openDropdown, handleOpenDropdown, handleCloseDropdown }}>
+          {children}
+        </DropdownContext.Provider>
+      );
+    };
+
+
+
     function App() {
       const textareaRef = React.useRef(null);
       const [formula, setFormula] = React.useState('');
@@ -507,23 +523,28 @@
   }
 
   function SelectInputWithMultipleOptions({ options, value, disabled, setter }) {
-    const [isDropdownVisible, setDropdownVisible] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState("");
+    const [id, setId] = React.useState(null);
     const dropdownRef = React.useRef(null);
 
-    React.useEffect(() => {
-      function handleClickOutside(event) {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setDropdownVisible(false);
-        }
-      }
+    const { openDropdown, handleOpenDropdown, handleCloseDropdown } = React.useContext(DropdownContext);
 
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+    const isDropdownVisible = openDropdown === id;
+
+    const toggleDropdown = (e) => {
+      if (isDropdownVisible) {
+        handleCloseDropdown();
+      } else {
+        handleOpenDropdown(id);
+      }
+    };
+
+    React.useEffect(() => {
+      setId(Math.random());
     }, []);
 
     React.useEffect(() => {
-      if (isDropdownVisible) {
+      if (isDropdownVisible && dropdownRef.current) {
         const dropdownBottom = dropdownRef.current.getBoundingClientRect().bottom;
         const windowHeight = window.innerHeight;
         const footerHeight = 50;
@@ -537,10 +558,6 @@
         }
       }
     }, [isDropdownVisible]);
-
-    const toggleDropdown = () => {
-      setDropdownVisible(!isDropdownVisible);
-    };
 
     const handleCheckboxChange = (e, option) => {
       if(option === "unselect all") {
@@ -1012,7 +1029,9 @@
     );
   }
 
-    ReactDOM.render(<App />, document.getElementById('root'));
+    ReactDOM.render(<DropdownProvider>
+      <App />
+    </DropdownProvider>, document.getElementById('root'));
   </script>  
 </body>
 </html>
