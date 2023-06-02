@@ -366,6 +366,7 @@
       const tooltipRef = React.useRef(null);
       const [comparisonEnabled, setComparisonEnabled] = React.useState(false);
       const [showService, setShowService] = React.useState(true);
+      const [processing, setProcessing] = React.useState(false);
 
       const resetFormula = () => {
         // reloading the service component will show default values
@@ -389,8 +390,18 @@
           rds: ["dbEngine", "instanceType", "region", "purchaseType", "purchaseTerm", "paymentOption"],
           rdsStorage: ["storageType", "storageSize", "region"]
         }
-        const argumentNames = argumentsPerComponent[service]
-        google.script.run.insertFormula(formula, args, argumentNames);
+        const argumentNames = argumentsPerComponent[service];
+        setProcessing(true);
+        google.script.run.withSuccessHandler(success).withFailureHandler(failure).insertFormula(formula, args, argumentNames);
+      }
+
+      function success(error) {
+        console.error(error);
+        setProcessing(false);
+      }
+
+      function failure() {
+        setProcessing(false);
       }
     
       function renderServiceComponent(service, setFormula, setArgs, comparisonEnabled) {
@@ -464,7 +475,7 @@
             </div>
             <textarea ref={textareaRef} value={displayFormula(formula)} onChange={event => setFormula(event.target.value)}></textarea>
             <button className="fullWidth border purple" onClick={insertFormula}>
-              {comparisonEnabled && args.join("").indexOf(cfg.delimiter) > -1 ? `Insert formula's in new sheet` : 'Insert Formula in active cell'}
+              {processing ? 'Processing...' : (comparisonEnabled && args.join("").indexOf(cfg.delimiter) > -1 ? `Insert formula's in new sheet` : 'Insert Formula in active cell')}
             </button>
             {showService && renderServiceComponent(service, setFormula, setArgs, comparisonEnabled, resetFormula)}
 
