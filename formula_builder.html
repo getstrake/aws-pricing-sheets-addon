@@ -391,6 +391,10 @@
 
       function insertFormula() {
         console.log('formula ' + formula);
+        if(args.includes("")) {
+          alert("Please select all arguments");
+          return;
+        }
         console.log('args ' + args.join(', '));
         const argumentsPerComponent = {
           ec2: ["purchaseType", "instanceType", "region", "platform", "offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"],
