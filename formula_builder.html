@@ -533,10 +533,11 @@
   
   function SelectInput({options, value, disabled, onChange}) {
     const displayValue = value.includes(cfg.delimiter) ? "compare" : value;
+    const updatedOptions = value === "" ? [""].concat(options) : options;
     
     return (
         <select disabled={disabled} value={displayValue} onChange={onChange}>
-            {options.map(x => <option value={x}>{x}</option>)}
+            {updatedOptions.map(x => <option value={x}>{x || "Please select"}</option>)}
         </select>
     );
   }
