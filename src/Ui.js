@@ -72,7 +72,7 @@ function insertFormulaWithCompare(formula, args, argumentNames) {
 
 function resizeColumnsAndStylizeSheet(sheet) {
   const firstRow = sheet.getRange('1:1');
-  sheet.autoResizeColumns(1, sheet.getLastColumn());
+  autoResizeColumnsWithPadding();
   sheet.setFrozenRows(1);
   firstRow.setFontWeight('bold');
 }
@@ -179,6 +179,17 @@ function cartesianProduct(arrays) {
   return arrays.reduce((a, b) =>
     a.map(x => b.map(y => [...x, y])).reduce((a, b) => a.concat(b), []), [[]]
   );
+}
+
+function autoResizeColumnsWithPadding() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastColumn = sheet.getLastColumn();
+  sheet.autoResizeColumns(1, sheet.getLastColumn());
+
+  for (var i = 1; i <= lastColumn; i++) {
+    var columnWidth = sheet.getColumnWidth(i);
+    sheet.setColumnWidth(i, columnWidth + 10);
+  }
 }
 
 function onboarding() {
