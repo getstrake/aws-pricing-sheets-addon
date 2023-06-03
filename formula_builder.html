@@ -333,6 +333,14 @@
       margin-left: 10px;
     }
 
+    .unselect-all {
+      cursor: pointer;
+      font-variant: all-petite-caps;
+    }
+    .unselect-all:hover {
+      color: red;
+    }
+
   </style>
 </head>
 <body>
@@ -597,11 +605,12 @@
       }
     }
 
+    const unselectAll = (e) => {
+      e.target.checked = false;
+      setter("");
+    }
+
     const handleCheckboxChange = (e, option) => {
-      if(option === "unselect all") {
-        setter("");
-        return;
-      }
       console.log({ e: e.target.checked, option });
       if(e.target.checked) {
         setter(value.split(cfg.delimiter).filter(x=>x).concat(option).sort().join(cfg.delimiter));
@@ -615,14 +624,6 @@
     const filteredOptions = options.filter(option => 
       option.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
     );
-
-    const addExtraOptions = (options) => {
-      if(options.length > 10) {
-        return ["unselect all", ...filteredOptions];
-      } else {
-        return options;
-      }
-    }
 
     if(disabled) {
       return <SelectInput options={options} value={value} disabled={disabled} onChange={setter} />
@@ -646,8 +647,18 @@
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />}
+            {options.length > 10 && value !== "" && (<ul className="items"><li>
+                  <label className="unselect-all">
+                    <input
+                      type="checkbox"
+                      onChange={unselectAll}
+                    />
+                    Unselect all
+                  </label>
+              </li>
+              </ul>)}
             <ul className="items" ref={ulRef}>
-            {addExtraOptions(options).map((option) => (
+            {(options.length > 10 ? filteredOptions : options).map((option) => (
               <li key={option}>
                 <label>
                   <input
