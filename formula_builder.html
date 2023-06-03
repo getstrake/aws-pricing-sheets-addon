@@ -995,7 +995,7 @@
     const [storageSize, setStorageSize] = React.useState(4000);
     const [region, setRegion] = React.useState('us-east-1');
 
-    const regionCodes = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
+    const regions = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
 
     const storageTypes = ["aurora", "gp2", "magnetic", "piops"];
 
@@ -1022,9 +1022,7 @@
           <tr>
             <td>Storage Type</td>
             <td>
-              <select value={storageType} onChange={e => setStorageType(e.target.value)}>
-                {storageTypes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={storageTypes} value={storageType} setter={setStorageType} />
             </td>
           </tr>
           <tr>
@@ -1036,9 +1034,7 @@
           <tr>
             <td>Region</td>
             <td>
-              <select value={region} onChange={e => setRegion(e.target.value)}>
-                {regionCodes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
             </td>
           </tr>
         </table>
