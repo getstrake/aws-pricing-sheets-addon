@@ -537,6 +537,7 @@
     const [searchTerm, setSearchTerm] = React.useState("");
     const [id, setId] = React.useState(null);
     const dropdownRef = React.useRef(null);
+    const ulRef = React.useRef(null);
 
     const { openDropdown, handleOpenDropdown, handleCloseDropdown } = React.useContext(DropdownContext);
 
@@ -555,20 +556,46 @@
     }, []);
 
     React.useEffect(() => {
-      if (isDropdownVisible && dropdownRef.current) {
-        const dropdownBottom = dropdownRef.current.getBoundingClientRect().bottom;
-        const windowHeight = window.innerHeight;
-        const footerHeight = 50;
-        const dropdownMargin = 50;
-
-        if (dropdownBottom > windowHeight - footerHeight - dropdownMargin) {
-          window.scrollTo({
-            top: dropdownMargin + footerHeight + window.pageYOffset + (dropdownBottom - windowHeight),
-            behavior: "smooth"
-          });
+      if (isDropdownVisible) {
+        if(ulRef.current) {
+          scrollToFirstSelectedItemWithinDropmenu();
+        
+        if(dropdownRef.current) {
+          scrollDropdownIntoView();
         }
       }
+      }
     }, [isDropdownVisible]);
+
+    function scrollToFirstSelectedItemWithinDropmenu() {
+      const firstSelectedCheckbox = ulRef.current.querySelector(
+          'input[type="checkbox"]:checked'
+        );
+        if (firstSelectedCheckbox) {
+          firstSelectedCheckbox.scrollIntoView({
+            block: 'center',
+            behavior: 'auto'
+          });
+          window.scrollTo({ // make sure the document itself is not scrolled down
+            top: 0,
+            behavior: "auto"
+          });
+        }
+    }
+
+    function scrollDropdownIntoView() {
+      const dropdownBottom = dropdownRef.current.getBoundingClientRect().bottom;
+      const windowHeight = window.innerHeight;
+      const footerHeight = 50;
+      const dropdownMargin = 50;
+
+      if (dropdownBottom > windowHeight - footerHeight - dropdownMargin) {
+        window.scrollTo({
+          top: dropdownMargin + footerHeight + window.pageYOffset + (dropdownBottom - windowHeight),
+          behavior: "smooth"
+        });
+      }
+    }
 
     const handleCheckboxChange = (e, option) => {
       if(option === "unselect all") {
@@ -619,7 +646,7 @@
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />}
-            <ul className="items">
+            <ul className="items" ref={ulRef}>
             {addExtraOptions(options).map((option) => (
               <li key={option}>
                 <label>
