@@ -93,19 +93,20 @@ function createNewSheetName(baseName) {
   return newSheetName;
 }
 
-function getHeadersAndIndicesFromFormulaArguments(args) {
-  let headers = [], indices = [];
+function getHeadersAndIndicesFromFormulaArguments(args, argumentNames) {
+  let headers = [], indices = [], argumentNamesThatHaveCompareInIt = [];
   for(const [index, arg] of args.entries()) {
     if(typeof arg === "string" && arg.includes(cfg.delimiter)) {
       indices.push(index);
       headers.push(arg.split(cfg.delimiter));
+      argumentNamesThatHaveCompareInIt.push(argumentNames[index]);
     }
   }
-  return {headers, indices};
+  return {headers, indices, argumentNamesThatHaveCompareInIt};
 }
 
 function prepareValues(functionName, args, argumentNames) {
-  const {headers, indices} = getHeadersAndIndicesFromFormulaArguments(args);
+  const {headers, indices, argumentNamesThatHaveCompareInIt} = getHeadersAndIndicesFromFormulaArguments(args, argumentNames);
   if(headers.length < 1) {
     throw new Error("At least one header must be present");
   }
@@ -118,20 +119,30 @@ function prepareValues(functionName, args, argumentNames) {
   combinations.forEach(combination => {
     const rowHasEC2OnDemand = functionName === "AWS_EC2" &&
                               argumentNames.includes("purchaseType") &&
-                              combination[argumentNames.indexOf("purchaseType")] === "ondemand";
+                              combination[argumentNamesThatHaveCompareInIt.indexOf("purchaseType")] === "ondemand";
 
-    const slicedArgs = rowHasEC2OnDemand ? args.slice(0,4) : args;
+    const rowHasRDSOnDemand = functionName === "AWS_RDS" &&
+                              argumentNames.includes("purchaseType") &&
+                              combination[argumentNamesThatHaveCompareInIt.indexOf("purchaseType")] === "ondemand";
+
+    const slicedArgs = (rowHasEC2OnDemand || rowHasRDSOnDemand) ? args.slice(0,4) : args;
     const formula = `=${functionName}(${replaceCellReference(slicedArgs, values.length + 1, indices).join(",")})`;
                       
-    if(rowHasEC2OnDemand) {
-      const RESERVED_INSTANCE_ARGS = ["offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"];
-      
+    if(rowHasEC2OnDemand || rowHasRDSOnDemand) {
       // Special case: on-demand vs reserved instances
       // Fill unnecessary arguments with "-"
 
-      row = [...combination, formula].map((value, index) => 
-        RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
-      )
+      if(rowHasEC2OnDemand) {
+        const EC2_RESERVED_INSTANCE_ARGS = ["offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"];
+        row = [...combination, formula].map((value, index) => 
+          EC2_RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
+        )
+      } else if(rowHasRDSOnDemand) {
+        const RDS_RESERVED_INSTANCE_ARGS = ["purchaseTerm", "paymentOption"];
+        row = [...combination, formula].map((value, index) => 
+          RDS_RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
+        )
+      }
       duplicateRow = isDuplicateRowExceptLastColumn(values, row);
       if(duplicateRow) {
         return; // skip this row

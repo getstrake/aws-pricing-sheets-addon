@@ -666,7 +666,7 @@
     );
   }
 
-  const SelectInputWithCheckboxes = ({ comparisonEnabled, options, value, setter, disabled }) => {
+  const SelectInputWithComparePossibility = ({ comparisonEnabled, options, value, setter, disabled }) => {
 
     React.useEffect(() => {
       if(!comparisonEnabled) {
@@ -761,49 +761,49 @@
                 <tr>
                     <td>Purchase Type</td>
                     <td>
-                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={purchaseTypes} value={purchaseType} setter={setPurchaseType} />
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTypes} value={purchaseType} setter={setPurchaseType} />
                     </td>
                 </tr>
                 <tr>
                     <td>Instance Type</td>
                     <td>
-                      <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType}/>
+                      <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType}/>
                     </td>
                 </tr>
                 <tr>
                   <td>Region</td>
                   <td>
-                    <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion}/>
+                    <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion}/>
                   </td>
                 </tr>
                 <tr>
                   <td>Platform</td>
                   <td>
-                    <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={platforms} value={platform} setter={setPlatform}/>
+                    <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={platforms} value={platform} setter={setPlatform}/>
                   </td>
                 </tr>
                 <tr>
                     <td>Offering Class</td>
                     <td>
-                      <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} disabled={!purchaseType.includes('reserved')} setter={setOfferingClass} />
+                      <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} disabled={!purchaseType.includes('reserved')} setter={setOfferingClass} />
                     </td>
                 </tr>
                 <tr>
                     <td>Purchase Term</td>
                     <td>
-                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={!purchaseType.includes('reserved')} setter={setPurchaseTerm} />
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={!purchaseType.includes('reserved')} setter={setPurchaseTerm} />
                     </td>
                 </tr>
                 <tr>
                     <td>Payment Option</td>
                     <td>
-                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={!purchaseType.includes('reserved')} setter={setPaymentOption} />
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={!purchaseType.includes('reserved')} setter={setPaymentOption} />
                     </td>
                 </tr>
                 <tr>
                     <td>SQL License</td>
                     <td>
-                        <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} disabled={!purchaseType.includes('reserved')} setter={setSQLLicense} />
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} disabled={!purchaseType.includes('reserved')} setter={setSQLLicense} />
                     </td>
                 </tr>
             </table>
@@ -857,7 +857,7 @@
             <td>Volume Type</td>
             <td>
               {volumeTypes[storageType].length > 0 ? (
-              <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={volumeTypes[storageType]} value={volumeType} setter={setVolumeType} />
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={volumeTypes[storageType]} value={volumeType} setter={setVolumeType} />
               ) : (<span className="text">-</span>)}
             </td>
           </tr>
@@ -878,7 +878,7 @@
           <tr>
             <td>Region</td>
             <td>
-              <SelectInputWithCheckboxes comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
             </td>
           </tr>
         </table>
@@ -903,7 +903,7 @@
 
     const instanceTypes = ["db.m1.large","db.m1.medium","db.m1.small","db.m1.xlarge","db.m2.2xlarge","db.m2.4xlarge","db.m2.xlarge","db.m3.2xlarge","db.m3.large","db.m3.medium","db.m3.xlarge","db.m4.10xlarge","db.m4.16xlarge","db.m4.2xlarge","db.m4.4xlarge","db.m4.large","db.m4.xlarge","db.m5.12xlarge","db.m5.16xlarge","db.m5.24xlarge","db.m5.2xlarge","db.m5.4xlarge","db.m5.8xlarge","db.m5.large","db.m5.xlarge","db.m5d.12xlarge","db.m5d.16xlarge","db.m5d.24xlarge","db.m5d.2xlarge","db.m5d.4xlarge","db.m5d.8xlarge","db.m5d.large","db.m5d.xlarge","db.m6g.12xlarge","db.m6g.16xlarge","db.m6g.2xlarge","db.m6g.4xlarge","db.m6g.8xlarge","db.m6g.large","db.m6g.xlarge","db.m6gd.12xlarge","db.m6gd.16xlarge","db.m6gd.2xlarge","db.m6gd.4xlarge","db.m6gd.8xlarge","db.m6gd.large","db.m6gd.xlarge","db.m6i.12xlarge","db.m6i.16xlarge","db.m6i.24xlarge","db.m6i.2xlarge","db.m6i.32xlarge","db.m6i.4xlarge","db.m6i.8xlarge","db.m6i.large","db.m6i.xlarge","db.r3.2xlarge","db.r3.4xlarge","db.r3.8xlarge","db.r3.large","db.r3.xlarge","db.r4.16xlarge","db.r4.2xlarge","db.r4.4xlarge","db.r4.8xlarge","db.r4.large","db.r4.xlarge","db.r5.12xlarge","db.r5.16xlarge","db.r5.24xlarge","db.r5.2xlarge","db.r5.4xlarge","db.r5.8xlarge","db.r5.large","db.r5.xlarge","db.r5b.12xlarge","db.r5b.16xlarge","db.r5b.24xlarge","db.r5b.2xlarge","db.r5b.4xlarge","db.r5b.8xlarge","db.r5b.large","db.r5b.xlarge","db.r5d.12xlarge","db.r5d.16xlarge","db.r5d.24xlarge","db.r5d.2xlarge","db.r5d.4xlarge","db.r5d.8xlarge","db.r5d.large","db.r5d.xlarge","db.r6g.12xlarge","db.r6g.16xlarge","db.r6g.2xlarge","db.r6g.4xlarge","db.r6g.8xlarge","db.r6g.large","db.r6g.xlarge","db.r6gd.12xlarge","db.r6gd.16xlarge","db.r6gd.2xlarge","db.r6gd.4xlarge","db.r6gd.8xlarge","db.r6gd.large","db.r6gd.xlarge","db.r6i.12xlarge","db.r6i.16xlarge","db.r6i.24xlarge","db.r6i.2xlarge","db.r6i.32xlarge","db.r6i.4xlarge","db.r6i.8xlarge","db.r6i.large","db.r6i.xlarge","db.t1.micro","db.t2.2xlarge","db.t2.large","db.t2.medium","db.t2.micro","db.t2.small","db.t2.xlarge","db.t3.2xlarge","db.t3.large","db.t3.medium","db.t3.micro","db.t3.small","db.t3.xlarge","db.t4g.2xlarge","db.t4g.large","db.t4g.medium","db.t4g.micro","db.t4g.small","db.t4g.xlarge","db.x1.16xlarge","db.x1.32xlarge","db.x1e.16xlarge","db.x1e.2xlarge","db.x1e.32xlarge","db.x1e.4xlarge","db.x1e.8xlarge","db.x1e.xlarge","db.x2g.12xlarge","db.x2g.16xlarge","db.x2g.2xlarge","db.x2g.4xlarge","db.x2g.8xlarge","db.x2g.large","db.x2g.xlarge","db.z1d.12xlarge","db.z1d.2xlarge","db.z1d.3xlarge","db.z1d.6xlarge","db.z1d.large","db.z1d.xlarge"];
 
-    const regionCodes = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
+    const regions = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
 
 
     const purchaseTypes = ["ondemand", "reserved"];
@@ -949,50 +949,38 @@
           <tr>
             <td>Database Engine</td>
             <td>
-              <select onChange={e => setDbEngine(e.target.value)} value={dbEngine}>
-                {dbEngines.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={dbEngines} value={dbEngine} setter={setDbEngine} />
             </td>
           </tr>
           <tr>
             <td>Instance Type</td>
             <td>
-              <select onChange={e => setInstanceType(e.target.value)} value={instanceType}>
-                {instanceTypes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType} />
             </td>
           </tr>
           <tr>
             <td>Region</td>
             <td>
-              <select onChange={e => setRegion(e.target.value)} value={region}>
-                {regionCodes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
             </td>
           </tr>
           <tr>
             <td>PurchaseType</td>
             <td>
-              <select onChange={e => setPurchaseType(e.target.value)} value={purchaseType}>
-                {purchaseTypes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTypes} value={purchaseType} setter={setPurchaseType} />
             </td>
           </tr>
 
             <tr>
               <td>Purchase Term</td>
               <td>
-                <select disabled={!purchaseType.includes('reserved')} value={!purchaseType.includes('reserved') ? '-' : purchaseTerm} onChange={e => setPurchaseTerm(e.target.value)}>
-                  {prependOptionMinusWhenReservedInstance(purchaseTerms).map(x => <option value={x}>{x}</option>)}
-                </select>
+                <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={!purchaseType.includes('reserved')} setter={setPurchaseTerm} />
               </td>
             </tr>
             <tr>
               <td>Payment Option</td>
               <td>
-                <select disabled={!purchaseType.includes('reserved')} value={!purchaseType.includes('reserved') ? '-' : paymentOption} onChange={e => setPaymentOption(e.target.value)}>
-                  {prependOptionMinusWhenReservedInstance(paymentOptions).map(x => <option value={x}>{x}</option>)}
-                </select>
+                <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={!purchaseType.includes('reserved')} setter={setPaymentOption} />
               </td>
             </tr>
         </table>
