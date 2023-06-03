@@ -730,12 +730,6 @@
         handleChange();
       }, [purchaseType, instanceType, region, platform, offeringClass, purchaseTerm, paymentOption, sqlLicense]);
 
-      React.useEffect(() => {
-        if(!comparisonEnabled) {
-
-        }
-      },[comparisonEnabled])
-
     function handleChange() {
       const displayStringOrNumber = x => typeof x === 'number' ? x : `"${x}"`;
       const args = getArgsForFormula();
