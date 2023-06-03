@@ -610,13 +610,9 @@
       setter("");
     }
 
-    const handleCheckboxChange = (e, option) => {
-      console.log({ e: e.target.checked, option });
-      if(e.target.checked) {
-        setter(value.split(cfg.delimiter).filter(x=>x).concat(option).sort().join(cfg.delimiter));
-      } else {
-        setter(value.split(cfg.delimiter).filter(x => x !== option).sort().join(cfg.delimiter));
-      }
+    const handleCheckboxChange = () => {
+      concatenatedValue = getCheckedOptionNames().join(cfg.delimiter);
+      setter(concatenatedValue);
     };
 
     const displayValue = v => v.split(cfg.delimiter).slice(0, 2).join(cfg.delimiter) + (v.split(cfg.delimiter).length > 2 ? cfg.delimiter + '...' : '');
@@ -624,6 +620,13 @@
     const filteredOptions = options.filter(option => 
       option.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
     );
+
+    const getCheckedOptionNames = () => {
+      const checkboxes = [...document.querySelectorAll('.items input[type="checkbox"]')];
+      const checkedBoxes = checkboxes.filter(box => box.checked);
+      // Get the labels of the checked boxes
+      return checkedBoxes.map(box => box.parentNode.textContent);
+    };
 
     if(disabled) {
       return <SelectInput options={options} value={value} disabled={disabled} onChange={setter} />
