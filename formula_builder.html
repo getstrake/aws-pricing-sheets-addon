@@ -611,7 +611,7 @@
     }
 
     const handleCheckboxChange = () => {
-      concatenatedValue = getCheckedOptionNames().join(cfg.delimiter);
+      const concatenatedValue = getCheckedOptionNames().join(cfg.delimiter);
       setter(concatenatedValue);
     };
 
