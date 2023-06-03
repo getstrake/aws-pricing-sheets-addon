@@ -96,7 +96,7 @@ function createNewSheetName(baseName) {
 function getHeadersAndIndicesFromFormulaArguments(args) {
   let headers = [], indices = [];
   for(const [index, arg] of args.entries()) {
-    if(arg.includes(cfg.delimiter)) {
+    if(typeof arg === "string" && arg.includes(cfg.delimiter)) {
       indices.push(index);
       headers.push(arg.split(cfg.delimiter));
     }
