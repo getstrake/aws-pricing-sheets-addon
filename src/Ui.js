@@ -59,7 +59,14 @@ function insertFormulaWithCompare(formula, args, argumentNames) {
   const functionName = formula.match(/[^(]+/)[0];
   const newSheetName = createNewSheetName(cfg.baseNameForCompareResults);
   const compareSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(newSheetName);
-  const values = prepareValues(functionName, args, argumentNames);
+
+  const showOnlyColumnsWithComparedValues = false; 
+  // When set to false, every parameter of the formula will be displayed in a separate column.
+  // You can later change this to true to only show columns that contain compared values.
+  // In this case, the remaining parameters will be hardcoded in the formula, appearing only in the last column labeled 'Price'.
+  // For instance: AWS_RDS_STORAGE(A2, 4000, "us-east-1") where A2 refers to column A with compared values and "us-east-1" is hardcoded
+
+  const values = prepareValues(functionName, args, argumentNames, showOnlyColumnsWithComparedValues);
   SpreadsheetApp.getActiveSpreadsheet().toast(`Please wait while "${newSheetName}" is being populated. This may take a few seconds. It will contain ${values.length - 1} formulas.`);
   
   compareSheet.clear();
@@ -93,20 +100,30 @@ function createNewSheetName(baseName) {
   return newSheetName;
 }
 
-function getHeadersAndIndicesFromFormulaArguments(args, argumentNames) {
+function getHeadersAndIndicesFromFormulaArguments(args, argumentNames, showOnlyColumnsWithComparedValues = false) {
   let headers = [], indices = [], argumentNamesThatHaveCompareInIt = [];
   for(const [index, arg] of args.entries()) {
-    if(typeof arg === "string" && arg.includes(cfg.delimiter)) {
+    if(showOnlyColumnsWithComparedValues) {
+      if(typeof arg === "string" && arg.includes(cfg.delimiter)) {
+        indices.push(index);
+        headers.push(arg.split(cfg.delimiter));
+        argumentNamesThatHaveCompareInIt.push(argumentNames[index]);
+      } 
+    } else { // show all columns
       indices.push(index);
-      headers.push(arg.split(cfg.delimiter));
-      argumentNamesThatHaveCompareInIt.push(argumentNames[index]);
+      if(typeof arg === "string" && arg.includes(cfg.delimiter)) {
+        headers.push(arg.split(cfg.delimiter));
+        argumentNamesThatHaveCompareInIt.push(argumentNames[index]);
+      } else {
+        headers.push([arg]);
+      }
     }
   }
   return {headers, indices, argumentNamesThatHaveCompareInIt};
 }
 
-function prepareValues(functionName, args, argumentNames) {
-  const {headers, indices, argumentNamesThatHaveCompareInIt} = getHeadersAndIndicesFromFormulaArguments(args, argumentNames);
+function prepareValues(functionName, args, argumentNames, showOnlyColumnsWithComparedValues) {
+  const {headers, indices, argumentNamesThatHaveCompareInIt} = getHeadersAndIndicesFromFormulaArguments(args, argumentNames, showOnlyColumnsWithComparedValues);
   if(headers.length < 1) {
     throw new Error("At least one header must be present");
   }
