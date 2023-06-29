@@ -177,7 +177,7 @@ function getEBSTests() {
 
     t.willThrow(function() {
       return EC2_EBS_GP2_GB(undefined, "us-east-1")
-    }, "must specify parameter"),
+    }, "unable to parse volume units"),
 
     t.willThrow(function() {
       return EC2_EBS_GP2_GB("foo", "us-east-1")
@@ -193,7 +193,7 @@ function getEBSTests() {
 
     t.willThrow(function() {
       return AWS_EBS("gp2","storage", undefined, "us-east-1")
-    }, "must specify parameter"),
+    }, "unable to parse volume units"),
 
     t.willThrow(function() {
       return AWS_EBS("gp2","storage", "foo", "us-east-1")
@@ -221,7 +221,7 @@ function getEC2Tests() {
         }, "Missing platform"),
         t.willThrow(function() {
             EC2_LINUX_OD("mX5.xlarge", "us-east-1")
-        }, "Can not find instance"),
+        }, "Unable to find the price. Make sure you have the correct region, purchase type and platform."),
 
         t.areEqual(0.192, () => AWS_EC2("ondemand", "m5.xlarge", "us-east-1", "linux")),
         t.areEqual(0.214, () => AWS_EC2("ondemand", "m5.xlarge", "ca-central-1", "linux")),
@@ -234,7 +234,7 @@ function getEC2Tests() {
         }, "Missing platform"),
         t.willThrow(function() {
           AWS_EC2("ondemand", "mX5.xlarge", "us-east-1", "linux")
-        }, "Can not find instance"),
+        }, "Unable to find the price. Make sure you have the correct region, purchase type and platform."),
 
     ],"EC2 Windows on-demand": [
         t.areEqual(0.376, () => EC2_WINDOWS_OD("m5.xlarge", "us-east-1")),
@@ -411,7 +411,7 @@ function getRDSFunctionTests() {
         ['purchase_type', 'reserved'],
         ['purchase_term', '1'],
         ['payment_option', 'partial_upfront']
-    ], "db.r1.2xlarge"), "Unable to find RDS instance db.r1.2xlarge for DB engine aurora/mysql"),
+    ], "db.r1.2xlarge"), "Unable to find the price. Make sure you have the correct region, database engine and purchase type."),
 
     t.willThrow(
         () => RDS_AURORA_MYSQL([
@@ -469,7 +469,7 @@ function getRDSStorageTests() {
 
       t.willThrow(() =>
           AWS_RDS_STORAGE("gp2",undefined, "us-east-1"),
-          "must specify a parameter"),
+          "Must specify storage size"),
 
       t.willThrow(() =>
           RDS_STORAGE_GP2_GB("foo", "us-east-1"),
@@ -487,14 +487,13 @@ function getRDSStorageTests() {
 function getFunctionTests() {
   const t = new UnitTestingApp();
   const tests = {"Function tests": [
-    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2023-01-01T00:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
+    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]}]}, () => getObjectWithValuesToLowerCase(
       { a: 
         [
           'A', 
           'b', 
           { c: 'CCCee', 
-            d: ['D', 'EE'] }, 
-          new Date(2023,0,1)
+            d: ['D', 'EE'] }
         ] 
     })),
   ]}

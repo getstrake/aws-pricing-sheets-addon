@@ -24,7 +24,7 @@ function EC2_EBS_MAGNETIC_GB(settingsOrSize, sizeOrRegion, region) {
 // EBS GP2 storage
 function EC2_EBS_GP2_GB(settingsOrSize, sizeOrRegion, region) {
   return analyticsWrapper(arguments, () => {
-    if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
+    if(!Array.isArray(settingsOrSize))
       return fetchApiEBS({
         volumeType: "gp2", 
         volumeSize: settingsOrSize, 
