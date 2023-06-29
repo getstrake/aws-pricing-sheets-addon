@@ -8,7 +8,7 @@ function fetchApiRDSStorage(options, funcName) {
   if(!region) throw 'Missing region';
   if(isNaN(parseFloat(storageSize))) throw 'Invalid storage size';
 
-  const path = '/pricing/1.0/rds/database-storage/index.json';
+  const path = `/rds/database-storage/${region}/single-az/index.json`;
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {

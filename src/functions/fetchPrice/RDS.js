@@ -18,7 +18,7 @@ function fetchApiRDS(options, funcName) {
     }
   }
 
-  const path = `/pricing/1.0/rds/region/${region}/${dbEngine}/${purchaseType}/single-az/index.json`;
+  const path = `/rds/region/${region}/${dbEngine}/${purchaseType}/single-az/${instanceType}/index.json`;
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {

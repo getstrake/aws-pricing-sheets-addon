@@ -1,5 +1,5 @@
 const cfg = {
-  baseHost: 'https://cdn.x.macroscope.io/aws-pricing/retro',
+  baseHost: 'https://cdn.x.macroscope.io/aws-pricing/retro/pricing/1.2',
   hoursPerMonth: 730,
   logCustomFunctionToAnalytics: false, // analytics, requires credentials, otherwise skips
   environment: "production", // should be either "development" or "production"

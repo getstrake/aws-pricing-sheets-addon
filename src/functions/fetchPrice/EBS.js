@@ -7,7 +7,7 @@ function fetchApiEBS(options, funcName) {
   if (!parseFloat(volumeSize))
     throw "unable to parse volume units";
 
-  const path = `/pricing/1.0/ec2/region/${region}/ebs/index.json`;
+  const path = `/ec2/region/${region}/ebs/index.json`;
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {
