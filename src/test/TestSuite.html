@@ -12,6 +12,7 @@
     <h1>Test Suite</h1>
     <p>Ps: tests are run in parallel</p>
     <div style="background: lightgrey; padding: 10px; font-size: 10px">
+      <div id="cdn-path">Cdn path: <?= baseHost ?></div>
       <div id="timestamp"></div>
       <div id="statistics"></div>
     </div>
@@ -21,6 +22,7 @@
       let maxSimultaneousTests = 30;
       let latestUnitTestIndex = maxSimultaneousTests - 1;
       const allTests = <?!= JSON.stringify(tests) ?>;
+      const baseHost = "<?= baseHost ?>";
       const statistics = {
         failureCount: 0,
         successCount: 0,
@@ -65,7 +67,7 @@
               const unitTest = () => google.script.run
                 .withSuccessHandler(e => printResult(e, '#' + testDiv.id))
                 .withFailureHandler(failure)
-                [callback](key, i);
+                [callback](key, i, baseHost);
               unitTests.push(unitTest);
               console.log({callback, key, i, selector: '#' + testDiv.id})
             }

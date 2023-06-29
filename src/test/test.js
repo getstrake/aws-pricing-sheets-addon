@@ -1,14 +1,29 @@
-// Run tests from the web app
-// when you visit the web app url, it will run the doGet function below
 function doGet(e) {
-  console.time('template')
-  console.log('start template')
+  if(e.parameter.baseHost)
+    cfg.baseHost = e.parameter.baseHost;
+  if(e.parameter.formula)
+    return executeFormulaViaWebApp(e);
   const template = HtmlService.createTemplateFromFile('src/test/TestSuite.html');
   template.tests = {...getEBSTests(), ...getEC2Tests(), ...getRDSFunctionTests(), ...getRDSStorageTests(), ...getFunctionTests()};  
-  console.timeEnd('template')
-  console.log('end template')
-  // console.log(template.tests)
+  template.baseHost = e.parameter.baseHost || cfg.baseHost;
   return template.evaluate();
+}
+
+function executeFormulaViaWebApp(e) {
+  try {
+    const formula = e.parameter.formula;
+    const functionName = formula.split("(")[0];
+    const whitelistedFormulas = getWhitelistedFormulas();
+    if(!whitelistedFormulas.includes(functionName)) return returnJson({success: false, message: 'Formula is not whitelisted'});
+    const result = eval(formula);
+    return returnJson({success: true, result: result})
+  } catch(err) {
+    return returnJson({success: false, message: JSON.stringify(err)});
+  }
+}
+
+function returnJson(content) {
+  return ContentService.createTextOutput(JSON.stringify(content) ).setMimeType(ContentService.MimeType.JSON); 
 }
 
 // test the web app in the sidebar in the spreadsheet
@@ -47,23 +62,28 @@ function catchError(func) {
 }
 
 // These functions will be called when you run the test suite in the sidebar/web app
-function EC2Test(chapter, testIndex) {
+function EC2Test(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
   return catchError(() => getEC2Tests()["EC2Test"][chapter][testIndex]);
 }
 
-function EBSTest(chapter, testIndex) {
+function EBSTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
   return catchError(() => getEBSTests()["EBSTest"][chapter][testIndex]);
 }
 
-function RDSFunctionTest(chapter, testIndex) {
+function RDSFunctionTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
   return catchError(() => getRDSFunctionTests()["RDSFunctionTest"][chapter][testIndex]);
 }
 
-function RDSStorageTest(chapter, testIndex) {
+function RDSStorageTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
   return catchError(() => getRDSStorageTests()["RDSStorageTest"][chapter][testIndex]);
 }
 
-function FunctionTest(chapter, testIndex) {
+function FunctionTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
   return catchError(() => getFunctionTests()["FunctionTest"][chapter][testIndex]);
 }
 
@@ -521,4 +541,105 @@ function showTest(tests, callback) {
   template.tests = tests;
   template.callback = callback;
   ui.showSidebar(template.evaluate());
+}
+
+function getWhitelistedFormulas() {
+  return ['EC2_EBS_IO2_GB',
+  'EC2_EBS_IO1_GB',
+  'EC2_EBS_SC1_GB',
+  'EC2_EBS_ST1_GB',
+  'EC2_EBS_GP3_GB',
+  'EC2_EBS_GP2_GB',
+  'EC2_EBS_MAGNETIC_GB',
+  'EC2_WINDOWS_MSSQL_STD_RI_ALL',
+  'EC2_WINDOWS_MSSQL_STD_RI_PARTIAL',
+  'EC2_WINDOWS_MSSQL_STD_RI_NO',
+  'EC2_WINDOWS_MSSQL_CONV_RI_ALL',
+  'EC2_WINDOWS_MSSQL_CONV_RI_PARTIAL',
+  'EC2_WINDOWS_MSSQL_CONV_RI_NO',
+  'EC2_LINUX_MSSQL_STD_RI_ALL',
+  'EC2_LINUX_MSSQL_STD_RI_PARTIAL',
+  'EC2_LINUX_MSSQL_STD_RI_NO',
+  'EC2_LINUX_MSSQL_CONV_RI_ALL',
+  'EC2_LINUX_MSSQL_CONV_RI_PARTIAL',
+  'EC2_LINUX_MSSQL_CONV_RI_NO',
+  'EC2_WINDOWS_STD_RI_ALL',
+  'EC2_WINDOWS_STD_RI_PARTIAL',
+  'EC2_WINDOWS_STD_RI_NO',
+  'EC2_WINDOWS_CONV_RI_ALL',
+  'EC2_WINDOWS_CONV_RI_PARTIAL',
+  'EC2_WINDOWS_CONV_RI_NO',
+  'EC2_SUSE_STD_RI_ALL',
+  'EC2_SUSE_STD_RI_PARTIAL',
+  'EC2_SUSE_STD_RI_NO',
+  'EC2_SUSE_CONV_RI_ALL',
+  'EC2_SUSE_CONV_RI_PARTIAL',
+  'EC2_SUSE_CONV_RI_NO',
+  'EC2_RHEL_STD_RI_ALL',
+  'EC2_RHEL_STD_RI_PARTIAL',
+  'EC2_RHEL_STD_RI_NO',
+  'EC2_RHEL_CONV_RI_ALL',
+  'EC2_RHEL_CONV_RI_PARTIAL',
+  'EC2_RHEL_CONV_RI_NO',
+  'EC2_LINUX_STD_RI_ALL',
+  'EC2_LINUX_STD_RI_PARTIAL',
+  'EC2_LINUX_STD_RI_NO',
+  'EC2_LINUX_CONV_RI_ALL',
+  'EC2_LINUX_CONV_RI_PARTIAL',
+  'EC2_LINUX_CONV_RI_NO',
+  'RDS_MARIADB_RI_ALL',
+  'RDS_MARIADB_RI_PARTIAL',
+  'RDS_MARIADB_RI_NO',
+  'RDS_MARIADB_RI',
+  'RDS_MARIADB_OD',
+  'RDS_MARIADB',
+  'RDS_POSTGRESQL_RI_ALL',
+  'RDS_POSTGRESQL_RI_PARTIAL',
+  'RDS_POSTGRESQL_RI_NO',
+  'RDS_POSTGRESQL_RI',
+  'RDS_POSTGRESQL_OD',
+  'RDS_POSTGRESQL',
+  'RDS_MYSQL_RI_ALL',
+  'RDS_MYSQL_RI_PARTIAL',
+  'RDS_MYSQL_RI_NO',
+  'RDS_MYSQL_RI',
+  'RDS_MYSQL_OD',
+  'RDS_MYSQL',
+  'RDS_AURORA_POSTGRESQL_RI_ALL',
+  'RDS_AURORA_POSTGRESQL_RI_PARTIAL',
+  'RDS_AURORA_POSTGRESQL_RI_NO',
+  'RDS_AURORA_POSTGRESQL_RI',
+  'RDS_AURORA_POSTGRESQL_OD',
+  'RDS_AURORA_POSTGRESQL',
+  'RDS_AURORA_MYSQL_RI_ALL',
+  'RDS_AURORA_MYSQL_RI_PARTIAL',
+  'RDS_AURORA_MYSQL_RI_NO',
+  'RDS_AURORA_MYSQL_RI',
+  'RDS_AURORA_MYSQL_OD',
+  'RDS_AURORA_MYSQL',
+  'RDS_STORAGE_MAGNETIC_GB',
+  'RDS_STORAGE_PIOPS_GB',
+  'RDS_STORAGE_GP2_GB',
+  'RDS_STORAGE_AURORA_GB',
+  'EC2_EBS_GP3_IOPS',
+  'EC2_EBS_IO2_IOPS',
+  'EC2_EBS_IO1_IOPS',
+  'EC2_EBS_SNAPSHOT_GB',
+  'EC2_EBS_GB',
+  'EC2_RI',
+  'EC2_OD',
+  'EC2',
+  'EC2_WINDOWS_OD',
+  'EC2_SUSE_OD',
+  'EC2_RHEL_OD',
+  'EC2_WINDOWS_MSSQL_OD',
+  'EC2_LINUX_MSSQL_OD',
+  'EC2_LINUX_OD',
+  'RDS_STORAGE_FROM_SETTINGS',
+  'RDS_STORAGE_GB',
+  'RDS_FROM_SETTINGS',
+  'AWS_RDS_STORAGE',
+  'AWS_RDS',
+  'AWS_EBS',
+  'AWS_EC2']
 }
