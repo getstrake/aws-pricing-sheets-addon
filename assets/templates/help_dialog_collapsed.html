@@ -48,7 +48,6 @@
   }
   
   .collapsible {
-    cursor: pointer;
     width: 100%;
     text-align: left;
     font-size: 15px;
@@ -83,6 +82,10 @@
   
         button.visible::before {
           transform: rotate(90deg) translateX(-3px);
+        }
+
+        button {
+          cursor: pointer;
         }
 </style>
 
@@ -123,6 +126,10 @@
         element.classList.remove(visibleTagName);
       }
     });
+  }
+
+  function openFormulaBuilder() {
+    google.script.run.showFormulaBuilder();
   }
 </script>
 

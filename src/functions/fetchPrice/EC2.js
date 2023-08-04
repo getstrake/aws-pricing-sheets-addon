@@ -7,7 +7,7 @@ function fetchApiEC2(options, funcName) {
   if(!purchaseType) throw 'Missing purchaseType';
   if(!platform) throw 'Missing platform';
 
-  const path = `/pricing/1.0/ec2/region/${region}/${purchaseType}/${platform}/index.json`;
+  const path = `/ec2/region/${region}/${purchaseType}/${platform}/${instanceType}/index.json`;
   const url = `${cfg.baseHost}${path}`;
   let response;
   try {

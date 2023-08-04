@@ -29,7 +29,9 @@ function AWS_EC2(purchaseType, instanceType, region, platform, offeringClass, pu
         throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances. Remove these arguments for on-demand instances or leave them empty.`
     }
 
-    if(sqlLicense) {
+    // we use "no sql license" in the formula builder sidebar 
+    // to indicate that the user has not selected a sql license
+    if(sqlLicense && sqlLicense !== "no sql license") {
       options.platform = options.platform + '_' + sqlLicense;
       delete options.sqlLicense;
     }
