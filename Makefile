@@ -1,7 +1,8 @@
 .PHONY: \
 	clean \
 	help-dialog \
-	publish-tags
+	publish-tags \
+	deploy
 
 #
 # All build steps that include repeatable processes based on dependencies
@@ -30,3 +31,11 @@ help_dialog_collapsed.html: Help.md assets/templates/help_dialog_collapsed.html
 
 publish-tags:
 	git push --tags origin
+
+deploy: help_dialog_collapsed.html
+	npm run gencode
+	clasp push
+	clasp version ""
+	clasp deploy \
+		-i $$(clasp deployments | awk -F ' ' '{ if ($$3 == "@10") { print $$2 } }') \
+		-V $$(clasp versions | awk -F ' - ' '{ if (NR > 1) { print $$1 } }' | sort --reverse --numeric-sort | head -n 1)
