@@ -37,5 +37,5 @@ deploy: help_dialog_collapsed.html
 	clasp push
 	clasp version ""
 	clasp deploy \
-		-i $$(clasp deployments | awk -F ' ' '{ if ($$3 == "@10") { print $$2 } }') \
 		-V $$(clasp versions | awk -F ' - ' '{ if (NR > 1) { print $$1 } }' | sort --reverse --numeric-sort | head -n 1)
+	clasp versions | awk -F ' - ' '{ if (NR > 1) { print $$1 } }' | sort --reverse --numeric-sort | head -n 1

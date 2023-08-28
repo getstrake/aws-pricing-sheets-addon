@@ -7,6 +7,7 @@ pnpm-lock.yaml
 .DS_Store
 src/Test.js
 src/analytics/credentials/
+src/analytics/Credentials.js
 Test.js
 help_dialog_collapsed.html
 src/functions/generated/*
