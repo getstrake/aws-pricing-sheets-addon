@@ -1,23 +1,90 @@
-// Run tests with the showTest functions below
+function doGet(e) {
+  if(e.parameter.baseHost)
+    cfg.baseHost = e.parameter.baseHost;
+  if(e.parameter.formula)
+    return executeFormulaViaWebApp(e);
+  const template = HtmlService.createTemplateFromFile('src/test/TestSuite.html');
+  template.tests = {...getEBSTests(), ...getEC2Tests(), ...getRDSFunctionTests(), ...getRDSStorageTests(), ...getFunctionTests()};  
+  template.baseHost = e.parameter.baseHost || cfg.baseHost;
+  return template.evaluate();
+}
 
+function executeFormulaViaWebApp(e) {
+  try {
+    const formula = e.parameter.formula;
+    const functionName = formula.split("(")[0];
+    const whitelistedFormulas = getWhitelistedFormulas();
+    if(!whitelistedFormulas.includes(functionName)) return returnJson({success: false, message: 'Formula is not whitelisted'});
+    const result = eval(formula);
+    return returnJson({success: true, result: result})
+  } catch(err) {
+    return returnJson({success: false, message: JSON.stringify(err)});
+  }
+}
+
+function returnJson(content) {
+  return ContentService.createTextOutput(JSON.stringify(content) ).setMimeType(ContentService.MimeType.JSON); 
+}
+
+// test the web app in the sidebar in the spreadsheet
+function testWebApp() {
+  const ui = SpreadsheetApp.getUi();
+  ui.showSidebar(doGet());
+}
+
+// Run tests in spreadsheet sidebar with the showTest functions below
 function showTestEBS() {
-  showTest(getEBSTests(), 'EBSTest');
+  showTest(getEBSTests());
 }
 
 function showTestEC2() {
-  showTest(getEC2Tests(), 'EC2Test');
+  showTest(getEC2Tests());
 }
 
 function showTestRDSFunction() {
-  showTest(getRDSFunctionTests(), 'RDSFunctionTest');
+  showTest(getRDSFunctionTests());
 }
 
 function showTestRDSStorageFunction() {
-  showTest(getRDSStorageTests(), 'RDSStorageTest');
+  showTest(getRDSStorageTests());
 }
 
 function showTestFunctions() {
-  showTest(getFunctionTests(), 'FunctionTest');
+  showTest(getFunctionTests());
+}
+
+function catchError(func) {
+  try {
+    return func();
+  } catch(err) {
+    return "❌ " + err;
+  }
+}
+
+// These functions will be called when you run the test suite in the sidebar/web app
+function EC2Test(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
+  return catchError(() => getEC2Tests()["EC2Test"][chapter][testIndex]);
+}
+
+function EBSTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
+  return catchError(() => getEBSTests()["EBSTest"][chapter][testIndex]);
+}
+
+function RDSFunctionTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
+  return catchError(() => getRDSFunctionTests()["RDSFunctionTest"][chapter][testIndex]);
+}
+
+function RDSStorageTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
+  return catchError(() => getRDSStorageTests()["RDSStorageTest"][chapter][testIndex]);
+}
+
+function FunctionTest(chapter, testIndex, baseHost) {
+  if(baseHost) cfg.baseHost = baseHost;
+  return catchError(() => getFunctionTests()["FunctionTest"][chapter][testIndex]);
 }
 
 function getEBSTests() {
@@ -25,7 +92,8 @@ function getEBSTests() {
   let s = [ // testing range
       ['region', 'us-east-1']
   ];
-  return {"EBS GP2": [
+  const tests = {
+    "EBS GP2": [
     t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB("400", "us-east-1"), 0.000001),
     t.areClose(400.0 * (0.10/730.0), () => EC2_EBS_GP2_GB("400", "us-east-2"), 0.000001),
     t.areClose(400.0 * (0.10/730.0), () => AWS_EBS("gp2","storage","400", "us-east-1"), 0.000001),
@@ -129,7 +197,7 @@ function getEBSTests() {
 
     t.willThrow(function() {
       return EC2_EBS_GP2_GB(undefined, "us-east-1")
-    }, "must specify parameter"),
+    }, "unable to parse volume units"),
 
     t.willThrow(function() {
       return EC2_EBS_GP2_GB("foo", "us-east-1")
@@ -145,14 +213,14 @@ function getEBSTests() {
 
     t.willThrow(function() {
       return AWS_EBS("gp2","storage", undefined, "us-east-1")
-    }, "must specify parameter"),
+    }, "unable to parse volume units"),
 
     t.willThrow(function() {
       return AWS_EBS("gp2","storage", "foo", "us-east-1")
     }, "unable to parse volume units"),
   ]};
+  return {"EBSTest": tests}// executes the tests in google apps script via EBSTest function
 }
-
 
 function getEC2Tests() {
   const t = new UnitTestingApp();
@@ -161,7 +229,7 @@ function getEC2Tests() {
     ["purchase_term", "ondemand"],
     ["operating_system", "linux"]
   ];
-  return {"EC2 on-demand": [
+  const tests =  {"EC2 on-demand": [
         t.areEqual(0.192, () => EC2_OD("m5.xlarge", "us-east-1", "linux")),
         t.areEqual(0.214, () => EC2_OD("m5.xlarge", "ca-central-1", "linux")),
         t.areEqual(0.192, () => EC2_LINUX_OD("m5.xlarge", "us-east-1")),
@@ -173,7 +241,7 @@ function getEC2Tests() {
         }, "Missing platform"),
         t.willThrow(function() {
             EC2_LINUX_OD("mX5.xlarge", "us-east-1")
-        }, "Can not find instance"),
+        }, "Unable to find the price. Make sure you have the correct region, purchase type and platform."),
 
         t.areEqual(0.192, () => AWS_EC2("ondemand", "m5.xlarge", "us-east-1", "linux")),
         t.areEqual(0.214, () => AWS_EC2("ondemand", "m5.xlarge", "ca-central-1", "linux")),
@@ -186,7 +254,7 @@ function getEC2Tests() {
         }, "Missing platform"),
         t.willThrow(function() {
           AWS_EC2("ondemand", "mX5.xlarge", "us-east-1", "linux")
-        }, "Can not find instance"),
+        }, "Unable to find the price. Make sure you have the correct region, purchase type and platform."),
 
     ],"EC2 Windows on-demand": [
         t.areEqual(0.376, () => EC2_WINDOWS_OD("m5.xlarge", "us-east-1")),
@@ -277,11 +345,12 @@ function getEC2Tests() {
           "operating_system": "linux"
         }, map2dArrayToObjectWithLowerCaseValues([["region", "us-east-1"], ["purchase_term", "ondemand"], ["operating_system", "linux"]]))
   ]};
+  return {"EC2Test": tests};
 }
 
 function getRDSFunctionTests() {
   const t = new UnitTestingApp();
-  return {"RDS func tests": [
+  const tests =  {"RDS func tests": [
     t.areEqual(0.58, () => RDS_AURORA_MYSQL_OD("db.r5.xlarge", "us-east-1")),
     t.areClose(0.38, () => RDS_AURORA_MYSQL_RI("db.r5.xlarge", "us-east-1", 1, "no_upfront"), 0.000001),
     // db.r5.xlarge no longer offered in partial upfront
@@ -362,7 +431,7 @@ function getRDSFunctionTests() {
         ['purchase_type', 'reserved'],
         ['purchase_term', '1'],
         ['payment_option', 'partial_upfront']
-    ], "db.r1.2xlarge"), "Unable to find RDS instance db.r1.2xlarge for DB engine aurora/mysql"),
+    ], "db.r1.2xlarge"), "Unable to find the price. Make sure you have the correct region, database engine and purchase type."),
 
     t.willThrow(
         () => RDS_AURORA_MYSQL([
@@ -376,11 +445,12 @@ function getRDSFunctionTests() {
     t.willThrow(() => AWS_RDS("aurora/mysql","db.r5.xlarge", "us-east-1", "reserved","2yr", "no_upfront"), "Only 1yr and 3yr purchase terms are supported for RDS RIs"),
   ]
   }
+  return {"RDSFunctionTest": tests};
 }
 
 function getRDSStorageTests() {
   const t = new UnitTestingApp();
-  return {"volume type tests": [
+  const tests = {"volume type tests": [
       t.areClose(4000 * (0.11/730), () => RDS_STORAGE_GB("aurora", 4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("gp2", 4000, "us-west-1"), 0.000001),
       t.areClose(4000 * (0.138/730), () => RDS_STORAGE_GB("piops", 4000, "us-west-1"), 0.000001),
@@ -419,7 +489,7 @@ function getRDSStorageTests() {
 
       t.willThrow(() =>
           AWS_RDS_STORAGE("gp2",undefined, "us-east-1"),
-          "must specify a parameter"),
+          "Must specify storage size"),
 
       t.willThrow(() =>
           RDS_STORAGE_GP2_GB("foo", "us-east-1"),
@@ -431,22 +501,23 @@ function getRDSStorageTests() {
           RDS_STORAGE_GB(['region', 'us-east-1'], 400, "gp2"),
           "invalid storage type")
       ]}
+  return { "RDSStorageTest": tests};
 }
 
 function getFunctionTests() {
   const t = new UnitTestingApp();
-  return {"Function tests": [
-    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]},"2023-01-01T00:00:00.000Z"]}, () => getObjectWithValuesToLowerCase(
+  const tests = {"Function tests": [
+    t.areDeepEqual({"a":["a","b",{"c":"cccee","d":["d","ee"]}]}, () => getObjectWithValuesToLowerCase(
       { a: 
         [
           'A', 
           'b', 
           { c: 'CCCee', 
-            d: ['D', 'EE'] }, 
-          new Date(2023,0,1)
+            d: ['D', 'EE'] }
         ] 
     })),
   ]}
+  return {"FunctionTest": tests};
 }
 
 function linuxRi(region, offeringClass, term, paymentOption) {
@@ -464,30 +535,111 @@ function paramsToSettings(region, platform, purchaseType, offeringClass, term, p
   ]
 }
 
-function EC2Test(chapter, testIndex) {
-  return getEC2Tests()[chapter][testIndex];
-}
-
-function EBSTest(chapter, testIndex) {
-  return getEBSTests()[chapter][testIndex];
-}
-
-function RDSFunctionTest(chapter, testIndex) {
-  return getRDSFunctionTests()[chapter][testIndex];
-}
-
-function RDSStorageTest(chapter, testIndex) {
-  return getRDSStorageTests()[chapter][testIndex];
-}
-
-function FunctionTest(chapter, testIndex) {
-  return getFunctionTests()[chapter][testIndex];
-}
-
 function showTest(tests, callback) {
   const ui = SpreadsheetApp.getUi();
   const template = HtmlService.createTemplateFromFile('src/test/TestSuite.html');
   template.tests = tests;
   template.callback = callback;
   ui.showSidebar(template.evaluate());
+}
+
+function getWhitelistedFormulas() {
+  return ['EC2_EBS_IO2_GB',
+  'EC2_EBS_IO1_GB',
+  'EC2_EBS_SC1_GB',
+  'EC2_EBS_ST1_GB',
+  'EC2_EBS_GP3_GB',
+  'EC2_EBS_GP2_GB',
+  'EC2_EBS_MAGNETIC_GB',
+  'EC2_WINDOWS_MSSQL_STD_RI_ALL',
+  'EC2_WINDOWS_MSSQL_STD_RI_PARTIAL',
+  'EC2_WINDOWS_MSSQL_STD_RI_NO',
+  'EC2_WINDOWS_MSSQL_CONV_RI_ALL',
+  'EC2_WINDOWS_MSSQL_CONV_RI_PARTIAL',
+  'EC2_WINDOWS_MSSQL_CONV_RI_NO',
+  'EC2_LINUX_MSSQL_STD_RI_ALL',
+  'EC2_LINUX_MSSQL_STD_RI_PARTIAL',
+  'EC2_LINUX_MSSQL_STD_RI_NO',
+  'EC2_LINUX_MSSQL_CONV_RI_ALL',
+  'EC2_LINUX_MSSQL_CONV_RI_PARTIAL',
+  'EC2_LINUX_MSSQL_CONV_RI_NO',
+  'EC2_WINDOWS_STD_RI_ALL',
+  'EC2_WINDOWS_STD_RI_PARTIAL',
+  'EC2_WINDOWS_STD_RI_NO',
+  'EC2_WINDOWS_CONV_RI_ALL',
+  'EC2_WINDOWS_CONV_RI_PARTIAL',
+  'EC2_WINDOWS_CONV_RI_NO',
+  'EC2_SUSE_STD_RI_ALL',
+  'EC2_SUSE_STD_RI_PARTIAL',
+  'EC2_SUSE_STD_RI_NO',
+  'EC2_SUSE_CONV_RI_ALL',
+  'EC2_SUSE_CONV_RI_PARTIAL',
+  'EC2_SUSE_CONV_RI_NO',
+  'EC2_RHEL_STD_RI_ALL',
+  'EC2_RHEL_STD_RI_PARTIAL',
+  'EC2_RHEL_STD_RI_NO',
+  'EC2_RHEL_CONV_RI_ALL',
+  'EC2_RHEL_CONV_RI_PARTIAL',
+  'EC2_RHEL_CONV_RI_NO',
+  'EC2_LINUX_STD_RI_ALL',
+  'EC2_LINUX_STD_RI_PARTIAL',
+  'EC2_LINUX_STD_RI_NO',
+  'EC2_LINUX_CONV_RI_ALL',
+  'EC2_LINUX_CONV_RI_PARTIAL',
+  'EC2_LINUX_CONV_RI_NO',
+  'RDS_MARIADB_RI_ALL',
+  'RDS_MARIADB_RI_PARTIAL',
+  'RDS_MARIADB_RI_NO',
+  'RDS_MARIADB_RI',
+  'RDS_MARIADB_OD',
+  'RDS_MARIADB',
+  'RDS_POSTGRESQL_RI_ALL',
+  'RDS_POSTGRESQL_RI_PARTIAL',
+  'RDS_POSTGRESQL_RI_NO',
+  'RDS_POSTGRESQL_RI',
+  'RDS_POSTGRESQL_OD',
+  'RDS_POSTGRESQL',
+  'RDS_MYSQL_RI_ALL',
+  'RDS_MYSQL_RI_PARTIAL',
+  'RDS_MYSQL_RI_NO',
+  'RDS_MYSQL_RI',
+  'RDS_MYSQL_OD',
+  'RDS_MYSQL',
+  'RDS_AURORA_POSTGRESQL_RI_ALL',
+  'RDS_AURORA_POSTGRESQL_RI_PARTIAL',
+  'RDS_AURORA_POSTGRESQL_RI_NO',
+  'RDS_AURORA_POSTGRESQL_RI',
+  'RDS_AURORA_POSTGRESQL_OD',
+  'RDS_AURORA_POSTGRESQL',
+  'RDS_AURORA_MYSQL_RI_ALL',
+  'RDS_AURORA_MYSQL_RI_PARTIAL',
+  'RDS_AURORA_MYSQL_RI_NO',
+  'RDS_AURORA_MYSQL_RI',
+  'RDS_AURORA_MYSQL_OD',
+  'RDS_AURORA_MYSQL',
+  'RDS_STORAGE_MAGNETIC_GB',
+  'RDS_STORAGE_PIOPS_GB',
+  'RDS_STORAGE_GP2_GB',
+  'RDS_STORAGE_AURORA_GB',
+  'EC2_EBS_GP3_IOPS',
+  'EC2_EBS_IO2_IOPS',
+  'EC2_EBS_IO1_IOPS',
+  'EC2_EBS_SNAPSHOT_GB',
+  'EC2_EBS_GB',
+  'EC2_RI',
+  'EC2_OD',
+  'EC2',
+  'EC2_WINDOWS_OD',
+  'EC2_SUSE_OD',
+  'EC2_RHEL_OD',
+  'EC2_WINDOWS_MSSQL_OD',
+  'EC2_LINUX_MSSQL_OD',
+  'EC2_LINUX_OD',
+  'RDS_STORAGE_FROM_SETTINGS',
+  'RDS_STORAGE_GB',
+  'RDS_FROM_SETTINGS',
+  'AWS_RDS_STORAGE',
+  'AWS_RDS',
+  'AWS_EBS',
+  'AWS_EC2']
 }

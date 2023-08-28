@@ -117,7 +117,7 @@ def gen_ebs(func_dir)
       // EBS #{vol_type_up} storage
       function EC2_EBS_#{vol_type_up}_GB(settingsOrSize, sizeOrRegion, region) {
         return analyticsWrapper(arguments, () => {
-          if(typeof settingsOrSize === "string" || typeof settingsOrSize === "number")
+          if(!Array.isArray(settingsOrSize))
             return fetchApiEBS({
               volumeType: "#{vol_type}", 
               volumeSize: settingsOrSize, 

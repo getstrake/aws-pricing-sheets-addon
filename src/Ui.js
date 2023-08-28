@@ -37,19 +37,187 @@ function showFormulaBuilder() {
   
   const ui = SpreadsheetApp.getUi();
   const template = HtmlService.createTemplateFromFile('formula_builder.html');
+  template.delimiter = cfg.delimiter;
   const html = template.evaluate();
   html.setTitle('AWS Pricing Formula Builder');
   ui.showSidebar(html);
 }
 
-function insertFormula(formula) {
-  if(!formula) throw "Should send formula as argument"
+function insertFormula(formula, args, argumentNames) {
+  if(!formula) throw "Should send formula as argument";
+  if(args.join("").includes(cfg.delimiter))
+    return insertFormulaWithCompare(formula, args, argumentNames);
   const activeSheet = SpreadsheetApp.getActiveSheet();
   const activeRange = activeSheet.getActiveRange();
   const cell = activeSheet.getRange(activeRange.getRow(),activeRange.getColumn())
   const cellName = cell.getA1Notation();
   cell.setValue('=' + formula);
   SpreadsheetApp.getActiveSpreadsheet().toast(`Formula is inserted into cell ${cellName}. To undo this, click on the sheet and press Ctrl+Z`)
+}
+
+function insertFormulaWithCompare(formula, args, argumentNames) {
+  const functionName = formula.match(/[^(]+/)[0];
+  const newSheetName = createNewSheetName(cfg.baseNameForCompareResults);
+  const compareSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(newSheetName);
+
+  const showOnlyColumnsWithComparedValues = false; 
+  // When set to false, every parameter of the formula will be displayed in a separate column.
+  // You can later change this to true to only show columns that contain compared values.
+  // In this case, the remaining parameters will be hardcoded in the formula, appearing only in the last column labeled 'Price'.
+  // For instance: AWS_RDS_STORAGE(A2, 4000, "us-east-1") where A2 refers to column A with compared values and "us-east-1" is hardcoded
+
+  const values = prepareValues(functionName, args, argumentNames, showOnlyColumnsWithComparedValues);
+  SpreadsheetApp.getActiveSpreadsheet().toast(`Please wait while "${newSheetName}" is being populated. This may take a few seconds. It will contain ${values.length - 1} formulas.`);
+  
+  compareSheet.clear();
+  compareSheet.getRange(1, 1, values.length, values[0].length).setValues(values);
+  
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  spreadsheet.setActiveSheet(compareSheet);
+  resizeColumnsAndStylizeSheet(compareSheet);
+}
+
+function resizeColumnsAndStylizeSheet(sheet) {
+  const firstRow = sheet.getRange('1:1');
+  autoResizeColumnsWithPadding();
+  sheet.setFrozenRows(1);
+  firstRow.setFontWeight('bold');
+}
+
+// generates a new sheet name: baseName, then baseName-1, then baseName-2, etc.
+function createNewSheetName(baseName) {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = spreadsheet.getSheets();
+  const sheetNames = sheets.map(x => x.getName());
+
+  let count = 1;
+  let newSheetName = baseName;
+  while (sheetNames.includes(newSheetName)) {
+    newSheetName = `${baseName}-${count}`;
+    count++;
+  }
+
+  return newSheetName;
+}
+
+function getHeadersAndIndicesFromFormulaArguments(args, argumentNames, showOnlyColumnsWithComparedValues = false) {
+  let headers = [], indices = [], argumentNamesThatHaveCompareInIt = [];
+  for(const [index, arg] of args.entries()) {
+    if(showOnlyColumnsWithComparedValues) {
+      if(typeof arg === "string" && arg.includes(cfg.delimiter)) {
+        indices.push(index);
+        headers.push(arg.split(cfg.delimiter));
+        argumentNamesThatHaveCompareInIt.push(argumentNames[index]);
+      } 
+    } else { // show all columns
+      indices.push(index);
+      if(typeof arg === "string" && arg.includes(cfg.delimiter)) {
+        headers.push(arg.split(cfg.delimiter));
+        argumentNamesThatHaveCompareInIt.push(argumentNames[index]);
+      } else {
+        headers.push([arg]);
+      }
+    }
+  }
+  return {headers, indices, argumentNamesThatHaveCompareInIt};
+}
+
+function prepareValues(functionName, args, argumentNames, showOnlyColumnsWithComparedValues) {
+  const {headers, indices, argumentNamesThatHaveCompareInIt} = getHeadersAndIndicesFromFormulaArguments(args, argumentNames, showOnlyColumnsWithComparedValues);
+  if(headers.length < 1) {
+    throw new Error("At least one header must be present");
+  }
+  
+  const header = headers.map((_, i) => argumentNames[indices[i]]).concat("price");
+  const values = [header];
+  const combinations = cartesianProduct(headers);
+  let row = [];
+  
+  combinations.forEach(combination => {
+    const rowHasEC2OnDemand = functionName === "AWS_EC2" &&
+                              argumentNames.includes("purchaseType") &&
+                              combination[argumentNamesThatHaveCompareInIt.indexOf("purchaseType")] === "ondemand";
+
+    const rowHasRDSOnDemand = functionName === "AWS_RDS" &&
+                              argumentNames.includes("purchaseType") &&
+                              combination[argumentNamesThatHaveCompareInIt.indexOf("purchaseType")] === "ondemand";
+
+    const slicedArgs = (rowHasEC2OnDemand || rowHasRDSOnDemand) ? args.slice(0,4) : args;
+    const formula = `=${functionName}(${replaceCellReference(slicedArgs, values.length + 1, indices).join(",")})`;
+                      
+    if(rowHasEC2OnDemand || rowHasRDSOnDemand) {
+      // Special case: on-demand vs reserved instances
+      // Fill unnecessary arguments with "-"
+
+      if(rowHasEC2OnDemand) {
+        const EC2_RESERVED_INSTANCE_ARGS = ["offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"];
+        row = [...combination, formula].map((value, index) => 
+          EC2_RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
+        )
+      } else if(rowHasRDSOnDemand) {
+        const RDS_RESERVED_INSTANCE_ARGS = ["purchaseTerm", "paymentOption"];
+        row = [...combination, formula].map((value, index) => 
+          RDS_RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
+        )
+      }
+      duplicateRow = isDuplicateRowExceptLastColumn(values, row);
+      if(duplicateRow) {
+        return; // skip this row
+      }
+    } else {
+      row = [...combination, formula];
+    }
+
+    values.push(row);
+  });
+  return values;
+}
+
+// because last cell has a formula with a cell reference in it, we can't compare it
+function isDuplicateRowExceptLastColumn(values, row) {
+  concatRowWithoutLastCell = cells => cells.slice(0,-1).join("");
+  const flatRows = values.map(concatRowWithoutLastCell);
+  return flatRows.includes(concatRowWithoutLastCell(row)); 
+}
+
+function replaceCellReference(args, row, indices) {
+  return args.map((value, index) => {
+    const columnIndex = indices.indexOf(index);
+    return columnIndex !== -1 ?
+      indexToColumnLetter(columnIndex) + row :
+      `"${value}"`;
+  })
+}
+
+function indexToColumnLetter(n) {
+  var ordA = 'a'.charCodeAt(0);
+  var ordZ = 'z'.charCodeAt(0);
+  var len = ordZ - ordA + 1;
+
+  var s = "";
+  while(n >= 0) {
+      s = String.fromCharCode(n % len + ordA) + s;
+      n = Math.floor(n / len) - 1;
+  }
+  return s;
+}
+
+// Helper function to generate cartesian product of input arrays
+function cartesianProduct(arrays) {
+  return arrays.reduce((a, b) =>
+    a.map(x => b.map(y => [...x, y])).reduce((a, b) => a.concat(b), []), [[]]
+  );
+}
+
+function autoResizeColumnsWithPadding() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastColumn = sheet.getLastColumn();
+  sheet.autoResizeColumns(1, sheet.getLastColumn());
+
+  for (var i = 1; i <= lastColumn; i++) {
+    var columnWidth = sheet.getColumnWidth(i);
+    sheet.setColumnWidth(i, columnWidth + 10);
+  }
 }
 
 function onboarding() {

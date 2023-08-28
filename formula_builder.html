@@ -8,9 +8,14 @@
   <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
 
   <style>
+    html {
+      font-size: 15px;
+    }
+
     .App {
       width:285px;
       font-family: arial, sans-serif;
+      padding-bottom: 80px; /* footer is overlay and fixed */
     }
 
     .logolinks {
@@ -69,7 +74,7 @@
       background-color: #4CAF50;
       color: white;
     }
-    tr:hover {
+    table.hoverable tr:hover {
       background-color: #f5f5f5;
     }
     td:first-child {
@@ -85,7 +90,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       padding: 8px;
-      font-size: 16px;
+      font-size: 1rem;
       font-family: Arial, sans-serif;
       color: #555;
       background-color: #fff;
@@ -99,7 +104,7 @@
     }
     option {
       max-width: 150px;
-      font-size: 16px;
+      font-size: 1rem;
       font-family: Arial, sans-serif;
       color: #555;
       background-color: #fff;
@@ -110,7 +115,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       padding: 8px;
-      font-size: 16px;
+      font-size: 1rem;
       font-family: Arial, sans-serif;
       color: #555;
       background-color: #fff;
@@ -127,7 +132,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       padding: 8px;
-      font-size: 16px;
+      font-size: 1rem;
       font-family: Arial, sans-serif;
       color: #555;
       background-color: #fff;
@@ -141,7 +146,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       padding: 8px;
-      font-size: 16px;
+      font-size: 1rem;
       font-family: Arial, sans-serif;
       color: #555;
       background-color: #fff;
@@ -153,19 +158,36 @@
     }
 
     button {
-      display: block;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 4px;
       padding: 8px;
-      font-size: 16px;
+      font-size: 1rem;
       font-family: Arial, sans-serif;
-      color: #ffffff;
-      background-color: #372753;
       cursor: pointer;
-      width: 100%;
       transition: background-color 0.3s ease;
     }
+
+    button.halfWidth {
+      display: inline-block;
+      width: 50%;
+    }
+    button.fullWidth {
+      display: block;
+      width: 100%;
+    }
+
+    button.purple {
+      color: #ffffff;
+      background-color: #372753;
+    }
+    button.border {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button.active {
+      background-color: #372753;
+      color: #e7def4;
+    }
+
     button:focus {
       outline: none;
     }
@@ -174,9 +196,13 @@
       color: #e7def4;
     }
 
+    .tabs {
+      margin-bottom: 4px;
+    }
+
     .header {
       font-family: Arial, sans-serif;
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: bold;
       color: #555;
       background-color: #fff;
@@ -199,17 +225,164 @@
       z-index:10;
     }
 
+    td:nth-child(1) {
+      width: 100px;
+    }
+
+    td:nth-child(2) {
+      width: 300px;
+    }
+
+    .dropdown-check-list {
+      display: inline-block;
+    }
+
+    .dropdown-check-list .anchor {
+      position: relative;
+      cursor: pointer;
+      max-width: 170px;
+      display: inline-block;
+      padding: 5px 50px 5px 10px;
+      border: 1px solid #ccc;
+      /* max-width: 120px; */
+      /* Allows the text to break onto the next line */
+      white-space: normal;  
+      /* Break the word if it's too long */
+      overflow-wrap: break-word;  
+      /* Padding to ensure the text doesn't overlap with the dropdown symbol */
+      padding-right: 30px;  
+      /* To include padding and border in element's total width and height */
+      box-sizing: border-box;  
+    }
+
+    .dropdown-check-list .anchor:after {
+      position: absolute;
+      content: "";
+      border-left: 2px solid #666666;
+      border-top: 2px solid #666666;
+      padding: 5px;
+      /* Adjust this if needed to match the new padding on the right of .anchor */
+      right: 10px;  
+      top: 20%;
+      -moz-transform: rotate(-135deg);
+      -ms-transform: rotate(-135deg);
+      -o-transform: rotate(-135deg);
+      -webkit-transform: rotate(-135deg);
+      transform: rotate(-135deg);
+    }
+
+    .dropdown-check-list .anchor:active:after {
+      right: 8px;
+      top: 21%;
+    }
+
+    .dropdown-check-list ul.items {
+      padding: 5px;
+      margin: 0;
+      border: 1px solid #ccc;
+      border-top: none;
+      max-height: 220px; /* Adjust this value according to your needs */
+      overflow: auto;
+    }
+
+    .dropdown-check-list ul.items label {
+      cursor: pointer;
+    }
+
+    .dropdown-check-list ul.items li {
+      list-style: none;
+    }
+
+    .dropdown-check-list.visible .anchor {
+      color: #0094ff;
+    }
+
+    span.anchor {
+      display: inline-block;
+      min-height: 1.9em;
+    }
+
+    .dropdown-check-list.visible .items {
+      display: block;
+    }
+
+    .dropdown-check-list .search {
+      width: 150px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .reset {
+      width: 20px;
+      cursor: pointer;
+      transition: width 0.3s ease;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .reset:hover {
+      color: red;
+    }
+
+    .dropdown-button-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-button-container .message {
+      margin-left: 10px;
+    }
+
+    .unselect-all {
+      cursor: pointer;
+      font-variant: all-petite-caps;
+    }
+    .unselect-all:hover {
+      color: red;
+    }
+
   </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
+    const cfg = {
+      delimiter: '<?= delimiter ?>', // for comparing multiple variables in formula
+    }
+
+    const DropdownContext = React.createContext();
+    const DropdownProvider = ({ children }) => {
+      const [openDropdown, setOpenDropdown] = React.useState(null);
+
+      const handleOpenDropdown = (id) => setOpenDropdown(id);
+      const handleCloseDropdown = () => setOpenDropdown(null);
+
+      return (
+        <DropdownContext.Provider value={{ openDropdown, handleOpenDropdown, handleCloseDropdown }}>
+          {children}
+        </DropdownContext.Provider>
+      );
+    };
+
+
+
     function App() {
       const textareaRef = React.useRef(null);
-      const [formula, setFormula] = React.useState('!');
+      const [formula, setFormula] = React.useState('');
       const [args, setArgs] = React.useState([]);
       const [service, setService] = React.useState('ec2');
       const tooltipRef = React.useRef(null);
+      const [comparisonEnabled, setComparisonEnabled] = React.useState(false);
+      const [showService, setShowService] = React.useState(true);
+      const [processing, setProcessing] = React.useState(false);
+
+      const resetFormula = () => {
+        // reloading the service component will show default values
+        setShowService(false);
+        setTimeout(() => {
+          setShowService(true);
+        }, 0);
+      };
 
       React.useEffect(() => {
         const textarea = textareaRef.current;
@@ -217,12 +390,33 @@
       }, [formula]);
 
       function insertFormula() {
-        // console.log(`google.script.run.insertFormula(${args.join(', ')})`);
         console.log('formula ' + formula);
-        google.script.run.insertFormula(formula);
+        if(args.includes("")) {
+          alert("Please select all arguments");
+          return;
+        }
+        console.log('args ' + args.join(', '));
+        const argumentsPerComponent = {
+          ec2: ["purchaseType", "instanceType", "region", "platform", "offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"],
+          ebs: ["volumeType", "storageType", "volumeSize", "region"],
+          rds: ["dbEngine", "instanceType", "region", "purchaseType", "purchaseTerm", "paymentOption"],
+          rdsStorage: ["storageType", "storageSize", "region"]
+        }
+        const argumentNames = argumentsPerComponent[service];
+        setProcessing(true);
+        google.script.run.withSuccessHandler(success).withFailureHandler(failure).insertFormula(formula, args, argumentNames);
+      }
+
+      function success(error) {
+        console.error(error);
+        setProcessing(false);
+      }
+
+      function failure() {
+        setProcessing(false);
       }
     
-      function renderServiceComponent(service, setFormula, setArgs) {
+      function renderServiceComponent(service, setFormula, setArgs, comparisonEnabled) {
         const serviceComponents = {
           ec2: EC2,
           ebs: EBS,
@@ -230,7 +424,7 @@
           rdsStorage: RDSStorage
         };
         const ServiceComponent = serviceComponents[service];
-        return ServiceComponent ? <ServiceComponent setFormula={setFormula} setArgs={setArgs} /> : null;
+        return ServiceComponent ? <ServiceComponent setFormula={setFormula} setArgs={setArgs} comparisonEnabled={comparisonEnabled} resetFormula={resetFormula}/> : null;
       }
       
       function showTooltip(evt, text) {
@@ -246,12 +440,32 @@
         tooltip.style.display = "none";
       }
 
+      function displayFormula(text) {
+        const escapeSpecialRegexChars = (x) => {
+          return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        };
+
+        const delimiter = escapeSpecialRegexChars(cfg.delimiter);
+        const pattern = new RegExp(`"[^"]+?${delimiter}[^"]+?"`, 'g'); // any argument with multiple options divided by the delimiter
+        const replacement = '"compare"';
+
+        return text.replace(pattern, replacement);
+      }
+
+      function showFormulaTab() {
+        setComparisonEnabled(false);
+      }
+
+      function showCompareFormulaTab() {
+        setComparisonEnabled(true);
+      }
 
         return (
           <div className="App">
             <div ref={tooltipRef} id="tooltip" style={{ display: "none" }}></div>
-            <div className="header">
-              AWS Pricing Formula Builder
+            <div className="tabs">
+              <button onClick={showFormulaTab} className={"halfWidth tab" + (!comparisonEnabled && " active")}>Formula</button>
+              <button onClick={showCompareFormulaTab} className={"halfWidth tab" + (comparisonEnabled && " active")}>Compare</button>
             </div>
             <div className="header">
               <table>
@@ -265,12 +479,17 @@
                       <option value="rdsStorage">RDS storage</option>
                     </select>
                 </td>
+                  <td>
+                    <span className="reset" onClick={resetFormula}>RESET</span>
+                  </td>
                 </tr>
               </table>
             </div>
-            <textarea ref={textareaRef} value={formula} onChange={event => setFormula(event.target.value)}></textarea>
-            <button onClick={insertFormula}>Insert Formula in active cell</button>
-            {renderServiceComponent(service, setFormula, setArgs)}
+            <textarea disabled ref={textareaRef} value={displayFormula(formula)} onChange={event => setFormula(event.target.value)}></textarea>
+            <button className="fullWidth border purple" onClick={insertFormula}>
+              {processing ? 'Processing...' : (comparisonEnabled && args.join("").indexOf(cfg.delimiter) > -1 ? `Insert formula's in new sheet` : 'Insert Formula in active cell')}
+            </button>
+            {showService && renderServiceComponent(service, setFormula, setArgs, comparisonEnabled, resetFormula)}
 
             <div className="sidebar bottom">
               <span className="gray logolinks">
@@ -316,7 +535,187 @@
         )
     }
   
-  function EC2({setFormula, setArgs}) {
+  function SelectInput({options, value, disabled, onChange}) {
+    const displayValue = value.includes(cfg.delimiter) ? "compare" : value;
+    const updatedOptions = value === "" ? [""].concat(options) : options;
+    
+    return (
+        <select disabled={disabled} value={displayValue} onChange={onChange}>
+            {updatedOptions.map(x => <option value={x}>{x || "Please select"}</option>)}
+        </select>
+    );
+  }
+
+  function SelectInputWithMultipleOptions({ options, value, disabled, setter }) {
+    const [searchTerm, setSearchTerm] = React.useState("");
+    const [id, setId] = React.useState(null);
+    const dropdownRef = React.useRef(null);
+    const ulRef = React.useRef(null);
+
+    const { openDropdown, handleOpenDropdown, handleCloseDropdown } = React.useContext(DropdownContext);
+
+    const isDropdownVisible = openDropdown === id;
+
+    const toggleDropdown = (e) => {
+      if (isDropdownVisible) {
+        handleCloseDropdown();
+      } else {
+        handleOpenDropdown(id);
+      }
+    };
+
+    React.useEffect(() => {
+      setId(Math.random());
+    }, []);
+
+    React.useEffect(() => {
+      if (isDropdownVisible) {
+        if(ulRef.current) {
+          scrollToFirstSelectedItemWithinDropmenu();
+        
+        if(dropdownRef.current) {
+          scrollDropdownIntoView();
+        }
+      }
+      }
+    }, [isDropdownVisible]);
+
+    function scrollToFirstSelectedItemWithinDropmenu() {
+      const firstSelectedCheckbox = ulRef.current.querySelector(
+          'input[type="checkbox"]:checked'
+        );
+        if (firstSelectedCheckbox) {
+          firstSelectedCheckbox.scrollIntoView({
+            block: 'center',
+            behavior: 'auto'
+          });
+          window.scrollTo({ // make sure the document itself is not scrolled down
+            top: 0,
+            behavior: "auto"
+          });
+        }
+    }
+
+    function scrollDropdownIntoView() {
+      const dropdownBottom = dropdownRef.current.getBoundingClientRect().bottom;
+      const windowHeight = window.innerHeight;
+      const footerHeight = 50;
+      const dropdownMargin = 50;
+
+      if (dropdownBottom > windowHeight - footerHeight - dropdownMargin) {
+        window.scrollTo({
+          top: dropdownMargin + footerHeight + window.pageYOffset + (dropdownBottom - windowHeight),
+          behavior: "smooth"
+        });
+      }
+    }
+
+    const unselectAll = (e) => {
+      e.target.checked = false;
+      setter("");
+    }
+
+    const handleCheckboxChange = () => {
+      const concatenatedValue = getCheckedOptionNames().join(cfg.delimiter);
+      setter(concatenatedValue);
+    };
+
+    const displayValue = v => v.split(cfg.delimiter).slice(0, 2).join(cfg.delimiter) + (v.split(cfg.delimiter).length > 2 ? cfg.delimiter + '...' : '');
+
+    const filteredOptions = options.filter(option => 
+      option.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0
+    );
+
+    const getCheckedOptionNames = () => {
+      const checkboxes = [...document.querySelectorAll('.items input[type="checkbox"]')];
+      const checkedBoxes = checkboxes.filter(box => box.checked);
+      // Get the labels of the checked boxes
+      return checkedBoxes.map(box => box.parentNode.textContent);
+    };
+
+    if(disabled) {
+      return <SelectInput options={options} value={value} disabled={disabled} onChange={setter} />
+    }
+
+    return (
+      <div className="dropdown-check-list" tabIndex="100" ref={dropdownRef}>
+        <div className="dropdown-button-container">
+          <span className="anchor" onClick={toggleDropdown}>
+            {displayValue(value)}
+          </span>
+          {value === "" && <span className="message">please select</span>}
+        </div>
+        {isDropdownVisible && (
+          <div>
+            
+            {options.length > 10 && <input
+              type="text"
+              className="search"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />}
+            {options.length > 10 && value !== "" && (<ul className="items"><li>
+                  <label className="unselect-all">
+                    <input
+                      type="checkbox"
+                      onChange={unselectAll}
+                    />
+                    Unselect all
+                  </label>
+              </li>
+              </ul>)}
+            <ul className="items" ref={ulRef}>
+            {(options.length > 10 ? filteredOptions : options).map((option) => (
+              <li key={option}>
+                <label>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleCheckboxChange(e, option)}
+                    checked={value.split(cfg.delimiter).includes(option)}
+                  />
+                  {option}
+                </label>
+              </li>
+            ))}
+          </ul>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const SelectInputWithComparePossibility = ({ comparisonEnabled, options, value, setter, disabled }) => {
+
+    React.useEffect(() => {
+      if(!comparisonEnabled) {
+        // when you switch from comparison to non-comparison mode, remove the comparison part
+        setter(value.split(cfg.delimiter)[0]);
+      }
+    },[comparisonEnabled])
+
+    if (comparisonEnabled) {
+      return (
+        <SelectInputWithMultipleOptions
+          options={options}
+          value={value}
+          setter={setter}
+          disabled={disabled}
+        />
+      );
+    } else {
+      return (
+        <SelectInput
+          options={options}
+          value={value}
+          onChange={e => setter(e.target.value)}
+          disabled={disabled}
+        />
+      );
+    }
+  }
+
+  function EC2({setFormula, setArgs, comparisonEnabled}) {
       const [purchaseType, setPurchaseType] = React.useState('ondemand');
       const [instanceType, setInstanceType] = React.useState('m5.xlarge');
       const [region, setRegion] = React.useState('us-east-1');
@@ -327,11 +726,13 @@
       const [sqlLicense, setSQLLicense] = React.useState('std');
       const [baseFormula, setBaseFormula] = React.useState('EC2');
 
+      const purchaseTypes = ["ondemand", "reserved"];
+
       const instanceTypes = ["a1.2xlarge","a1.4xlarge","a1.large","a1.medium","a1.xlarge","c1.medium","c1.xlarge","c3.2xlarge","c3.4xlarge","c3.8xlarge","c3.large","c3.xlarge","c4.2xlarge","c4.4xlarge","c4.8xlarge","c4.large","c4.xlarge","c5.12xlarge","c5.18xlarge","c5.24xlarge","c5.2xlarge","c5.4xlarge","c5.9xlarge","c5.large","c5.xlarge","c5a.12xlarge","c5a.16xlarge","c5a.24xlarge","c5a.2xlarge","c5a.4xlarge","c5a.8xlarge","c5a.large","c5a.xlarge","c5ad.12xlarge","c5ad.16xlarge","c5ad.24xlarge","c5ad.2xlarge","c5ad.4xlarge","c5ad.8xlarge","c5ad.large","c5ad.xlarge","c5d.12xlarge","c5d.18xlarge","c5d.24xlarge","c5d.2xlarge","c5d.4xlarge","c5d.9xlarge","c5d.large","c5d.xlarge","c5n.18xlarge","c5n.2xlarge","c5n.4xlarge","c5n.9xlarge","c5n.large","c5n.xlarge","c6a.12xlarge","c6a.16xlarge","c6a.24xlarge","c6a.2xlarge","c6a.32xlarge","c6a.48xlarge","c6a.4xlarge","c6a.8xlarge","c6a.large","c6a.xlarge","c6g.12xlarge","c6g.16xlarge","c6g.2xlarge","c6g.4xlarge","c6g.8xlarge","c6g.large","c6g.medium","c6g.xlarge","c6gd.12xlarge","c6gd.16xlarge","c6gd.2xlarge","c6gd.4xlarge","c6gd.8xlarge","c6gd.large","c6gd.medium","c6gd.xlarge","c6gn.12xlarge","c6gn.16xlarge","c6gn.2xlarge","c6gn.4xlarge","c6gn.8xlarge","c6gn.large","c6gn.medium","c6gn.xlarge","c6i.12xlarge","c6i.16xlarge","c6i.24xlarge","c6i.2xlarge","c6i.32xlarge","c6i.4xlarge","c6i.8xlarge","c6i.large","c6i.xlarge","c6id.12xlarge","c6id.16xlarge","c6id.24xlarge","c6id.2xlarge","c6id.32xlarge","c6id.4xlarge","c6id.8xlarge","c6id.large","c6id.xlarge","c6in.12xlarge","c6in.16xlarge","c6in.24xlarge","c6in.2xlarge","c6in.32xlarge","c6in.4xlarge","c6in.8xlarge","c6in.large","c6in.xlarge","c7g.12xlarge","c7g.16xlarge","c7g.2xlarge","c7g.4xlarge","c7g.8xlarge","c7g.large","c7g.medium","c7g.xlarge","cc2.8xlarge","cr1.8xlarge","d2.2xlarge","d2.4xlarge","d2.8xlarge","d2.xlarge","d3.2xlarge","d3.4xlarge","d3.8xlarge","d3.xlarge","d3en.12xlarge","d3en.2xlarge","d3en.4xlarge","d3en.6xlarge","d3en.8xlarge","d3en.xlarge","dl1.24xlarge","f1.16xlarge","f1.2xlarge","f1.4xlarge","g2.2xlarge","g2.8xlarge","g3.16xlarge","g3.4xlarge","g3.8xlarge","g3s.xlarge","g4ad.16xlarge","g4ad.2xlarge","g4ad.4xlarge","g4ad.8xlarge","g4ad.xlarge","g4dn.12xlarge","g4dn.16xlarge","g4dn.2xlarge","g4dn.4xlarge","g4dn.8xlarge","g4dn.xlarge","g5.12xlarge","g5.16xlarge","g5.24xlarge","g5.2xlarge","g5.48xlarge","g5.4xlarge","g5.8xlarge","g5.xlarge","g5g.16xlarge","g5g.2xlarge","g5g.4xlarge","g5g.8xlarge","g5g.xlarge","h1.16xlarge","h1.2xlarge","h1.4xlarge","h1.8xlarge","hpc6a.48xlarge","hpc6id.32xlarge","hs1.8xlarge","i2.2xlarge","i2.4xlarge","i2.8xlarge","i2.xlarge","i3.16xlarge","i3.2xlarge","i3.4xlarge","i3.8xlarge","i3.large","i3.xlarge","i3en.12xlarge","i3en.24xlarge","i3en.2xlarge","i3en.3xlarge","i3en.6xlarge","i3en.large","i3en.xlarge","i4i.16xlarge","i4i.2xlarge","i4i.32xlarge","i4i.4xlarge","i4i.8xlarge","i4i.large","i4i.xlarge","im4gn.16xlarge","im4gn.2xlarge","im4gn.4xlarge","im4gn.8xlarge","im4gn.large","im4gn.xlarge","inf1.24xlarge","inf1.2xlarge","inf1.6xlarge","inf1.xlarge","is4gen.2xlarge","is4gen.4xlarge","is4gen.8xlarge","is4gen.large","is4gen.medium","is4gen.xlarge","m1.large","m1.medium","m1.small","m1.xlarge","m2.2xlarge","m2.4xlarge","m2.xlarge","m3.2xlarge","m3.large","m3.medium","m3.xlarge","m4.10xlarge","m4.16xlarge","m4.2xlarge","m4.4xlarge","m4.large","m4.xlarge","m5.12xlarge","m5.16xlarge","m5.24xlarge","m5.2xlarge","m5.4xlarge","m5.8xlarge","m5.large","m5.xlarge","m5a.12xlarge","m5a.16xlarge","m5a.24xlarge","m5a.2xlarge","m5a.4xlarge","m5a.8xlarge","m5a.large","m5a.xlarge","m5ad.12xlarge","m5ad.16xlarge","m5ad.24xlarge","m5ad.2xlarge","m5ad.4xlarge","m5ad.8xlarge","m5ad.large","m5ad.xlarge","m5d.12xlarge","m5d.16xlarge","m5d.24xlarge","m5d.2xlarge","m5d.4xlarge","m5d.8xlarge","m5d.large","m5d.xlarge","m5dn.12xlarge","m5dn.16xlarge","m5dn.24xlarge","m5dn.2xlarge","m5dn.4xlarge","m5dn.8xlarge","m5dn.large","m5dn.xlarge","m5n.12xlarge","m5n.16xlarge","m5n.24xlarge","m5n.2xlarge","m5n.4xlarge","m5n.8xlarge","m5n.large","m5n.xlarge","m5zn.12xlarge","m5zn.2xlarge","m5zn.3xlarge","m5zn.6xlarge","m5zn.large","m5zn.xlarge","m6a.12xlarge","m6a.16xlarge","m6a.24xlarge","m6a.2xlarge","m6a.32xlarge","m6a.48xlarge","m6a.4xlarge","m6a.8xlarge","m6a.large","m6a.xlarge","m6g.12xlarge","m6g.16xlarge","m6g.2xlarge","m6g.4xlarge","m6g.8xlarge","m6g.large","m6g.medium","m6g.xlarge","m6gd.12xlarge","m6gd.16xlarge","m6gd.2xlarge","m6gd.4xlarge","m6gd.8xlarge","m6gd.large","m6gd.medium","m6gd.xlarge","m6i.12xlarge","m6i.16xlarge","m6i.24xlarge","m6i.2xlarge","m6i.32xlarge","m6i.4xlarge","m6i.8xlarge","m6i.large","m6i.xlarge","m6id.12xlarge","m6id.16xlarge","m6id.24xlarge","m6id.2xlarge","m6id.32xlarge","m6id.4xlarge","m6id.8xlarge","m6id.large","m6id.xlarge","m6idn.12xlarge","m6idn.16xlarge","m6idn.24xlarge","m6idn.2xlarge","m6idn.32xlarge","m6idn.4xlarge","m6idn.8xlarge","m6idn.large","m6idn.xlarge","m6in.12xlarge","m6in.16xlarge","m6in.24xlarge","m6in.2xlarge","m6in.32xlarge","m6in.4xlarge","m6in.8xlarge","m6in.large","m6in.xlarge","p2.16xlarge","p2.8xlarge","p2.xlarge","p3.16xlarge","p3.2xlarge","p3.8xlarge","p3dn.24xlarge","p4d.24xlarge","p4de.24xlarge","r3.2xlarge","r3.4xlarge","r3.8xlarge","r3.large","r3.xlarge","r4.16xlarge","r4.2xlarge","r4.4xlarge","r4.8xlarge","r4.large","r4.xlarge","r5.12xlarge","r5.16xlarge","r5.24xlarge","r5.2xlarge","r5.4xlarge","r5.8xlarge","r5.large","r5.xlarge","r5a.12xlarge","r5a.16xlarge","r5a.24xlarge","r5a.2xlarge","r5a.4xlarge","r5a.8xlarge","r5a.large","r5a.xlarge","r5ad.12xlarge","r5ad.16xlarge","r5ad.24xlarge","r5ad.2xlarge","r5ad.4xlarge","r5ad.8xlarge","r5ad.large","r5ad.xlarge","r5b.12xlarge","r5b.16xlarge","r5b.24xlarge","r5b.2xlarge","r5b.4xlarge","r5b.8xlarge","r5b.large","r5b.xlarge","r5d.12xlarge","r5d.16xlarge","r5d.24xlarge","r5d.2xlarge","r5d.4xlarge","r5d.8xlarge","r5d.large","r5d.xlarge","r5dn.12xlarge","r5dn.16xlarge","r5dn.24xlarge","r5dn.2xlarge","r5dn.4xlarge","r5dn.8xlarge","r5dn.large","r5dn.xlarge","r5n.12xlarge","r5n.16xlarge","r5n.24xlarge","r5n.2xlarge","r5n.4xlarge","r5n.8xlarge","r5n.large","r5n.xlarge","r6a.12xlarge","r6a.16xlarge","r6a.24xlarge","r6a.2xlarge","r6a.32xlarge","r6a.48xlarge","r6a.4xlarge","r6a.8xlarge","r6a.large","r6a.xlarge","r6g.12xlarge","r6g.16xlarge","r6g.2xlarge","r6g.4xlarge","r6g.8xlarge","r6g.large","r6g.medium","r6g.xlarge","r6gd.12xlarge","r6gd.16xlarge","r6gd.2xlarge","r6gd.4xlarge","r6gd.8xlarge","r6gd.large","r6gd.medium","r6gd.xlarge","r6i.12xlarge","r6i.16xlarge","r6i.24xlarge","r6i.2xlarge","r6i.32xlarge","r6i.4xlarge","r6i.8xlarge","r6i.large","r6i.xlarge","r6id.12xlarge","r6id.16xlarge","r6id.24xlarge","r6id.2xlarge","r6id.32xlarge","r6id.4xlarge","r6id.8xlarge","r6id.large","r6id.xlarge","r6idn.12xlarge","r6idn.16xlarge","r6idn.24xlarge","r6idn.2xlarge","r6idn.32xlarge","r6idn.4xlarge","r6idn.8xlarge","r6idn.large","r6idn.xlarge","r6in.12xlarge","r6in.16xlarge","r6in.24xlarge","r6in.2xlarge","r6in.32xlarge","r6in.4xlarge","r6in.8xlarge","r6in.large","r6in.xlarge","t1.micro","t2.2xlarge","t2.large","t2.medium","t2.micro","t2.nano","t2.small","t2.xlarge","t3.2xlarge","t3.large","t3.medium","t3.micro","t3.nano","t3.small","t3.xlarge","t3a.2xlarge","t3a.large","t3a.medium","t3a.micro","t3a.nano","t3a.small","t3a.xlarge","t4g.2xlarge","t4g.large","t4g.medium","t4g.micro","t4g.nano","t4g.small","t4g.xlarge","trn1.2xlarge","trn1.32xlarge","u-12tb1.112xlarge","u-18tb1.112xlarge","u-24tb1.112xlarge","u-3tb1.56xlarge","u-6tb1.112xlarge","u-6tb1.56xlarge","u-9tb1.112xlarge","vt1.24xlarge","vt1.3xlarge","vt1.6xlarge","x1.16xlarge","x1.32xlarge","x1e.16xlarge","x1e.2xlarge","x1e.32xlarge","x1e.4xlarge","x1e.8xlarge","x1e.xlarge","x2gd.12xlarge","x2gd.16xlarge","x2gd.2xlarge","x2gd.4xlarge","x2gd.8xlarge","x2gd.large","x2gd.medium","x2gd.xlarge","x2idn.16xlarge","x2idn.24xlarge","x2idn.32xlarge","x2iedn.16xlarge","x2iedn.24xlarge","x2iedn.2xlarge","x2iedn.32xlarge","x2iedn.4xlarge","x2iedn.8xlarge","x2iedn.xlarge","x2iezn.12xlarge","x2iezn.2xlarge","x2iezn.4xlarge","x2iezn.6xlarge","x2iezn.8xlarge","z1d.12xlarge","z1d.2xlarge","z1d.3xlarge","z1d.6xlarge","z1d.large","z1d.xlarge"];
 
-      // const regionCodesForOndemandInstances = ["af-south-1","ap-east-1","ap-northeast-1","ap-northeast-1-tpe-1","ap-northeast-1-wl1-kix1","ap-northeast-1-wl1-nrt1","ap-northeast-2","ap-northeast-2-wl1-cjj1","ap-northeast-2-wl1-sel1","ap-northeast-3","ap-south-1","ap-south-1-ccu-1","ap-south-1-del-1","ap-south-2","ap-southeast-1","ap-southeast-1-bkk-1","ap-southeast-2","ap-southeast-2-per-1","ap-southeast-3","ap-southeast-4","ca-central-1","ca-central-1-wl1-yto1","eu-central-1","eu-central-1-ham-1","eu-central-1-waw-1","eu-central-1-wl1-ber1","eu-central-1-wl1-dtm1","eu-central-1-wl1-muc1","eu-central-2","eu-north-1","eu-north-1-cph-1","eu-north-1-hel-1","eu-south-1","eu-south-2","eu-west-1","eu-west-2","eu-west-2-wl1-lon1","eu-west-2-wl1-man1","eu-west-3","me-central-1","me-south-1","me-south-1-mct-1","sa-east-1","us-east-1","us-east-1-atl-1","us-east-1-bos-1","us-east-1-bue-1","us-east-1-chi-1","us-east-1-dfw-1","us-east-1-iah-1","us-east-1-mci-1","us-east-1-mia-1","us-east-1-msp-1","us-east-1-nyc-1","us-east-1-phl-1","us-east-1-scl-1","us-east-1-wl1","us-east-1-wl1-atl1","us-east-1-wl1-bna1","us-east-1-wl1-chi1","us-east-1-wl1-clt1","us-east-1-wl1-dfw1","us-east-1-wl1-dtw1","us-east-1-wl1-iah1","us-east-1-wl1-mia1","us-east-1-wl1-msp1","us-east-1-wl1-nyc1","us-east-1-wl1-tpa1","us-east-1-wl1-was1","us-east-2","us-gov-east-1","us-gov-west-1","us-west-1","us-west-2","us-west-2-den-1","us-west-2-las-1","us-west-2-lax-1","us-west-2-pdx-1","us-west-2-phx-1","us-west-2-sea-1","us-west-2-wl1","us-west-2-wl1-den1","us-west-2-wl1-las1","us-west-2-wl1-lax1","us-west-2-wl1-phx1","us-west-2-wl1-sea1"];
+      // const regionsForOndemandInstances = ["af-south-1","ap-east-1","ap-northeast-1","ap-northeast-1-tpe-1","ap-northeast-1-wl1-kix1","ap-northeast-1-wl1-nrt1","ap-northeast-2","ap-northeast-2-wl1-cjj1","ap-northeast-2-wl1-sel1","ap-northeast-3","ap-south-1","ap-south-1-ccu-1","ap-south-1-del-1","ap-south-2","ap-southeast-1","ap-southeast-1-bkk-1","ap-southeast-2","ap-southeast-2-per-1","ap-southeast-3","ap-southeast-4","ca-central-1","ca-central-1-wl1-yto1","eu-central-1","eu-central-1-ham-1","eu-central-1-waw-1","eu-central-1-wl1-ber1","eu-central-1-wl1-dtm1","eu-central-1-wl1-muc1","eu-central-2","eu-north-1","eu-north-1-cph-1","eu-north-1-hel-1","eu-south-1","eu-south-2","eu-west-1","eu-west-2","eu-west-2-wl1-lon1","eu-west-2-wl1-man1","eu-west-3","me-central-1","me-south-1","me-south-1-mct-1","sa-east-1","us-east-1","us-east-1-atl-1","us-east-1-bos-1","us-east-1-bue-1","us-east-1-chi-1","us-east-1-dfw-1","us-east-1-iah-1","us-east-1-mci-1","us-east-1-mia-1","us-east-1-msp-1","us-east-1-nyc-1","us-east-1-phl-1","us-east-1-scl-1","us-east-1-wl1","us-east-1-wl1-atl1","us-east-1-wl1-bna1","us-east-1-wl1-chi1","us-east-1-wl1-clt1","us-east-1-wl1-dfw1","us-east-1-wl1-dtw1","us-east-1-wl1-iah1","us-east-1-wl1-mia1","us-east-1-wl1-msp1","us-east-1-wl1-nyc1","us-east-1-wl1-tpa1","us-east-1-wl1-was1","us-east-2","us-gov-east-1","us-gov-west-1","us-west-1","us-west-2","us-west-2-den-1","us-west-2-las-1","us-west-2-lax-1","us-west-2-pdx-1","us-west-2-phx-1","us-west-2-sea-1","us-west-2-wl1","us-west-2-wl1-den1","us-west-2-wl1-las1","us-west-2-wl1-lax1","us-west-2-wl1-phx1","us-west-2-wl1-sea1"];
 
-      // const regionCodesForReservedInstances = ["af-south-1", "ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "ap-south-1", "ap-south-2", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ap-southeast-4", "ca-central-1", "eu-central-1", "eu-central-2", "eu-north-1", "eu-south-1", "eu-south-2", "eu-west-1", "eu-west-2", "eu-west-3", "me-central-1", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-gov-east-1", "us-gov-west-1", "us-west-1", "us-west-2"];
+      // const regionsForReservedInstances = ["af-south-1", "ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "ap-south-1", "ap-south-2", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ap-southeast-4", "ca-central-1", "eu-central-1", "eu-central-2", "eu-north-1", "eu-south-1", "eu-south-2", "eu-west-1", "eu-west-2", "eu-west-3", "me-central-1", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-gov-east-1", "us-gov-west-1", "us-west-1", "us-west-2"];
 
       const regions = ["af-south-1","ap-east-1","ap-northeast-1","ap-northeast-2","ap-northeast-3","ap-south-1","ap-south-2","ap-southeast-1","ap-southeast-2","ap-southeast-3","ap-southeast-4","ca-central-1","eu-central-1","eu-central-2","eu-north-1","eu-south-1","eu-south-2","eu-west-1","eu-west-2","eu-west-3","me-central-1","me-south-1","sa-east-1","us-east-1","us-east-2","us-gov-east-1","us-gov-west-1","us-west-1","us-west-2"];
 
@@ -342,7 +743,7 @@
       const offeringClasses = ["standard","convertible"];
       const purchaseTerms = ["1yr", "3yr"];
       const paymentOptions = ["no_upfront", "partial_upfront", "all_upfront"];
-      const sqlLicenses = ["std", "web", "enterprise"]
+      const sqlLicenses = ["no sql license", "std", "web", "enterprise"]
 
       React.useEffect(() => {
         handleChange();
@@ -359,101 +760,85 @@
 
       function getArgsForFormula() {
         let args = [purchaseType, instanceType, region, platform];
-        if(purchaseType === 'reserved')
-          args = args.concat([offeringClass, purchaseTerm, paymentOption, sqlLicense]);
+        if(purchaseType.includes('reserved'))
+          args = args.concat([offeringClass, purchaseTerm, paymentOption])
+
+        if(sqlLicense !== "no sql license")
+          args = args.concat(sqlLicense);
+
         return args;
       }
 
+      // old
       function prependOptionMinusWhenReservedInstance(arr) {
-        return purchaseType !== 'reserved' ? ['-'].concat(arr) : arr;
+        return purchaseType.includes('reserved') ? ['-'].concat(arr) : arr;
       }
 
-      // purchaseType, instanceType, region, platform, offeringClass, (reserved: purchaseTerm, paymentOption, sqlLicense)
-      // "reserved", "m5.xlarge", "us-east-2", "linux", "standard",   (reserved: "1yr", "no_upfront", "std")
       return (
         <div>
-          <table>
-            <tr>
-              <td>Purchase Type</td>
-              <td>
-                <select value={purchaseType} onChange={e => setPurchaseType(e.target.value)}>
-                  <option value="ondemand">ondemand</option>
-                  <option value="reserved">reserved</option>
-                </select>
-            </td>
-            </tr>
-            <tr>
-              <td>Instance Type</td>
-              <td>
-                <select value={instanceType} onChange={e => setInstanceType(e.target.value)}>
-                  {instanceTypes.map(x => <option value={x}>{x}</option>)}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Region</td>
-              <td>
-                <select value={region} onChange={e => setRegion(e.target.value)}>
-                  {regions.map(x => <option value={x}>{x}</option>)}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Platform</td>
-              <td>
-                <select value={platform} onChange={e => setPlatform(e.target.value)}>
-                  {platforms.map(x => <option value={x}>{x}</option>)}
-                </select>
-              </td>
-            </tr>
-              <tr>
-                <td>Offering Class</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : offeringClass} onChange={e => setOfferingClass(e.target.value)}>
-                    {
-                      prependOptionMinusWhenReservedInstance(offeringClasses).map(x => <option value={x}>{x}</option>)
-                    }
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>Purchase Term</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : purchaseTerm} onChange={e => setPurchaseTerm(e.target.value)}>
-                    { prependOptionMinusWhenReservedInstance(purchaseTerms).map(x => <option value={x}>{x}</option>)}
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>Payment Option</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : paymentOption} onChange={e => setPaymentOption(e.target.value)}>
-                    {prependOptionMinusWhenReservedInstance(paymentOptions).map(x => <option value={x}>{x}</option>)}
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>SQL License</td>
-                <td>
-                  <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : sqlLicense} onChange={e => setSQLLicense(e.target.value)}>
-                    {prependOptionMinusWhenReservedInstance(sqlLicenses).map(x => <option value={x}>{x}</option>)}
-                  </select>
-                </td>
-              </tr>
-          </table>
+          <table className="hoverable">
+                <tr>
+                    <td>Purchase Type</td>
+                    <td>
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTypes} value={purchaseType} setter={setPurchaseType} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Instance Type</td>
+                    <td>
+                      <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType}/>
+                    </td>
+                </tr>
+                <tr>
+                  <td>Region</td>
+                  <td>
+                    <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion}/>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Platform</td>
+                  <td>
+                    <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={platforms} value={platform} setter={setPlatform}/>
+                  </td>
+                </tr>
+                <tr>
+                    <td>Offering Class</td>
+                    <td>
+                      <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={offeringClasses} value={offeringClass} disabled={!purchaseType.includes('reserved')} setter={setOfferingClass} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Purchase Term</td>
+                    <td>
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={!purchaseType.includes('reserved')} setter={setPurchaseTerm} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Payment Option</td>
+                    <td>
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={!purchaseType.includes('reserved')} setter={setPaymentOption} />
+                    </td>
+                </tr>
+                <tr>
+                    <td>SQL License</td>
+                    <td>
+                        <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={sqlLicenses} value={sqlLicense} disabled={!purchaseType.includes('reserved')} setter={setSQLLicense} />
+                    </td>
+                </tr>
+            </table>
         </div>
       );
     }
 
 
-  function EBS({ setFormula, setArgs }) {
+  function EBS({ setFormula, setArgs, comparisonEnabled}) {
     const [baseFormula, setBaseFormula] = React.useState('EBS');
     const [volumeType, setVolumeType] = React.useState('magnetic');
     const [storageType, setStorageType] = React.useState('storage');
     const [region, setRegion] = React.useState('us-east-1');
     const [volumeSize, setVolumeSize] = React.useState(4000);
 
-    const regionCodes = ["af-south-1","ap-east-1","ap-northeast-1","ap-northeast-2","ap-northeast-3","ap-south-1","ap-south-2","ap-southeast-1","ap-southeast-2","ap-southeast-3","ap-southeast-4","ca-central-1","eu-central-1","eu-central-2","eu-north-1","eu-south-1","eu-south-2","eu-west-1","eu-west-2","eu-west-3","me-central-1","me-south-1","sa-east-1","us-east-1","us-east-2","us-gov-east-1","us-gov-west-1","us-west-1","us-west-2"];
+    const regions = ["af-south-1","ap-east-1","ap-northeast-1","ap-northeast-2","ap-northeast-3","ap-south-1","ap-south-2","ap-southeast-1","ap-southeast-2","ap-southeast-3","ap-southeast-4","ca-central-1","eu-central-1","eu-central-2","eu-north-1","eu-south-1","eu-south-2","eu-west-1","eu-west-2","eu-west-3","me-central-1","me-south-1","sa-east-1","us-east-1","us-east-2","us-gov-east-1","us-gov-west-1","us-west-1","us-west-2"];
 
     const volumeTypes = {
       storage: ["magnetic", "gp2", "io1", "io2", "st1", "sc1"],
@@ -475,9 +860,10 @@
     }
 
     function getArgsForFormula() {
-      if(!volumeTypes[storageType].includes(volumeType)) {
-        setVolumeType(volumeTypes[storageType][0] || "");
-      }
+      const validVolumeType = volumeType.split(cfg.delimiter)
+                                          .filter(x => volumeTypes[storageType].includes(x))
+                                          .join(cfg.delimiter);
+      setVolumeType(validVolumeType || "");
       return [volumeType, storageType, volumeSize, region];
     }
 
@@ -490,9 +876,7 @@
             <td>Volume Type</td>
             <td>
               {volumeTypes[storageType].length > 0 ? (
-                <select value={volumeType} onChange={e => setVolumeType(e.target.value)}>
-                  {volumeTypes[storageType].map(x => <option value={x}>{x}</option>)}
-                </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={volumeTypes[storageType]} value={volumeType} setter={setVolumeType} />
               ) : (<span className="text">-</span>)}
             </td>
           </tr>
@@ -513,9 +897,7 @@
           <tr>
             <td>Region</td>
             <td>
-              <select value={region} onChange={e => setRegion(e.target.value)}>
-                {regionCodes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
             </td>
           </tr>
         </table>
@@ -524,7 +906,7 @@
   }
 
 
-  function RDS({ setFormula, setArgs }) {
+  function RDS({ setFormula, setArgs, comparisonEnabled }) {
     const [dbEngine, setDbEngine] = React.useState('aurora/mysql');
     const [instanceType, setInstanceType] = React.useState('db.r6g.xlarge');
     const [region, setRegion] = React.useState('us-east-1');
@@ -540,7 +922,7 @@
 
     const instanceTypes = ["db.m1.large","db.m1.medium","db.m1.small","db.m1.xlarge","db.m2.2xlarge","db.m2.4xlarge","db.m2.xlarge","db.m3.2xlarge","db.m3.large","db.m3.medium","db.m3.xlarge","db.m4.10xlarge","db.m4.16xlarge","db.m4.2xlarge","db.m4.4xlarge","db.m4.large","db.m4.xlarge","db.m5.12xlarge","db.m5.16xlarge","db.m5.24xlarge","db.m5.2xlarge","db.m5.4xlarge","db.m5.8xlarge","db.m5.large","db.m5.xlarge","db.m5d.12xlarge","db.m5d.16xlarge","db.m5d.24xlarge","db.m5d.2xlarge","db.m5d.4xlarge","db.m5d.8xlarge","db.m5d.large","db.m5d.xlarge","db.m6g.12xlarge","db.m6g.16xlarge","db.m6g.2xlarge","db.m6g.4xlarge","db.m6g.8xlarge","db.m6g.large","db.m6g.xlarge","db.m6gd.12xlarge","db.m6gd.16xlarge","db.m6gd.2xlarge","db.m6gd.4xlarge","db.m6gd.8xlarge","db.m6gd.large","db.m6gd.xlarge","db.m6i.12xlarge","db.m6i.16xlarge","db.m6i.24xlarge","db.m6i.2xlarge","db.m6i.32xlarge","db.m6i.4xlarge","db.m6i.8xlarge","db.m6i.large","db.m6i.xlarge","db.r3.2xlarge","db.r3.4xlarge","db.r3.8xlarge","db.r3.large","db.r3.xlarge","db.r4.16xlarge","db.r4.2xlarge","db.r4.4xlarge","db.r4.8xlarge","db.r4.large","db.r4.xlarge","db.r5.12xlarge","db.r5.16xlarge","db.r5.24xlarge","db.r5.2xlarge","db.r5.4xlarge","db.r5.8xlarge","db.r5.large","db.r5.xlarge","db.r5b.12xlarge","db.r5b.16xlarge","db.r5b.24xlarge","db.r5b.2xlarge","db.r5b.4xlarge","db.r5b.8xlarge","db.r5b.large","db.r5b.xlarge","db.r5d.12xlarge","db.r5d.16xlarge","db.r5d.24xlarge","db.r5d.2xlarge","db.r5d.4xlarge","db.r5d.8xlarge","db.r5d.large","db.r5d.xlarge","db.r6g.12xlarge","db.r6g.16xlarge","db.r6g.2xlarge","db.r6g.4xlarge","db.r6g.8xlarge","db.r6g.large","db.r6g.xlarge","db.r6gd.12xlarge","db.r6gd.16xlarge","db.r6gd.2xlarge","db.r6gd.4xlarge","db.r6gd.8xlarge","db.r6gd.large","db.r6gd.xlarge","db.r6i.12xlarge","db.r6i.16xlarge","db.r6i.24xlarge","db.r6i.2xlarge","db.r6i.32xlarge","db.r6i.4xlarge","db.r6i.8xlarge","db.r6i.large","db.r6i.xlarge","db.t1.micro","db.t2.2xlarge","db.t2.large","db.t2.medium","db.t2.micro","db.t2.small","db.t2.xlarge","db.t3.2xlarge","db.t3.large","db.t3.medium","db.t3.micro","db.t3.small","db.t3.xlarge","db.t4g.2xlarge","db.t4g.large","db.t4g.medium","db.t4g.micro","db.t4g.small","db.t4g.xlarge","db.x1.16xlarge","db.x1.32xlarge","db.x1e.16xlarge","db.x1e.2xlarge","db.x1e.32xlarge","db.x1e.4xlarge","db.x1e.8xlarge","db.x1e.xlarge","db.x2g.12xlarge","db.x2g.16xlarge","db.x2g.2xlarge","db.x2g.4xlarge","db.x2g.8xlarge","db.x2g.large","db.x2g.xlarge","db.z1d.12xlarge","db.z1d.2xlarge","db.z1d.3xlarge","db.z1d.6xlarge","db.z1d.large","db.z1d.xlarge"];
 
-    const regionCodes = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
+    const regions = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
 
 
     const purchaseTypes = ["ondemand", "reserved"];
@@ -571,13 +953,13 @@
 
     function getArgsForFormula() {
       let args = [dbEngine, instanceType, region, purchaseType];
-      if (purchaseType === 'reserved')
+      if (purchaseType.includes('reserved'))
         args = args.concat([purchaseTerm, paymentOption]);
       return args;
     }
 
     function prependOptionMinusWhenReservedInstance(arr) {
-      return purchaseType !== 'reserved' ? ['-'].concat(arr) : arr;
+      return purchaseType.includes('reserved') ? ['-'].concat(arr) : arr;
     }
 
     return (
@@ -586,50 +968,38 @@
           <tr>
             <td>Database Engine</td>
             <td>
-              <select onChange={e => setDbEngine(e.target.value)} value={dbEngine}>
-                {dbEngines.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={dbEngines} value={dbEngine} setter={setDbEngine} />
             </td>
           </tr>
           <tr>
             <td>Instance Type</td>
             <td>
-              <select onChange={e => setInstanceType(e.target.value)} value={instanceType}>
-                {instanceTypes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType} />
             </td>
           </tr>
           <tr>
             <td>Region</td>
             <td>
-              <select onChange={e => setRegion(e.target.value)} value={region}>
-                {regionCodes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
             </td>
           </tr>
           <tr>
             <td>PurchaseType</td>
             <td>
-              <select onChange={e => setPurchaseType(e.target.value)} value={purchaseType}>
-                {purchaseTypes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTypes} value={purchaseType} setter={setPurchaseType} />
             </td>
           </tr>
 
             <tr>
               <td>Purchase Term</td>
               <td>
-                <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : purchaseTerm} onChange={e => setPurchaseTerm(e.target.value)}>
-                  {prependOptionMinusWhenReservedInstance(purchaseTerms).map(x => <option value={x}>{x}</option>)}
-                </select>
+                <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={!purchaseType.includes('reserved')} setter={setPurchaseTerm} />
               </td>
             </tr>
             <tr>
               <td>Payment Option</td>
               <td>
-                <select disabled={purchaseType !== 'reserved'} value={purchaseType !== 'reserved' ? '-' : paymentOption} onChange={e => setPaymentOption(e.target.value)}>
-                  {prependOptionMinusWhenReservedInstance(paymentOptions).map(x => <option value={x}>{x}</option>)}
-                </select>
+                <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={!purchaseType.includes('reserved')} setter={setPaymentOption} />
               </td>
             </tr>
         </table>
@@ -638,13 +1008,13 @@
   }
 
 
-  function RDSStorage({ setFormula, setArgs }) {
+  function RDSStorage({ setFormula, setArgs, comparisonEnabled }) {
     const [baseFormula, setBaseFormula] = React.useState('RDS_STORAGE');
     const [storageType, setStorageType] = React.useState('gp2');
     const [storageSize, setStorageSize] = React.useState(4000);
     const [region, setRegion] = React.useState('us-east-1');
 
-    const regionCodes = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
+    const regions = ['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
 
     const storageTypes = ["aurora", "gp2", "magnetic", "piops"];
 
@@ -671,9 +1041,7 @@
           <tr>
             <td>Storage Type</td>
             <td>
-              <select value={storageType} onChange={e => setStorageType(e.target.value)}>
-                {storageTypes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={storageTypes} value={storageType} setter={setStorageType} />
             </td>
           </tr>
           <tr>
@@ -685,9 +1053,7 @@
           <tr>
             <td>Region</td>
             <td>
-              <select value={region} onChange={e => setRegion(e.target.value)}>
-                {regionCodes.map(x => <option value={x}>{x}</option>)}
-              </select>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
             </td>
           </tr>
         </table>
@@ -695,7 +1061,9 @@
     );
   }
 
-    ReactDOM.render(<App />, document.getElementById('root'));
+    ReactDOM.render(<DropdownProvider>
+      <App />
+    </DropdownProvider>, document.getElementById('root'));
   </script>  
 </body>
 </html>
