@@ -390,12 +390,10 @@
       }, [formula]);
 
       function insertFormula() {
-        console.log('formula ' + formula);
-        if(args.includes("")) {
+        if(args.includes("") && args[1] !== "snapshot") {
           alert("Please select all arguments");
           return;
         }
-        console.log('args ' + args.join(', '));
         const argumentsPerComponent = {
           ec2: ["purchaseType", "instanceType", "region", "platform", "offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"],
           ebs: ["volumeType", "storageType", "volumeSize", "region"],
