@@ -400,10 +400,12 @@
           ec2: ["purchaseType", "instanceType", "region", "platform", "offeringClass", "purchaseTerm", "paymentOption", "sqlLicense"],
           ebs: ["volumeType", "storageType", "volumeSize", "region"],
           rds: ["dbEngine", "instanceType", "region", "purchaseType", "purchaseTerm", "paymentOption"],
-          rdsStorage: ["storageType", "storageSize", "region"]
+          rdsStorage: ["storageType", "storageSize", "region"],
+          redshift: ["instanceType", "region", "purchaseType", "purchaseTerm", "paymentOption"]
         }
         const argumentNames = argumentsPerComponent[service];
         setProcessing(true);
+        console.log({formula, args, argumentNames});
         google.script.run.withSuccessHandler(success).withFailureHandler(failure).insertFormula(formula, args, argumentNames);
       }
 
@@ -421,7 +423,8 @@
           ec2: EC2,
           ebs: EBS,
           rds: RDS,
-          rdsStorage: RDSStorage
+          rdsStorage: RDSStorage,
+          redshift: Redshift
         };
         const ServiceComponent = serviceComponents[service];
         return ServiceComponent ? <ServiceComponent setFormula={setFormula} setArgs={setArgs} comparisonEnabled={comparisonEnabled} resetFormula={resetFormula}/> : null;
@@ -477,6 +480,7 @@
                       <option value="ebs">EBS</option>
                       <option value="rds">RDS</option>
                       <option value="rdsStorage">RDS storage</option>
+                      <option value="redshift">Redshift</option>
                     </select>
                 </td>
                   <td>
@@ -770,11 +774,6 @@
         return args;
       }
 
-      // old
-      function prependOptionMinusWhenReservedInstance(arr) {
-        return purchaseType.includes('reserved') ? ['-'].concat(arr) : arr;
-      }
-
       return (
         <div>
           <table className="hoverable">
@@ -961,10 +960,6 @@
       return args;
     }
 
-    function prependOptionMinusWhenReservedInstance(arr) {
-      return purchaseType.includes('reserved') ? ['-'].concat(arr) : arr;
-    }
-
     return (
       <div>
         <table>
@@ -1060,6 +1055,97 @@
               <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
             </td>
           </tr>
+        </table>
+      </div>
+    );
+  }
+
+  function Redshift({ setFormula, setArgs, comparisonEnabled }) {
+    /// yet to be implemented in CDN 
+    const features = optionsFromCDN.redshift.features;
+
+    // AWS_Redshift(instanceType, region, purchaseType, purchaseTerm, paymentOption)
+
+    const [instanceType, setInstanceType] = React.useState('db.r6g.xlarge');
+    const [region, setRegion] = React.useState('us-east-1');
+    const [purchaseType, setPurchaseType] = React.useState('reserved');
+    const [purchaseTerm, setPurchaseTerm] = React.useState('3yr');
+    const [paymentOption, setPaymentOption] = React.useState('partial_upfront');
+
+    const [baseFormula, setBaseFormula] = React.useState('Redshift');
+
+    const [paymentOptions, setPaymentOptions] = React.useState(["no_upfront", "partial_upfront", "all_upfront"]);
+
+    const instanceTypes = features['instance_type']; //["db.m1.large","db.m1.medium","db.m1.small","db.m1.xlarge","db.m2.2xlarge","db.m2.4xlarge","db.m2.xlarge","db.m3.2xlarge","db.m3.large","db.m3.medium","db.m3.xlarge","db.m4.10xlarge","db.m4.16xlarge","db.m4.2xlarge","db.m4.4xlarge","db.m4.large","db.m4.xlarge","db.m5.12xlarge","db.m5.16xlarge","db.m5.24xlarge","db.m5.2xlarge","db.m5.4xlarge","db.m5.8xlarge","db.m5.large","db.m5.xlarge","db.m5d.12xlarge","db.m5d.16xlarge","db.m5d.24xlarge","db.m5d.2xlarge","db.m5d.4xlarge","db.m5d.8xlarge","db.m5d.large","db.m5d.xlarge","db.m6g.12xlarge","db.m6g.16xlarge","db.m6g.2xlarge","db.m6g.4xlarge","db.m6g.8xlarge","db.m6g.large","db.m6g.xlarge","db.m6gd.12xlarge","db.m6gd.16xlarge","db.m6gd.2xlarge","db.m6gd.4xlarge","db.m6gd.8xlarge","db.m6gd.large","db.m6gd.xlarge","db.m6i.12xlarge","db.m6i.16xlarge","db.m6i.24xlarge","db.m6i.2xlarge","db.m6i.32xlarge","db.m6i.4xlarge","db.m6i.8xlarge","db.m6i.large","db.m6i.xlarge","db.r3.2xlarge","db.r3.4xlarge","db.r3.8xlarge","db.r3.large","db.r3.xlarge","db.r4.16xlarge","db.r4.2xlarge","db.r4.4xlarge","db.r4.8xlarge","db.r4.large","db.r4.xlarge","db.r5.12xlarge","db.r5.16xlarge","db.r5.24xlarge","db.r5.2xlarge","db.r5.4xlarge","db.r5.8xlarge","db.r5.large","db.r5.xlarge","db.r5b.12xlarge","db.r5b.16xlarge","db.r5b.24xlarge","db.r5b.2xlarge","db.r5b.4xlarge","db.r5b.8xlarge","db.r5b.large","db.r5b.xlarge","db.r5d.12xlarge","db.r5d.16xlarge","db.r5d.24xlarge","db.r5d.2xlarge","db.r5d.4xlarge","db.r5d.8xlarge","db.r5d.large","db.r5d.xlarge","db.r6g.12xlarge","db.r6g.16xlarge","db.r6g.2xlarge","db.r6g.4xlarge","db.r6g.8xlarge","db.r6g.large","db.r6g.xlarge","db.r6gd.12xlarge","db.r6gd.16xlarge","db.r6gd.2xlarge","db.r6gd.4xlarge","db.r6gd.8xlarge","db.r6gd.large","db.r6gd.xlarge","db.r6i.12xlarge","db.r6i.16xlarge","db.r6i.24xlarge","db.r6i.2xlarge","db.r6i.32xlarge","db.r6i.4xlarge","db.r6i.8xlarge","db.r6i.large","db.r6i.xlarge","db.t1.micro","db.t2.2xlarge","db.t2.large","db.t2.medium","db.t2.micro","db.t2.small","db.t2.xlarge","db.t3.2xlarge","db.t3.large","db.t3.medium","db.t3.micro","db.t3.small","db.t3.xlarge","db.t4g.2xlarge","db.t4g.large","db.t4g.medium","db.t4g.micro","db.t4g.small","db.t4g.xlarge","db.x1.16xlarge","db.x1.32xlarge","db.x1e.16xlarge","db.x1e.2xlarge","db.x1e.32xlarge","db.x1e.4xlarge","db.x1e.8xlarge","db.x1e.xlarge","db.x2g.12xlarge","db.x2g.16xlarge","db.x2g.2xlarge","db.x2g.4xlarge","db.x2g.8xlarge","db.x2g.large","db.x2g.xlarge","db.z1d.12xlarge","db.z1d.2xlarge","db.z1d.3xlarge","db.z1d.6xlarge","db.z1d.large","db.z1d.xlarge"];
+
+    const regions = features["region"]; //['us-east-1', 'us-west-2', 'eu-west-1', 'us-east-2', 'eu-central-1', 'ap-northeast-1', 'ap-southeast-2', 'ap-southeast-1', 'ap-south-1', 'ap-northeast-2', 'us-gov-west-1', 'us-west-1', 'eu-west-2', 'sa-east-1', 'ca-central-1', 'eu-west-3', 'us-gov-east-1', 'eu-south-1', 'eu-north-1', 'ap-northeast-3', 'af-south-1', 'ap-east-1', 'me-south-1', 'ap-southeast-3', 'ap-south-2', 'ap-southeast-4', 'eu-south-2', 'me-central-1', 'eu-central-2'];
+
+
+    const purchaseTypes = features["purchase_type"]; //["ondemand", "reserved"];
+    const purchaseTerms = features["purchase_term"]; //["1yr", "3yr"];
+
+    React.useEffect(() => {
+      handleChange();
+      // mention this only in add-on custom-function in sheet cell, not in the formula builder?
+      if(purchaseTerm === "3yr") {
+        setPaymentOptions(["partial_upfront", "all_upfront"]);
+        if(paymentOption === "no_upfront") {
+          window.alert(`"No upfront payment" is not available for 3 year term. Changing to partial upfront.`);
+          setPaymentOption("partial_upfront");
+        }
+      } else
+        setPaymentOptions(["no_upfront", "partial_upfront", "all_upfront"]);
+    }, [instanceType, region, purchaseType, purchaseTerm, paymentOption]);
+
+    function handleChange() {
+      const displayStringOrNumber = x => typeof x === 'number' ? x : `"${x}"`;
+      const args = getArgsForFormula();
+      const value = `AWS_${baseFormula}(${args.map(displayStringOrNumber).join(", ")})`;
+      setFormula(value);
+      setArgs(args);
+    }
+
+    function getArgsForFormula() {
+      let args = [instanceType, region, purchaseType];
+      if (purchaseType.includes('reserved'))
+        args = args.concat([purchaseTerm, paymentOption]);
+      return args;
+    }
+
+    return (
+      <div>
+        <table>
+          <tr>
+            <td>Instance Type</td>
+            <td>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={instanceTypes} value={instanceType} setter={setInstanceType} />
+            </td>
+          </tr>
+          <tr>
+            <td>Region</td>
+            <td>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={regions} value={region} setter={setRegion} />
+            </td>
+          </tr>
+          <tr>
+            <td>PurchaseType</td>
+            <td>
+              <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTypes} value={purchaseType} setter={setPurchaseType} />
+            </td>
+          </tr>
+
+            <tr>
+              <td>Purchase Term</td>
+              <td>
+                <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={purchaseTerms} value={purchaseTerm} disabled={!purchaseType.includes('reserved')} setter={setPurchaseTerm} />
+              </td>
+            </tr>
+            <tr>
+              <td>Payment Option</td>
+              <td>
+                <SelectInputWithComparePossibility comparisonEnabled={comparisonEnabled} options={paymentOptions} value={paymentOption} disabled={!purchaseType.includes('reserved')} setter={setPaymentOption} />
+              </td>
+            </tr>
         </table>
       </div>
     );
