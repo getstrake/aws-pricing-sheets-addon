@@ -112,3 +112,37 @@ function AWS_RDS_STORAGE(storageType, storageSize, region) {
     return fetchApiRDSStorage(options, arguments.callee.name);
   });
 }
+
+/**
+ * Returns the instance price for a RDS DB instance
+ * 
+ * @param {"dc1.large"} instanceType Type of RDS instance
+ * @param {"us-east-1"} region Override the region setting (optional)
+ * @param {"reserved"} purchaseType Either "ondemand" or "reserved"
+ * @param {"3yr"} purchaseTerm Purchase term (for reserved instances)
+ * @param {"partial_upfront"} paymentOption Payment option: no_upfront, partial_upfront, all_upfront (for reserved instances)
+ *
+ * @returns price
+ * @customfunction
+ */
+function AWS_Redshift(instanceType, region, purchaseType, purchaseTerm, paymentOption) {
+  return analyticsWrapper(arguments, () => {
+    // rewrite arguments to lowercase
+    const options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, purchaseTerm, paymentOption });
+    
+    if(options.purchaseType === "on-demand") options.purchaseType = "ondemand";
+    // validation
+    if(!["ondemand","reserved"].includes(options.purchaseType))
+      throw `Purchase type "${options.purchaseType}" is not supported. Please use "ondemand" or "reserved".`;
+
+    if(options.purchaseType === "ondemand") {
+      if(purchaseTerm || paymentOption)
+        throw `Purchase term "${purchaseTerm}" ${paymentOption ? `and payment option "${paymentOption}" are`: "is"} only supported for reserved instances. Remove these arguments for on-demand instances.`
+    }
+
+    // rewrite purchaseType
+    if(options.purchaseType === "reserved") options.purchaseType = "reserved-instance";
+    
+    return fetchApiRedshift(options, arguments.callee.name);
+  });
+}
