@@ -1332,16 +1332,20 @@ function prepareValues(functionName, args, argumentNames, showOnlyColumnsWithCom
   combinations.forEach(combination => {
     const rowHasEC2OnDemand = functionName === "AWS_EC2" &&
                               argumentNames.includes("purchaseType") &&
-                              combination[argumentNamesThatHaveCompareInIt.indexOf("purchaseType")] === "ondemand";
+                              combination[argumentNames.indexOf("purchaseType")] === "ondemand";
 
     const rowHasRDSOnDemand = functionName === "AWS_RDS" &&
                               argumentNames.includes("purchaseType") &&
-                              combination[argumentNamesThatHaveCompareInIt.indexOf("purchaseType")] === "ondemand";
+                              combination[argumentNames.indexOf("purchaseType")] === "ondemand";
 
-    const slicedArgs = (rowHasEC2OnDemand || rowHasRDSOnDemand) ? args.slice(0,4) : args;
+    const rowHasRedshiftOnDemand = functionName === "AWS_Redshift" &&
+                              argumentNames.includes("purchaseType") &&
+                              combination[argumentNames.indexOf("purchaseType")] === "ondemand";
+
+    const slicedArgs = rowHasRedshiftOnDemand ? args.slice(0,3) : ((rowHasEC2OnDemand || rowHasRDSOnDemand) ? args.slice(0,4) : args);
     const formula = `=${functionName}(${replaceCellReference(slicedArgs, values.length + 1, indices).join(",")})`;
                       
-    if(rowHasEC2OnDemand || rowHasRDSOnDemand) {
+    if(rowHasEC2OnDemand || rowHasRDSOnDemand || rowHasRedshiftOnDemand) {
       // Special case: on-demand vs reserved instances
       // Fill unnecessary arguments with "-"
 
@@ -1350,7 +1354,7 @@ function prepareValues(functionName, args, argumentNames, showOnlyColumnsWithCom
         row = [...combination, formula].map((value, index) => 
           EC2_RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
         )
-      } else if(rowHasRDSOnDemand) {
+      } else if(rowHasRDSOnDemand || rowHasRedshiftOnDemand) {
         const RDS_RESERVED_INSTANCE_ARGS = ["purchaseTerm", "paymentOption"];
         row = [...combination, formula].map((value, index) => 
           RDS_RESERVED_INSTANCE_ARGS.includes(argumentNames[indices[index]]) ? "-" : value
