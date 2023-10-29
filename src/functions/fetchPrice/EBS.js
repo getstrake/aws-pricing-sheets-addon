@@ -30,7 +30,9 @@ function getVolumeTypeFullName(volumeType) {
     'io1': 'Provisioned IOPS',
     'io2': 'Provisioned IOPS',
   }
-  return volumeTypeMap[volumeType?.toString().toLowerCase()]
+  const volumeTypeFullName = volumeTypeMap[volumeType?.toString().toLowerCase()];
+  if(!volumeTypeFullName) throw "Unknown volume type " + volumeType;
+  return volumeTypeFullName;
 }
 
 const getTotalPriceEBS = (prices, options) => {
@@ -41,8 +43,9 @@ const getTotalPriceEBS = (prices, options) => {
   if (storageType === "iops") {
     if(volumeType === "io2")
       return tieredIO2IOPS(prices, volumeSize)
-    if(volumeType === "gp3")
+    else if(volumeType === "gp3")
       return tieredGP3IOPS(prices, volumeSize)
+    else throw "Only volume types io2 and gp3 are supported for iops pricing";
   }
 
   function usageTypeFull(volumeType) {
@@ -69,7 +72,8 @@ const getTotalPriceEBS = (prices, options) => {
   // console.log('filting on volumeTypeMap[volumeType] ' + getVolumeTypeFullName(volumeType));
   // console.log('filting on usageTypeFull(volumeType) ' + usageTypeFull(volumeType));
 
-  prices = prices.filter(filterStorageLib[storageType] || filterStorageLib.snapshot); // from v1: take snapshot if no storageType matches
+  if(!filterStorageLib[storageType]) throw "Unknown storage type. Only storage, snapshot, and iops are supported";
+  prices = prices.filter(filterStorageLib[storageType]);
 
   if (prices.length === 0)
     throw "Can not find instance";
