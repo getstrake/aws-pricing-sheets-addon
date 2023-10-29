@@ -641,5 +641,6 @@ function getWhitelistedFormulas() {
   'AWS_RDS_STORAGE',
   'AWS_RDS',
   'AWS_EBS',
-  'AWS_EC2']
+  'AWS_EC2',
+  'AWS_Redshift']
 }
