@@ -46,7 +46,7 @@ function showFormulaBuilder() {
 
 function getOptionsForFormulaBuilder() {
   // 'testing' path will be replaced by a path to the production folder
-  return JSON.parse(UrlFetchApp.fetch('https://cdn.x.macroscope.io/aws-pricing/testing/formula_builder.json').getContentText());
+  return JSON.parse(UrlFetchApp.fetch(cfg.baseHost + '/formula_builder.json').getContentText());
 
   // below is an example of the data
   return {
