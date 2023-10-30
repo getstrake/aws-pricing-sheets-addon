@@ -1338,7 +1338,7 @@ function prepareValues(functionName, args, argumentNames, showOnlyColumnsWithCom
                               argumentNames.includes("purchaseType") &&
                               combination[argumentNames.indexOf("purchaseType")] === "ondemand";
 
-    const rowHasRedshiftOnDemand = functionName === "AWS_Redshift" &&
+    const rowHasRedshiftOnDemand = functionName === "AWS_REDSHIFT" &&
                               argumentNames.includes("purchaseType") &&
                               combination[argumentNames.indexOf("purchaseType")] === "ondemand";
 

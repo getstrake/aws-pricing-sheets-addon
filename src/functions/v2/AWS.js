@@ -125,7 +125,7 @@ function AWS_RDS_STORAGE(storageType, storageSize, region) {
  * @returns price
  * @customfunction
  */
-function AWS_Redshift(instanceType, region, purchaseType, purchaseTerm, paymentOption) {
+function AWS_REDSHIFT(instanceType, region, purchaseType, purchaseTerm, paymentOption) {
   return analyticsWrapper(arguments, () => {
     // rewrite arguments to lowercase
     const options = getObjectWithValuesToLowerCase({ instanceType, region, purchaseType, purchaseTerm, paymentOption });

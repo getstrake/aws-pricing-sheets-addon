@@ -912,7 +912,7 @@
     const features = optionsFromCDN.rds.features;
 
     const [dbEngine, setDbEngine] = React.useState('aurora/mysql');
-    const [instanceType, setInstanceType] = React.useState('db.r6g.xlarge');
+    const [instanceType, setInstanceType] = React.useState('dc1.large');
     const [region, setRegion] = React.useState('us-east-1');
     const [purchaseType, setPurchaseType] = React.useState('reserved');
     const [purchaseTerm, setPurchaseTerm] = React.useState('3yr');
@@ -1066,13 +1066,13 @@
 
     // AWS_Redshift(instanceType, region, purchaseType, purchaseTerm, paymentOption)
 
-    const [instanceType, setInstanceType] = React.useState('db.r6g.xlarge');
+    const [instanceType, setInstanceType] = React.useState('dc1.large');
     const [region, setRegion] = React.useState('us-east-1');
     const [purchaseType, setPurchaseType] = React.useState('reserved');
     const [purchaseTerm, setPurchaseTerm] = React.useState('3yr');
     const [paymentOption, setPaymentOption] = React.useState('partial_upfront');
 
-    const [baseFormula, setBaseFormula] = React.useState('Redshift');
+    const [baseFormula, setBaseFormula] = React.useState('REDSHIFT');
 
     const [paymentOptions, setPaymentOptions] = React.useState(["no_upfront", "partial_upfront", "all_upfront"]);
 
