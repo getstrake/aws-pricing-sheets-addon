@@ -15,6 +15,8 @@ function executeFormulaViaWebApp(e) {
     const functionName = formula.split("(")[0];
     const whitelistedFormulas = getWhitelistedFormulas();
     if(!whitelistedFormulas.includes(functionName)) return returnJson({success: false, message: 'Formula is not whitelisted'});
+    const regFormula = /^[a-zA-Z_]+\((\s*('.*?'|".*?"|\w+)(\s*,\s*('.*?'|".*?"|\w+))*\s*)?\)$/;
+    if(!regFormula.test(formula)) return returnJson({success: false, message: 'Invalid formula'});
     const result = eval(formula);
     return returnJson({success: true, result: result})
   } catch(err) {
