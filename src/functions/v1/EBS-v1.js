@@ -42,6 +42,12 @@ function EC2_EBS_GP3_IOPS(a, b, c) {
   });
 }
 
+function EC2_EBS_GP3_GB(a, b, c) {
+  return analyticsWrapper(arguments, () => {
+    return _EC2_EBS('gp3', 'storage', a, b, c);
+  });
+}
+
 function _EC2_EBS(volumeType, storageType, a, b, c) {
     if (typeof a === "string" || typeof a === "number") {
       const [volumeSize, region] = [a, b];
